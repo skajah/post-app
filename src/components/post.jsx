@@ -4,11 +4,18 @@ import Comments from './comments';
 import ContentDetails from './common/contentDetails';
 import CreateCommentBox from './commentBox';
 import _ from 'lodash';
+import Media from './common/media';
 
 class Post extends Component {
     state = { 
         username: 'Sam',
         date: new Date(),
+        text: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae nostrum quod accusantium temporibus accusamus aperiam aliquam dolor, odit animi vel.',
+        media: {
+            type: 'audio',
+            src: 'https://www.computerhope.com/jargon/m/example.mp3',
+            controls: true
+        },
         comments: []
     }
     componentDidMount() {
@@ -33,14 +40,27 @@ class Post extends Component {
     
 
     render() { 
-        const { username, date } = this.state;
-        const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
+        const { username, date, text, media } = this.state;
+        const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
 
         return ( 
             <div className="post">
                 <ContentDetails 
                 details={{username, date}}
                 profilePicUrl={url}/> 
+
+                <p>{text}</p> 
+
+                {
+                    media ? 
+                    <Media 
+                    type={media.type}
+                    src={media.src}
+                    controls={media.controls}/> : 
+                    null
+                }
+
+
 
                 <Comments 
                 comments={this.state.comments}

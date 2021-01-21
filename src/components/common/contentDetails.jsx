@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import ProfilePic from './profilePic';
 import DeleteIcon from './icons/deleteIcon';
+import ProfilePic from './profilePic';
 
 class ContentDetails extends Component {
     render() { 

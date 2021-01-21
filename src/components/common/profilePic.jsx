@@ -1,16 +1,13 @@
-import React, { Component } from 'react'
+import React from 'react'
+import Media from './media';
 
-class ProfilePic extends Component {
+class ProfilePic extends Media {
     render() { 
+        
         const { src, alt } = this.props;
+        const attr = {className: 'profile-pic', alt: alt || 'Profile pic'};
 
-        return ( 
-            <img
-                src={src} 
-                className="img-cirlce profile-pic" 
-                alt={alt || 'Profile Pic'}
-            />
-         );
+        return this.renderMedia('image', src, attr);
     }
 }
  
