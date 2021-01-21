@@ -1,13 +1,48 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+#root {
+  /* margin: 10px; */
+  background-color: rgb(27, 27, 27);
+  color: white;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.profile-pic {
+  margin-right: 10px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 100%;
+}
+
+.name-date {
+  margin-bottom: 0;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.content-details,
+.comment-box,
+.comment {
+  display: flex;
+}
+
+.post {
+  font-size: 0.8rem;
+  width: 30vw;
+}
+
+.comments,
+.comment-box {
+  margin-left: 30px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.delete-icon {
+  margin-left: auto; /* makes last item of flex box aligned to end */
+}
+
+.text-box {
+  flex-grow: 3;
 }
