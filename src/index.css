@@ -45,4 +45,6 @@
 
 .text-box {
   flex-grow: 3;
+  border: 2px solid lightseagreen;
+  height: 2rem;
 }
