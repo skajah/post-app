@@ -39,8 +39,7 @@ class Post extends Component {
         return ( 
             <div className="post">
                 <ContentDetails 
-                username={username} 
-                date={date.toDateString()}
+                details={{username, date}}
                 profilePicUrl={url}/> 
 
                 <Comments 

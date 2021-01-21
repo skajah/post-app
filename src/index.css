@@ -11,18 +11,9 @@
   border-radius: 100%;
 }
 
-.name-date {
-  margin-bottom: 0;
-}
-
 .name {
   font-weight: bold;
-}
-
-.content-details,
-.comment-box,
-.comment {
-  display: flex;
+  margin-right: 10px;
 }
 
 .post {
@@ -39,12 +30,12 @@
   cursor: pointer;
 }
 
-.delete-icon {
-  margin-left: auto; /* makes last item of flex box aligned to end */
+.comment-box {
+  display: flex;
 }
 
 .text-box {
-  flex-grow: 3;
   border: 2px solid lightseagreen;
   height: 2rem;
+  flex-grow: 3;
 }
