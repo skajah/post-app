@@ -1,9 +1,8 @@
 import { Component } from 'react'
 
 class Icon extends Component {
-    state = {
-        clickable: 'clickable'
-    }
+    clickable =  'clickable';
+
     renderIcon() {
         return null;
     }

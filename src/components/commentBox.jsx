@@ -14,7 +14,7 @@ class CreateCommentBox extends Component {
 
                 <TextBox 
                 name="commentText"
-                placeHolder="Comment on this post..."
+                placeHolder=" Comment on this post..."
                 className="text-box"
                 onEnter={this.props.onEnter}/>
 

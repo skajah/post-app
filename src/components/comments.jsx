@@ -5,7 +5,7 @@ class Comments extends Component {
 
     render() { 
         const { comments, onDelete } = this.props;
-        console.log(comments);
+        // console.log(comments);
         return ( 
             <div className="comments">
                 {

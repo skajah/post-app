@@ -1,21 +1,25 @@
 import React, { Component } from 'react';
-import DeleteIcon from './icons/deleteIcon';
+import Delete from './icons/delete';
+import Like from './icons/like';
 import ProfilePic from './profilePic';
 
 class ContentDetails extends Component {
     render() { 
-        const { details, profilePicUrl, onDelete } = this.props;
+        const { details, profilePicUrl, onDelete, onLike, likes } = this.props;
         // console.log(profilePicUrl, comment);
         const { username, date } = details;
         return ( 
             <div className="row content-details">
-                <div className="col-11">
+                <div className="col-10">
                     <ProfilePic src={profilePicUrl}/>
                     <span className="name">{username}</span>
                     <span className="date text-muted">{date.toDateString()}</span>
                 </div>
                 <div className="col-1">
-                    <DeleteIcon onDelete={onDelete}/>
+                    <Like onLike={onLike} likes={likes}/>
+                </div>
+                <div className="col-1">
+                    <Delete onDelete={onDelete}/>
                 </div>
             </div>
          );

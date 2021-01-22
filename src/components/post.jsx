@@ -1,26 +1,26 @@
 import React, { Component } from 'react'
-import { getComments } from '../services/fakeCommentService';
 import Comments from './comments';
 import ContentDetails from './common/contentDetails';
 import CreateCommentBox from './commentBox';
 import _ from 'lodash';
 import Media from './common/media';
+import { getLikes } from '../utils/getLikes';
 
 class Post extends Component {
     state = { 
-        username: 'Sam',
+        username: 'Anonymous',
         date: new Date(),
-        text: 'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae nostrum quod accusantium temporibus accusamus aperiam aliquam dolor, odit animi vel.',
-        media: {
-            type: 'audio',
-            src: 'https://www.computerhope.com/jargon/m/example.mp3',
-            controls: true
-        },
+        text: '',
+        media: null,
         comments: []
-    }
+    } 
     componentDidMount() {
-        const comments = getComments();
-        this.setState({ comments });
+        this.populateState();
+    }
+
+    populateState(){
+        const { username, date, text, media, comments, likes } = this.props.post;
+        this.setState({ username, date, text, media, comments,  likes: likes || 0});
     }
 
     handleDelete = ({ _id }) => {
@@ -32,42 +32,52 @@ class Post extends Component {
     handleCreate = text => {
         // console.log('Handling creation: ', text);
         const comments = [...this.state.comments];
-        const nextId = _.max(comments.map(c => c._id)) + 1;
+        const nextId = (_.max(comments.map(c => c._id)) + 1) || 0;
         const newComment = { _id: nextId, username: 'User' + nextId, date: new Date(), text};
         comments.push(newComment);
         this.setState({ comments });
     }
+
+    handleLike = (liked) => {
+        const likes = getLikes(this.state.likes, liked);
+        this.setState({ likes });
+    }
     
 
     render() { 
-        const { username, date, text, media } = this.state;
+        const { username, date, text, media, likes } = this.state;
+        const { onDelete } = this.props;
         const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
 
         return ( 
-            <div className="post">
-                <ContentDetails 
-                details={{username, date}}
-                profilePicUrl={url}/> 
+            <div className="card bg-light post">
+                <div className="card-header">
+                    <ContentDetails 
+                    details={this.state}
+                    profilePicUrl={url}
+                    onDelete={onDelete}
+                    onLike={this.handleLike}
+                    likes={likes}/> 
+                </div>
+                <div className="card-body">
+                    <p>{text}</p> 
+                    {
+                        media ? 
+                        <Media 
+                        type={media.type}
+                        src={media.src}
+                        controls={media.controls}/> : 
+                        null
+                    }
+                    <Comments 
+                    comments={this.state.comments}
+                    onDelete={this.handleDelete}/>
+                </div>
 
-                <p>{text}</p> 
-
-                {
-                    media ? 
-                    <Media 
-                    type={media.type}
-                    src={media.src}
-                    controls={media.controls}/> : 
-                    null
-                }
-
-
-
-                <Comments 
-                comments={this.state.comments}
-                onDelete={this.handleDelete}/>
-
-                <CreateCommentBox 
-                onEnter={this.handleCreate}/>
+                <div className="card-footer">
+                    <CreateCommentBox 
+                    onEnter={this.handleCreate}/>
+                </div>
             </div>
          );
     }
