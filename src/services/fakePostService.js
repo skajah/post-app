@@ -12,7 +12,7 @@ const medias = [
   {
     type: 'video',
     src:
-      'https://vod-progressive.akamaized.net/exp=1611285299~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F1930%2F13%2F334654600%2F1322028013.mp4~hmac=126f0c1c62c6b5de9fbecbd199dcc336ae537f88d3801a4d874a80af6c083589/vimeo-prod-skyfire-std-us/01/1930/13/334654600/1322028013.mp4?filename=Pexels+Videos+2284984.mp4',
+      'https://vod-progressive.akamaized.net/exp=1611348493~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F1826%2F16%2F409130897%2F1754500252.mp4~hmac=883ecd0797156bebbb77cab605e726b41aabc91303589a00a776c8ac1ac766b8/vimeo-prod-skyfire-std-us/01/1826/16/409130897/1754500252.mp4?filename=production+ID%3A4182916.mp4',
     controls: true,
   },
   {

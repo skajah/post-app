@@ -1,3 +1,18 @@
+#header {
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+  width: 100vw;
+}
+
+#content {
+  display: grid;
+  grid-template: 80fr / 70fr 30fr;
+  grid-template-areas: 'main   side';
+  margin-top: 3rem;
+  padding-top: 10px;
+}
+
 .profile-pic {
   margin-right: 10px;
   width: 2.5rem;
@@ -10,12 +25,17 @@
   margin-right: 10px;
 }
 
+.navbar {
+  position: fixed;
+}
+
+.nav-item:hover {
+  background-color: rgba(100, 119, 119, 0.5);
+}
+
 .posts {
-  width: 60vw;
-  margin-left: 40px;
-  overflow-y: scroll;
-  font-size: 0.8rem;
-  /* color: white; */
+  font-size: 1rem;
+  grid-area: main;
 }
 
 .post {
