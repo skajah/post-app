@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import Posts from './components/posts';
 import NavBar from './components/navbar';
+import Login from './components/login';
+import Register from './components/register';
+import NotFound from './components/notFound';
 import './App.css';
-import { Route, Switch } from 'react-router-dom';
 
 class App extends Component {
   render() {
@@ -13,7 +16,12 @@ class App extends Component {
         </div>
         <div id="content">
           <Switch>
-            <Route path="/" component={Posts} exact />
+            <Route path="/login" component={Login} exact />
+            <Route path="/register" component={Register} exact />
+            <Route path="/posts" component={Posts} />
+            <Route path="/not-found" component={NotFound} />
+            <Redirect from="/" to="/posts" exact />
+            <Redirect to="/not-found" />
           </Switch>
         </div>
         <div id="footer">Just a footer...</div>
