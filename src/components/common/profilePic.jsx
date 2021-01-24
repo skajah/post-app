@@ -1,4 +1,3 @@
-import React from 'react'
 import Media from './media';
 
 class ProfilePic extends Media {

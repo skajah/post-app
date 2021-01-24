@@ -4,8 +4,11 @@ import Posts from './components/posts';
 import NavBar from './components/navbar';
 import Login from './components/login';
 import Register from './components/register';
+import ProfileEdit from './components/profileEdit';
 import NotFound from './components/notFound';
+import ProtectedRoute from './components/common/protectedRoute';
 import './App.css';
+import Logout from './components/logout';
 
 class App extends Component {
   render() {
@@ -17,8 +20,14 @@ class App extends Component {
         <div id="content">
           <Switch>
             <Route path="/login" component={Login} exact />
+            <Route path="/logout" component={Logout} exact />
             <Route path="/register" component={Register} exact />
-            <Route path="/posts" component={Posts} />
+            <ProtectedRoute path="/posts" component={Posts} exact />
+            <ProtectedRoute
+              path="/profile/edit"
+              component={ProfileEdit}
+              exact
+            />
             <Route path="/not-found" component={NotFound} />
             <Redirect from="/" to="/posts" exact />
             <Redirect to="/not-found" />

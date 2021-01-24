@@ -1,7 +1,7 @@
 import React from 'react'
 import Joi from 'joi-browser';
 import Form from './common/form';
-
+import auth from '../services/authService';
 
 class Register extends Form {
     state = {
@@ -16,8 +16,8 @@ class Register extends Form {
     }
 
     doSubmit = () => {
-        alert(`Registered with: ${this.state.data.email}`);
-        window.location = '/';
+        auth.login(this.state.data);
+        window.location = '/posts';
     }
 
     render() {
