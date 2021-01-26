@@ -7,7 +7,7 @@
 
 #content {
   margin-top: 80px;
-  height: 100vh;
+  height: 90vh;
   overflow-y: auto;
 }
 
@@ -55,6 +55,10 @@
 
 .comment-box {
   display: flex;
+}
+
+.comment-text-box {
+  flex-grow: 3;
 }
 
 .text-box {

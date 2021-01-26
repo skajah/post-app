@@ -11,6 +11,7 @@ class Post extends Component {
         username: 'Anonymous',
         date: new Date(),
         text: '',
+        commentText: '',
         media: null,
         comments: []
     } 
@@ -23,13 +24,13 @@ class Post extends Component {
         this.setState({ username, date, text, media, comments,  likes: likes || 0});
     }
 
-    handleDelete = ({ _id }) => {
+    handleDeleteComment = ({ _id }) => {
         // console.log('Deleting: ' + _id);
         const comments  = this.state.comments.filter(c => c._id !== _id );
         this.setState({ comments });
     }
 
-    handleCreate = text => {
+    handleCreateComment = text => {
         // console.log('Handling creation: ', text);
         const comments = [...this.state.comments];
         const nextId = (_.max(comments.map(c => c._id)) + 1) || 0;
@@ -43,6 +44,15 @@ class Post extends Component {
         this.setState({ likes });
     }
     
+    handleCommentTextChange = commentText => {
+        const n = commentText.length;
+        if (commentText[n - 1] === '\n'){
+            this.handleCreateComment(commentText.substring(0, n))
+            this.setState({ commentText: '' });
+            return;
+        } 
+        this.setState({ commentText });
+    }
 
     render() { 
         const { text, media, likes } = this.state;
@@ -71,12 +81,13 @@ class Post extends Component {
                     }
                     <Comments 
                     comments={this.state.comments}
-                    onDelete={this.handleDelete}/>
+                    onDelete={this.handleDeleteComment}/>
                 </div>
 
                 <div className="card-footer">
                     <CreateCommentBox 
-                    onEnter={this.handleCreate}/>
+                    text={this.state.commentText}
+                    onTextChange={this.handleCommentTextChange}/>
                 </div>
             </div>
          );

@@ -6,6 +6,7 @@ class CreateCommentBox extends Component {
 
     render() { 
         const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
+        const { text, onTextChange } = this.props;
 
         return ( 
             <div className="comment-box">
@@ -15,8 +16,9 @@ class CreateCommentBox extends Component {
                 <TextBox 
                 name="commentText"
                 placeHolder=" Comment on this post..."
-                className="text-box"
-                onEnter={this.props.onEnter}/>
+                className="comment-text-box"
+                value={text}
+                onTextChange={onTextChange}/>
 
             </div>
          );
