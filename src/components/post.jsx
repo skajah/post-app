@@ -12,6 +12,7 @@ class Post extends Component {
         date: new Date(),
         text: '',
         commentText: '',
+        emptyComment: false,
         media: null,
         comments: []
     } 
@@ -21,7 +22,7 @@ class Post extends Component {
 
     populateState(){
         const { username, date, text, media, comments, likes } = this.props.post;
-        this.setState({ username, date, text, media, comments,  likes: likes || 0});
+        this.setState({ username, date, text, media, comments,  likes: likes || 0 });
     }
 
     handleDeleteComment = ({ _id }) => {
@@ -31,12 +32,16 @@ class Post extends Component {
     }
 
     handleCreateComment = text => {
-        // console.log('Handling creation: ', text);
+        if (!text.trim()){
+            this.setState({ emptyComment: true });
+            return;
+        }
+
         const comments = [...this.state.comments];
         const nextId = (_.max(comments.map(c => c._id)) + 1) || 0;
         const newComment = { _id: nextId, username: 'User' + nextId, date: new Date(), text};
-        comments.push(newComment);
-        this.setState({ comments });
+        comments.unshift(newComment);
+        this.setState({ comments, emptyComment: false });
     }
 
     handleLike = (liked) => {
@@ -58,6 +63,7 @@ class Post extends Component {
         const { text, media, likes } = this.state;
         const { onDelete } = this.props;
         const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
+        const { comments, commentText, emptyComment } = this.state;
 
         return ( 
             <div className="card bg-light post">
@@ -80,14 +86,15 @@ class Post extends Component {
                         null
                     }
                     <Comments 
-                    comments={this.state.comments}
+                    comments={comments}
                     onDelete={this.handleDeleteComment}/>
                 </div>
 
                 <div className="card-footer">
                     <CreateCommentBox 
-                    text={this.state.commentText}
-                    onTextChange={this.handleCommentTextChange}/>
+                    text={commentText}
+                    onTextChange={this.handleCommentTextChange}
+                    emptyComment={emptyComment}/>
                 </div>
             </div>
          );

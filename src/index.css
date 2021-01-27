@@ -35,10 +35,11 @@
 .posts {
   font-size: 1rem;
   width: 70%;
+  margin: 10px;
 }
 
 .post {
-  margin: 10px;
+  margin-top: 10px;
 }
 
 .comments,
@@ -58,7 +59,11 @@
 }
 
 .comment-text-box {
-  flex-grow: 3;
+  width: 100%;
+}
+
+.post-text-box {
+  width: 100%;
 }
 
 .text-box {
@@ -70,4 +75,9 @@
 .form {
   width: 25%;
   margin: 0 auto;
+}
+
+.create-post-footer {
+  display: grid;
+  grid-template-columns: repeat(4, 25fr);
 }

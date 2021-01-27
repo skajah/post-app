@@ -16,10 +16,10 @@ class ContentDetails extends Component {
                     <span className="date text-muted">{date.toDateString()}</span>
                 </div>
                 <div className="col-1">
-                    <Like onLike={onLike} likes={likes}/>
+                    <Like onClick={onLike} likes={likes}/>
                 </div>
                 <div className="col-1">
-                    <Delete onDelete={onDelete}/>
+                    <Delete onClick={onDelete}/>
                 </div>
             </div>
          );

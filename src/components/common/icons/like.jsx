@@ -2,32 +2,28 @@ import Icon from './icon';
 
 class Like extends Icon {
     state = { 
-        liked: false
+        liked: false,
+        classes: "fa fa-heart-o"
      }
 
-    getHeartStyle() {
-        return this.state.liked ? '' : '-o';
-    }
-
     handleLike = () => {
-        const liked = !this.state.liked;
-        this.setState({ liked });
-        this.props.onLike(liked);
+        let { liked, classes } = this.state;
+        liked = !liked;
+        classes = liked ? "fa fa-heart" : "fa fa-heart-o";
+        this.setState({ liked, classes });
+        this.props.onClick(liked);
     }
 
     renderIcon() {
         return (
-        <span class="fa-layers fa-fw"
+        <span className="fa-layers fa-fw"
         onClick={this.handleLike}>
-            <i class={"fa fa-heart" + this.getHeartStyle()} />
-            <span class="fa-layers-counter"> {this.props.likes || null} </span>
+            <i className={this.getClasses()} />
+            <span className="fa-layers-counter"> {this.props.likes || null} </span>
         </span>);
 
     }
 
-    render() { 
-        return this.renderIcon();
-    }
 }
  
 export default Like;
