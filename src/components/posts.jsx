@@ -58,11 +58,8 @@ class Posts extends Component {
                 <CreatePostBox 
                 text={this.state.postText}
                 onTextChange={this.handlePostTextChange} 
-                onCreatePost={this.handleCreatePost}/>
-                
-                { this.state.emptyPost && 
-                    <div className="alert alert-warning">Post can't be empty</div>
-                }
+                onCreatePost={this.handleCreatePost}
+                warning={this.state.emptyPost && "Post can't be empty"}/>
 
                 {
                     posts.map(post => {

@@ -94,7 +94,7 @@ class Post extends Component {
                     <CreateCommentBox 
                     text={commentText}
                     onTextChange={this.handleCommentTextChange}
-                    emptyComment={emptyComment}/>
+                    warning={emptyComment && "Comment can't be empty"}/>
                 </div>
             </div>
          );

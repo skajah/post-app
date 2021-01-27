@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ProfilePic from './common/profilePic';
 import TextBox from './common/textBox';
+import withWarning from './hoc/withWarning';
 
 class CreatePostBox extends Component {
     render() { 
@@ -34,4 +35,4 @@ class CreatePostBox extends Component {
     }
 }
  
-export default CreatePostBox;
+export default withWarning(CreatePostBox);

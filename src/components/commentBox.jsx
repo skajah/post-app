@@ -18,11 +18,9 @@ class CreateCommentBox extends Component {
                     placeHolder=" Comment on this post..."
                     value={text}
                     className="comment-text-box"
-                    onTextChange={onTextChange}/>
-
-                    { emptyComment && 
-                        <div className="alert alert-warning">Comment can't be empty</div>
-                        }
+                    onTextChange={onTextChange}
+                    // Pass down warning so that it is aligned with text box
+                    warning={this.props.warning}/> 
                 </div>
             </div>
          );

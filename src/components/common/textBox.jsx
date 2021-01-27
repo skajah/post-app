@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import withWarning from '../hoc/withWarning';
 
 class TextBox extends Component {
 
@@ -24,4 +25,4 @@ class TextBox extends Component {
     }
 }
  
-export default TextBox;
+export default withWarning(TextBox);
