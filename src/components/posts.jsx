@@ -56,7 +56,7 @@ class Posts extends Component {
     }
 
     uploadMedia = (type, src) => {
-        const media = { type, src };
+        const media = { type, src, attr: {className: 'post-media'} };
         this.setState({ media, emptyPost: false });
     }
 

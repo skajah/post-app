@@ -37,7 +37,7 @@ class CreatePostBox extends Component {
                     onTextChange={onTextChange}
                     className="post-text-box"/>
 
-                    { media && <Media type={media.type} src={media.src}/> }
+                    { media && <Media type={media.type} src={media.src} {...media.attr}/> }
 
                 </div>
                 <div className="card-footer create-post-footer">

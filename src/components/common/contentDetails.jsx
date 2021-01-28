@@ -13,10 +13,10 @@ class ContentDetails extends Component {
                 <div className="col-10">
                     <ProfilePic src={profilePicUrl}/>
                     <div>
-                        <span className="posted-username">{username}</span>
-                        <span className="posted-time">{date.toLocaleTimeString()}</span>
+                        <span className="post-username">{username}</span>
+                        <span className="post-time">{date.toLocaleTimeString()}</span>
                         <br/>
-                        <span className="posted-date">{date.toDateString()}</span>
+                        <span className="post-date">{date.toDateString()}</span>
                     </div>
                 </div>
                 <div className="col-2">

@@ -78,12 +78,11 @@ class Post extends Component {
                 <div className="card-body">
                     <p>{text}</p> 
                     {
-                        media ? 
+                        media && 
                         <Media 
                         type={media.type}
                         src={media.src}
-                        {...media.attr}/> : 
-                        null
+                        {...media.attr}/> 
                     }
                     <Comments 
                     comments={comments}
