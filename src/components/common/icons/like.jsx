@@ -15,12 +15,13 @@ class Like extends Icon {
     }
 
     renderIcon() {
+        // fa-layers fa-fw ?
         return (
-        <span className="fa-layers fa-fw"
-        onClick={this.handleLike}>
-            <i className={this.getClasses()} />
+        <button className="btn" onClick={this.handleLike}>
+            <i className={this.state.classes} />
             <span className="fa-layers-counter"> {this.props.likes || null} </span>
-        </span>);
+        </button>
+        );
 
     }
 

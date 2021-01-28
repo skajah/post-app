@@ -82,7 +82,7 @@ class Post extends Component {
                         <Media 
                         type={media.type}
                         src={media.src}
-                        controls={media.controls}/> : 
+                        {...media.attr}/> : 
                         null
                     }
                     <Comments 

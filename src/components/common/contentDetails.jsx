@@ -12,13 +12,15 @@ class ContentDetails extends Component {
             <div className="row content-details">
                 <div className="col-10">
                     <ProfilePic src={profilePicUrl}/>
-                    <span className="name">{username}</span>
-                    <span className="date text-muted">{date.toDateString()}</span>
+                    <div>
+                        <span className="posted-username">{username}</span>
+                        <span className="posted-time">{date.toLocaleTimeString()}</span>
+                        <br/>
+                        <span className="posted-date">{date.toDateString()}</span>
+                    </div>
                 </div>
-                <div className="col-1">
+                <div className="col-2">
                     <Like onClick={onLike} likes={likes}/>
-                </div>
-                <div className="col-1">
                     <Delete onClick={onDelete}/>
                 </div>
             </div>

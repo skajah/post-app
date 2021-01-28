@@ -27,8 +27,8 @@ class Posts extends Component {
     }
 
     handleCreatePost = () => {
-        const text = this.state.postText;
-        if (!text.trim()) {
+        const { postText, media } = this.state;
+        if ( !(postText.trim() || media) ) {
             this.setState({ emptyPost: true });
             return;
         }
@@ -38,12 +38,12 @@ class Posts extends Component {
             username: 'Anonymous',
             date : new Date(),
             likes: 0,
-            text: this.state.postText,
-            media: null,
+            text: postText,
+            media,
             comments: []
         };
         posts.unshift(post);
-        this.setState({ posts, postText: '', emptyPost: false });
+        this.setState({ posts, postText: '', emptyPost: false, media: null });
     }
 
     getNextId(){
@@ -51,15 +51,42 @@ class Posts extends Component {
         return (_.max(posts.map(p => p._id)) + 1) || 0;
     }
 
+    handleClearMedia = () => {
+        this.setState({ media: null });
+    }
+
+    uploadMedia = (type, src) => {
+        const media = { type, src };
+        this.setState({ media, emptyPost: false });
+    }
+
+
+    handleUploadImage = (file) => {
+        this.uploadMedia('image', file);
+    }
+
+    handleUploadVideo = (file) => {
+        this.uploadMedia('video', file);
+    }
+
+    handleUploadAudio = (file) => {
+        this.uploadMedia('audio', file);
+    }
+
     render() { 
-        const { posts } = this.state;
+        const { posts, postText, media } = this.state;
         return ( 
             <div className="posts">
                 <CreatePostBox 
-                text={this.state.postText}
+                text={postText}
                 onTextChange={this.handlePostTextChange} 
                 onCreatePost={this.handleCreatePost}
-                warning={this.state.emptyPost && "Post can't be empty"}/>
+                warning={this.state.emptyPost && "Post can't be empty"}
+                onUploadImage={this.handleUploadImage}
+                onUploadVideo={this.handleUploadVideo}
+                onUploadAudio={this.handleUploadAudio}
+                media={media}
+                onClearMedia={this.handleClearMedia}/>
 
                 {
                     posts.map(post => {

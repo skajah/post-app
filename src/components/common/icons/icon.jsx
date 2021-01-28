@@ -1,19 +1,16 @@
 import { Component } from 'react'
 
 class Icon extends Component {
-    clickable = 'clickable'
     state = {
         classes: ''
     }
 
-    getClasses = () => {
-        return `${this.state.classes} ${this.clickable}`;
-    }
-
     renderIcon() {
-        return <i className={this.getClasses()}
-                  onClick={this.props.onClick}
-                  />;
+        return (
+        <button className="btn" onClick={this.props.onClick}>
+            <i className={this.state.classes}/>
+        </button>
+        );
     }
 
     render(){

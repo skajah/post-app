@@ -11,6 +11,10 @@
   overflow-y: auto;
 }
 
+.content-details div:first-child {
+  display: flex;
+}
+
 .profile-pic {
   margin-right: 10px;
   width: 2.5rem;
@@ -18,9 +22,15 @@
   border-radius: 100%;
 }
 
-.name {
+.posted-username {
   font-weight: bold;
   margin-right: 10px;
+}
+
+.posted-date,
+.posted-time {
+  color: #999999;
+  font-size: 95%;
 }
 
 .nav-items {
@@ -77,7 +87,19 @@
   margin: 0 auto;
 }
 
+.create-post-header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .create-post-footer {
-  display: grid;
-  grid-template-columns: repeat(4, 25fr);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.upload-icons {
+  display: flex;
+  justify-content: space-evenly;
+  flex-grow: 3;
 }

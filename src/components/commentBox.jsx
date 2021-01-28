@@ -6,7 +6,7 @@ class CreateCommentBox extends Component {
 
     render() { 
         const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
-        const { text, onTextChange, emptyComment } = this.props;
+        const { text, onTextChange } = this.props;
 
         return ( 
             <div className="comment-box">

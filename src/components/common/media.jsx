@@ -7,11 +7,11 @@ class Media extends Component {
     }
 
     renderVideo(src, attr) {
-        return <video src={src} {...attr} />;
+        return <video src={src} controls {...attr} />;
     }
 
     renderAudio(src, attr){
-        return <audio src={src} {...attr} />;
+        return <audio src={src} controls {...attr} />;
     }
     renderMedia(type, src, attr) {
         let media = null;
