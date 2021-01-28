@@ -74,14 +74,16 @@ class Posts extends Component {
     }
 
     render() { 
-        const { posts, postText, media } = this.state;
+        const { posts, postText, media, emptyPost } = this.state;
+        const alert = { type: 'warning', message: "Post can't be empty"};
+
         return ( 
             <div className="posts">
                 <CreatePostBox 
                 text={postText}
                 onTextChange={this.handlePostTextChange} 
                 onCreatePost={this.handleCreatePost}
-                warning={this.state.emptyPost && "Post can't be empty"}
+                alert={emptyPost && alert}
                 onUploadImage={this.handleUploadImage}
                 onUploadVideo={this.handleUploadVideo}
                 onUploadAudio={this.handleUploadAudio}

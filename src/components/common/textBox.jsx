@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import withWarning from '../hoc/withWarning';
+import withAlert from '../hoc/withAlert';
 
 class TextBox extends Component {
 
@@ -25,4 +25,4 @@ class TextBox extends Component {
     }
 }
  
-export default withWarning(TextBox);
+export default withAlert(TextBox);

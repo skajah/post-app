@@ -4,7 +4,7 @@ import TextBox from './common/textBox';
 import Camera from './common/icons/camera';
 import VideoCamera from './common/icons/videoCamera';
 import Volume from './common/icons/volume';
-import withWarning from './hoc/withWarning';
+import withAlert from './hoc/withAlert';
 import Media from './common/media';
 
 class CreatePostBox extends Component {
@@ -67,4 +67,4 @@ class CreatePostBox extends Component {
     }
 }
  
-export default withWarning(CreatePostBox);
+export default withAlert(CreatePostBox);

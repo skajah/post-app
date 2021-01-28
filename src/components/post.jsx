@@ -64,7 +64,7 @@ class Post extends Component {
         const { onDelete } = this.props;
         const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
         const { comments, commentText, emptyComment } = this.state;
-
+        const alert = { type: 'warning', message: "Comment can't be empty"};
         return ( 
             <div className="card bg-light post">
                 <div className="card-header">
@@ -94,7 +94,7 @@ class Post extends Component {
                     <CreateCommentBox 
                     text={commentText}
                     onTextChange={this.handleCommentTextChange}
-                    warning={emptyComment && "Comment can't be empty"}/>
+                    alert={emptyComment && alert}/>
                 </div>
             </div>
          );

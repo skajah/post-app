@@ -6,7 +6,7 @@ class CreateCommentBox extends Component {
 
     render() { 
         const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
-        const { text, onTextChange } = this.props;
+        const { text, onTextChange, alert } = this.props;
 
         return ( 
             <div className="comment-box">
@@ -19,8 +19,8 @@ class CreateCommentBox extends Component {
                     value={text}
                     className="comment-text-box"
                     onTextChange={onTextChange}
-                    // Pass down warning so that it is aligned with text box
-                    warning={this.props.warning}/> 
+                    // Pass down alert so that it is aligned with text box
+                    alert={alert}/> 
                 </div>
             </div>
          );
