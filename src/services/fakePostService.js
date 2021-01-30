@@ -23,11 +23,18 @@ const medias = [
   null,
 ];
 
+const dates = [
+  new Date(),
+  new Date('01/29/2021'),
+  new Date('01/24/2021'),
+  new Date('12/31/2020'),
+];
+
 const posts = _.range(4).map((id) => {
   return {
     _id: id,
     username: names[id],
-    date: new Date(),
+    date: dates[id],
     likes: Math.floor(Math.random() * 10),
     text: 'Recusandae nostrum quod accusantium temporibus accusamus.',
     media: medias[id],

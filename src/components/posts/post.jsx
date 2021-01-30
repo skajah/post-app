@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import Comments from './comments';
-import ContentDetails from './common/contentDetails';
-import CreateCommentBox from './commentBox';
+import Comments from '../comments/comments';
+import CreateCommentBox from '../comments/commentBox';
+import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
-import Media from './common/media';
-import { getLikes } from '../utils/getLikes';
+import Media from '../common/media';
+import { getLikes } from '../../utils/getLikes';
 
 class Post extends Component {
     state = { 

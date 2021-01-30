@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import ContentDetails from './common/contentDetails';
-import { getLikes } from '../utils/getLikes';
+import ContentDetails from '../common/contentDetails';
+import { getLikes } from '../../utils/getLikes';
 
 
 class Comment extends Component {

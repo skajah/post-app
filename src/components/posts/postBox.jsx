@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import ProfilePic from './common/profilePic';
-import TextBox from './common/textBox';
-import Camera from './common/icons/camera';
-import VideoCamera from './common/icons/videoCamera';
-import Volume from './common/icons/volume';
-import withAlert from './hoc/withAlert';
-import Media from './common/media';
+import ProfilePic from '../common/profilePic';
+import TextBox from '../common/textBox';
+import Camera from '../common/icons/camera';
+import VideoCamera from '../common/icons/videoCamera';
+import Volume from '../common/icons/volume';
+import withAlert from '../hoc/withAlert';
+import Media from '../common/media';
 
 class CreatePostBox extends Component {
     render() { 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import TextBox from './common/textBox';
-import ProfilePic from './common/profilePic';
+import TextBox from '../common/textBox';
+import ProfilePic from '../common/profilePic';
 
 class CreateCommentBox extends Component {
 

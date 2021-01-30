@@ -5,7 +5,7 @@ import Login from './components/login';
 import Register from './components/register';
 import ProfileEdit from './components/profileEdit';
 import NotFound from './components/notFound';
-import PostPage from './components/postPage';
+import PostPage from './components/posts/postPage';
 import Logout from './components/logout';
 import ProtectedRoute from './components/common/protectedRoute';
 import './App.css';
