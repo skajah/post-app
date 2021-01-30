@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import Posts from './components/posts';
 import NavBar from './components/navbar';
 import Login from './components/login';
 import Register from './components/register';
 import ProfileEdit from './components/profileEdit';
 import NotFound from './components/notFound';
+import PostPage from './components/postPage';
+import Logout from './components/logout';
 import ProtectedRoute from './components/common/protectedRoute';
 import './App.css';
-import Logout from './components/logout';
 
 class App extends Component {
   render() {
@@ -22,7 +22,7 @@ class App extends Component {
             <Route path="/login" component={Login} exact />
             <Route path="/logout" component={Logout} exact />
             <Route path="/register" component={Register} exact />
-            <ProtectedRoute path="/posts" component={Posts} exact />
+            <ProtectedRoute path="/posts" component={PostPage} exact />
             <ProtectedRoute
               path="/profile/edit"
               component={ProfileEdit}

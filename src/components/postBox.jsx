@@ -45,17 +45,20 @@ class CreatePostBox extends Component {
                         <Camera 
                         extensions={['jpg', 'jpeg', 'png', 'gif']}
                         onFileChosen={onUploadImage}
-                        maxFileSize={10}/>
+                        maxFileSize={10}
+                        size="lg"/>
 
                         <VideoCamera 
                         extensions={['mp4', 'mov', 'mpg']}
                         onFileChosen={onUploadVideo}
-                        maxFileSize={10}/>
+                        maxFileSize={10}
+                        size="lg"/>
 
                         <Volume
                         extensions={['mp3', 'wav', 'ogg']}
                         onFileChosen={onUploadAudio}
-                        maxFileSize={10}/>
+                        maxFileSize={10}
+                        size="lg"/>
                     </span>
                     
                     <button 

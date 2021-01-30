@@ -6,8 +6,7 @@
 }
 
 #content {
-  margin-top: 80px;
-  height: 90vh;
+  margin: 80px 10px 0;
   overflow-y: auto;
 }
 
@@ -48,9 +47,9 @@
 }
 
 .posts {
-  font-size: 1rem;
   width: 70%;
-  margin: 10px;
+  margin-right: 10px;
+  height: 90vh;
 }
 
 .post {
@@ -81,7 +80,8 @@
   width: 100%;
 }
 
-.text-box {
+.comment-text-box,
+.post-search-text-box {
   border: 2px solid lightseagreen;
   height: 2rem;
   flex-grow: 3;
@@ -107,4 +107,19 @@
   display: flex;
   justify-content: space-evenly;
   flex-grow: 3;
+}
+
+.post-page {
+  display: flex;
+}
+
+.post-search-box {
+  display: flex;
+  position: fixed;
+  left: 75%;
+  align-items: center;
+}
+
+.post-page {
+  padding: 10px;
 }

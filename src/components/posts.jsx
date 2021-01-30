@@ -1,26 +1,13 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
-import { getPosts } from '../services/fakePostService';
 import Post from './post';
 import CreatePostBox from './postBox';
 
 class Posts extends Component {
     state = { 
-        posts: [],
         postText: '',
         emptyPost: false,
         media: null,
      }
-
-    componentDidMount(){
-        const posts = getPosts();
-        this.setState({ posts });
-    }
-
-    handleDelete = ({ _id }) => {
-        const posts = this.state.posts.filter(post => post._id !== _id);
-        this.setState({ posts });
-    }
 
     handlePostTextChange = postText => {
         this.setState({ postText });
@@ -32,23 +19,9 @@ class Posts extends Component {
             this.setState({ emptyPost: true });
             return;
         }
-        const posts = [...this.state.posts];
-        const post = {
-            _id: this.getNextId(),
-            username: 'Anonymous',
-            date : new Date(),
-            likes: 0,
-            text: postText,
-            media,
-            comments: []
-        };
-        posts.unshift(post);
-        this.setState({ posts, postText: '', emptyPost: false, media: null });
-    }
 
-    getNextId(){
-        const { posts } = this.state;
-        return (_.max(posts.map(p => p._id)) + 1) || 0;
+        this.props.onCreatePost(postText, media);
+        this.setState({ postText: '', emptyPost: false, media: null });
     }
 
     handleClearMedia = () => {
@@ -74,7 +47,8 @@ class Posts extends Component {
     }
 
     render() { 
-        const { posts, postText, media, emptyPost } = this.state;
+        const { postText, media, emptyPost } = this.state;
+        const { posts, onDelete } = this.props;
         const alert = { type: 'warning', message: "Post can't be empty"};
 
         return ( 
@@ -95,7 +69,7 @@ class Posts extends Component {
                         return <Post 
                         key={post._id} 
                         post={post}
-                        onDelete={() => this.handleDelete(post)}/>;
+                        onDelete={() => onDelete(post)}/>;
                     }) 
                 }
             </div>

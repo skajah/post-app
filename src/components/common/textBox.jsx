@@ -9,18 +9,38 @@ class TextBox extends Component {
         // console.log('Current Text: ', text);
     };
 
-    render() { 
-        const { name, placeHolder, value, ...rest } = this.props;
-
-        return ( 
+    renderTextArea = (name, placeHolder, value, rest) => {
+        return (
             <textarea
             name={name}
             id={name} // for css
             value={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
-            {...rest}
-            />
+            {...rest}/>
+        );
+    }
+    
+    renderInput = (name, placeHolder, value, rest) => {
+        return (
+            <input
+            type="text"
+            name={name}
+            id={name} // for css
+            value={value}
+            placeHolder={placeHolder}
+            onChange={this.handleTextChange}
+            {...rest}/>
+        );
+    }
+
+    render() { 
+        const { name, placeHolder, value, type, ...rest } = this.props;
+
+        return ( 
+            type === 'input' ? 
+            this.renderInput(name, placeHolder, value, rest) :
+            this.renderTextArea(name, placeHolder, value, rest)
          );
     }
 }

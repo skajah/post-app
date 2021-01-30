@@ -18,7 +18,7 @@ class Like extends Icon {
         // fa-layers fa-fw ?
         return (
         <button className="btn" onClick={this.handleLike}>
-            <i className={this.state.classes} />
+            <i className={this.getClasses()} />
             <span className="fa-layers-counter"> {this.props.likes || null} </span>
         </button>
         );
