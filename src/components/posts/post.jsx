@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Comments from '../comments/comments';
-import CreateCommentBox from '../comments/commentBox';
+import CreateCommentBox from '../comments/createCommentBox';
 import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';

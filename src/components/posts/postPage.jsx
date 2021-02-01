@@ -3,7 +3,7 @@ import _ from 'lodash';
 import Posts from './posts';
 import PostSearch from './postSearch';
 import { getPosts } from '../../services/fakePostService';
-import { filterByRelativeDate } from '../../utils/postFilters';
+import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
 
 class PostPage extends Component {
     state = {
@@ -60,6 +60,13 @@ class PostPage extends Component {
                     });
     }
 
+    handleDateRange = (start, end) => {
+        this.setState({ keywordFilter: null,
+                        relativeDateFilter: null,
+                        dateRangeFilter: [start, end] 
+                    });
+    }
+
     getCurrentPosts = () => {
         const { 
             keywordFilter, 
@@ -72,6 +79,13 @@ class PostPage extends Component {
         
         if (relativeDateFilter)
             return filterByRelativeDate(posts, relativeDateFilter);
+        
+        if (dateRangeFilter){
+            const [start, end] = this.state.dateRangeFilter;
+            return filterByDateRange(posts, start, end);
+        }
+
+            
         return posts;
     }
 
@@ -88,7 +102,9 @@ class PostPage extends Component {
                 searchByKeyword={this.handleSearchByKeyword}
                 dates={this.relativeDates}
                 selectedDate={relativeDateFilter}
-                onDateSelected={this.handleDateSelected}/>
+                onDateSelected={this.handleDateSelected}
+                onDateRange={this.handleDateRange}/>
+
             </div>
          );
     }

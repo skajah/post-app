@@ -1,28 +1,30 @@
 import React, { Component } from 'react'
-import TextBox from '../common/textBox';
-import Search from '../common/icons/search';
+import TextBox from './textBox';
+import Search from './icons/search';
 
-class PostSearchKeyword extends Component {
+class SearchKeyword extends Component {
 
     handleSearchTextChange = text => {
         this.props.searchByKeyword(text);
     }
     
     render() { 
+        const { placeHolder } = this.props;
+
         return ( 
-            <div className="post-search-keyword">
+            <div className="search-keyword">
                 <TextBox 
-                name="postSearchKeyword" 
-                placeHolder=" Search posts by user" 
-                className="post-search-keyword-text-box"
+                name="searchKeyword" 
+                placeHolder={placeHolder} 
+                className="search-keyword-text-box"
                 type="input"
                 onTextChange={this.handleSearchTextChange}
                 />
-    
+                
                 <Search disabled={true} size="lg"/> 
             </div>
          );
     }
 }
  
-export default PostSearchKeyword;
+export default SearchKeyword;

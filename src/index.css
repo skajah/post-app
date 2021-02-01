@@ -81,7 +81,7 @@
 }
 
 .comment-text-box,
-.post-search-keyword-text-box {
+.search-keyword-text-box {
   border: 2px solid lightseagreen;
   height: 2rem;
   flex-grow: 3;
@@ -120,7 +120,7 @@
   flex-direction: column;
 }
 
-.post-search-keyword {
+.search-keyword {
   display: flex;
   align-items: center;
 }

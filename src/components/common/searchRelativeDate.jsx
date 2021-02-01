@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import ListGroup from '../common/listGroup';
+import ListGroup from './listGroup';
 
-class PostSearchDate extends Component {
+class SearchRelativeDate extends Component {
 
     render() { 
         const { dates, selectedDate, onDateSelected} = this.props;
@@ -13,4 +13,4 @@ class PostSearchDate extends Component {
     }
 }
  
-export default PostSearchDate;
+export default SearchRelativeDate;

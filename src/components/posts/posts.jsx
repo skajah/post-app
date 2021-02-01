@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Post from './post';
-import CreatePostBox from './postBox';
+import CreatePostBox from './createPostBox';
 
 class Posts extends Component {
     state = { 

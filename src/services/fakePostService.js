@@ -25,9 +25,9 @@ const medias = [
 
 const dates = [
   new Date(),
-  new Date('01/29/2021'),
-  new Date('01/24/2021'),
-  new Date('12/31/2020'),
+  new Date('2021/01/31'),
+  new Date('2021/01/25'),
+  new Date('2020/12/31'),
 ];
 
 const posts = _.range(4).map((id) => {
