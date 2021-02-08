@@ -3,7 +3,8 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import NavBar from './components/navbar';
 import Login from './components/login';
 import Register from './components/register';
-import ProfileEdit from './components/profileEdit';
+import ProfilePage from './components/profile/profilePage';
+import ProfileEdit from './components/profile/profileEdit';
 import NotFound from './components/notFound';
 import PostPage from './components/posts/postPage';
 import Logout from './components/logout';
@@ -23,6 +24,7 @@ class App extends Component {
             <Route path="/logout" component={Logout} exact />
             <Route path="/register" component={Register} exact />
             <ProtectedRoute path="/posts" component={PostPage} exact />
+            <ProtectedRoute path="/profile" component={ProfilePage} exact />
             <ProtectedRoute
               path="/profile/edit"
               component={ProfileEdit}

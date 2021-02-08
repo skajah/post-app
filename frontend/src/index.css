@@ -21,7 +21,8 @@
   border-radius: 100%;
 }
 
-.post-username {
+.post-username,
+.profile-username {
   font-weight: bold;
   margin-right: 10px;
 }
@@ -127,4 +128,34 @@
 
 .post-page {
   padding: 10px;
+}
+
+.profile-details {
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-page {
+  width: 50%;
+  margin: 0 auto;
+}
+
+.tab-nav {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.tab-nav-item {
+  padding: 10px;
+  border: 1px solid lightblue;
+}
+
+.tab-nav-item:hover {
+  cursor: pointer;
+}
+
+.tab-nav-active {
+  background: steelblue;
+  color: white;
 }

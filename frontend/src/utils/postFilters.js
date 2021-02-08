@@ -35,10 +35,10 @@ function excludeToday(objects, startDate = new Date()) {
 function filterByDaysAgo(objects, days, daysFrom, keepFromDate = false) {
   const objectsFixed = keepFromDate ? objects : excludeToday(objects, daysFrom);
   const millis = 60 * 60 * 24 * 1000 * (days + 1);
-  const startDate = new Date(daysFrom);
-  startDate.setUTCHours(0, 0, 0, 0);
+  const startDate = new Date(daysFrom.getTime());
+  startDate.setHours(0, 0, 0, 0);
   return objectsFixed.filter(
-    (o) => Math.abs(clearTime(o.date) - startDate) <= millis
+    (o) => Math.abs(clearTime(o.date) - startDate) < millis
   );
 }
 
