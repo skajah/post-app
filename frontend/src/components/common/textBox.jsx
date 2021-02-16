@@ -13,7 +13,6 @@ class TextBox extends Component {
         return (
             <textarea
             name={name}
-            id={name} // for css
             value={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
@@ -26,7 +25,6 @@ class TextBox extends Component {
             <input
             type="text"
             name={name}
-            id={name} // for css
             value={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}

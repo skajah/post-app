@@ -19,7 +19,7 @@ class ProfilePage extends Component {
     render() { 
         return ( 
             <div className="profile-page">
-                <div className="card bg-light">
+                <div className="card center">
                     <div className="card-header"> <ProfileDetails /> </div>
                     <div className="card-body">
                         <TabNav 

@@ -1,112 +1,53 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
-import Posts from './posts';
-import PostSearch from './postSearch';
-import { getPosts } from '../../services/fakePostService';
-import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
+import { Redirect } from 'react-router-dom';
+import { getPost } from '../../services/postService';
+import Post from './post';
+import { getComments } from '../../services/commentService';
+import { makeDate, makeDates } from '../../utils/makeDate';
 
 class PostPage extends Component {
+    
     state = {
-        posts: [],
-        keywordFilter: null,
-        relativeDateFilter: null,
-        dateRangeFilter: null
+        post: null,
+        comments: null,
+        validId: true,
     }
 
-    relativeDates = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days']
-
-    componentDidMount() {
-        this.setState({ posts: getPosts()});
+    async componentDidMount(){
+        await this.setPost();
     }
 
-    handleDelete = ({ _id }) => {
-        const posts = this.state.posts.filter(post => post._id !== _id);
-        this.setState({ posts });
+    async setPost() {
+        try {
+            const { id: postId } = this.props.match.params;
+            const { data: post } = await getPost(postId);
+            if (!post) return this.setState({ validId: false }); 
+            const { data: comments } = await getComments(postId);
+            makeDates(comments);
+            post.comments = comments;
+            makeDate(post);
+            this.setState({ post, comments });
+        } catch (ex) { 
+            if (ex.response && ex.response.status === 404)
+                this.props.history.replace('/not-found'); // don't want to be able to go back to invalid post
+        } 
     }
 
-    handleCreatePost = (postText, media) => {
-        const post = {
-            _id: this.getNextId(),
-            username: 'Anonymous',
-            date : new Date(),
-            likes: 0,
-            text: postText,
-            media,
-            comments: []
-        };
+    render() { 
+        const { post, comments, validId } = this.state;
 
-        const posts = [...this.state.posts];
-        posts.unshift(post);
-        this.setState({ posts });
-    }
+        if (!validId) return <Redirect to="/not-found" />;
 
-    getNextId(){
-        const { posts } = this.state;
-        return (_.max(posts.map(p => p._id)) + 1) || 0;
-    }
+        if (!(post && comments)) return null;
 
-    handleSearchByKeyword = text => { 
-        const trimmed = text.trim().toLowerCase();
-        this.setState({ keywordFilter: trimmed, 
-                        relativeDateFilter: null, 
-                        dateRangeFilter: null 
-                    });
-    }
-
-    handleDateSelected = date => {
-        this.setState({ keywordFilter: null, 
-                        relativeDateFilter: date, 
-                        dateRangeFilter: null 
-                    });
-    }
-
-    handleDateRange = (start, end) => {
-        this.setState({ keywordFilter: null,
-                        relativeDateFilter: null,
-                        dateRangeFilter: [start, end] 
-                    });
-    }
-
-    getCurrentPosts = () => {
-        const { 
-            keywordFilter, 
-            relativeDateFilter, 
-            dateRangeFilter, 
-            posts } = this.state;
-
-        if (keywordFilter) 
-            return posts.filter(p => p.username.toLowerCase().includes(keywordFilter));
-        
-        if (relativeDateFilter)
-            return filterByRelativeDate(posts, relativeDateFilter);
-        
-        if (dateRangeFilter){
-            const [start, end] = this.state.dateRangeFilter;
-            return filterByDateRange(posts, start, end);
-        }
-
-            
-        return posts;
-    }
-
-    render() {  
-        const { relativeDateFilter } = this.state;
-
-        return ( 
+        return (
             <div className="post-page">
-                <Posts 
-                    posts={this.getCurrentPosts()}
-                    onDelete={this.handleDelete}
-                    onCreatePost={this.handleCreatePost}/>
-                <PostSearch 
-                searchByKeyword={this.handleSearchByKeyword}
-                dates={this.relativeDates}
-                selectedDate={relativeDateFilter}
-                onDateSelected={this.handleDateSelected}
-                onDateRange={this.handleDateRange}/>
-
+               <Post 
+                post={post}
+                comments={comments}
+                showComments={true}/>
             </div>
-         );
+        );
     }
 }
  

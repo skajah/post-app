@@ -48,7 +48,7 @@ class Posts extends Component {
 
     render() { 
         const { postText, media, emptyPost } = this.state;
-        const { posts, onDelete } = this.props;
+        const { posts, onDelete, onPostClick } = this.props;
         const alert = { type: 'warning', message: "Post can't be empty"};
 
         return ( 
@@ -69,7 +69,8 @@ class Posts extends Component {
                         return <Post 
                         key={post._id} 
                         post={post}
-                        onDelete={() => onDelete(post)}/>;
+                        onDelete={() => onDelete(post)}
+                        onPostClick={() => onPostClick(post)}/>;
                     }) 
                 }
             </div>

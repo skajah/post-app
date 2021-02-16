@@ -13,15 +13,15 @@ class SearchKeyword extends Component {
 
         return ( 
             <div className="search-keyword">
+                <Search disabled={true} size="lg"/> 
+
                 <TextBox 
                 name="searchKeyword" 
                 placeHolder={placeHolder} 
-                className="search-keyword-text-box"
+                className="text-box search-keyword-text-box"
                 type="input"
                 onTextChange={this.handleSearchTextChange}
                 />
-                
-                <Search disabled={true} size="lg"/> 
             </div>
          );
     }

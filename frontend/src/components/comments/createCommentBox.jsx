@@ -9,7 +9,7 @@ class CreateCommentBox extends Component {
         const { text, onTextChange, alert } = this.props;
 
         return ( 
-            <div className="comment-box">
+            <div className="create-comment-box">
                 <ProfilePic // default style prop to make size 60x60
                 src={url}/> 
                 <div style={{width: "100%"}}>
@@ -17,7 +17,7 @@ class CreateCommentBox extends Component {
                     name="commentText"
                     placeHolder=" Comment on this post..."
                     value={text}
-                    className="comment-text-box"
+                    className="text-box create-comment-text-box"
                     onTextChange={onTextChange}
                     // Pass down alert so that it is aligned with text box
                     alert={alert}/> 

@@ -24,18 +24,22 @@ class CreatePostBox extends Component {
             <div className="card bg-light create-post-box">
                 <div className="card-header create-post-header">
                     <ProfilePic src={url}/>  
-                    <button 
-                    className="btn btn-danger"
-                    onClick={onClearMedia}
-                    disabled={ !media }>Clear Media</button>
+                    {
+                        media && 
+                        <button 
+                        className="btn clear-media-button"
+                        onClick={onClearMedia}>Clear Media</button>
+                    }
+                    
                 </div>
-                <div className="card-body">
+                <div className="card-body create-post-body">
                     <TextBox 
                     name="postText"
                     placeHolder=" What's on your mind?"
                     value={text}
                     onTextChange={onTextChange}
-                    className="post-text-box"/>
+                    className="text-box"
+                    id="create-post-text-box"/>
 
                     { media && <Media type={media.type} src={media.src} {...media.attr}/> }
 
@@ -62,7 +66,7 @@ class CreatePostBox extends Component {
                     </span>
                     
                     <button 
-                    className="btn btn-secondary" 
+                    className="btn create-post-button" 
                     onClick={onCreatePost}>Post</button>
                 </div>
             </div>

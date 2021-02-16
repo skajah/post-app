@@ -30,13 +30,19 @@ class PostSearch extends Component {
 
         return ( 
             <div className="post-search-box">
+                <p
+                style={{
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                }}
+                >Search for posts</p>
                 <SearchKeyword 
-                placeHolder=" Search posts by user"
+                placeHolder=" Enter a username"
                 searchByKeyword={searchByKeyword}/>
 
                 <p
-                style={{fontWeight: 'bold', fontSize: '1.2rem', margin: '1.5rem 0 .5rem'}}
-                >Search by Date</p>
+                style={{margin: '1.5rem 0 .5rem', fontWeight: '500'}}
+                >Select a date</p>
 
                 <SearchRelativeDate 
                 dates={dates} 

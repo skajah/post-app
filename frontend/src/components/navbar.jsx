@@ -6,8 +6,8 @@ class NavBar extends Component {
     render() { 
         const user = auth.getCurrentUser();
         return ( 
-            <nav className="navbar navbar-expand-lg navbar-light bg-light justify-content-between">
-                <Link className="navbar-brand " to="/posts">
+            <nav className="navbar navbar-expand-lg justify-content-between">
+                <Link className="navbar-brand" to="/posts">
                     <i class="fa fa-comments" style={{marginRight: 5}} />
                     SBKonnect
                 </Link>

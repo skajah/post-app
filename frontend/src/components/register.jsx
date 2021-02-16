@@ -22,7 +22,7 @@ class Register extends Form {
 
     render() {
         return (
-            <div className="form">
+            <div className="form form-register center">
                 <h1>Register</h1>
                 <form onSubmit={this.handleSubmit}>
                     {this.renderInput('username', 'Username')}

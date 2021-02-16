@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { Redirect } from 'react-router-dom';
 import Joi from 'joi-browser';
 import Form from './common/form';
 import auth from '../services/authService';
@@ -30,8 +31,10 @@ class Login extends Form {
     }
 
     render() {
+        if (auth.getCurrentUser()) return <Redirect to="/"/>;
+
         return (
-            <div className="form">
+            <div className="form form-login center">
                 <h1>Login</h1>
                 <form onSubmit={this.handleSubmit}>
                     {this.renderInput('email', 'Email')}

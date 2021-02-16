@@ -8,7 +8,7 @@ class ListGroup extends Component {
                 {
                     items.map(item => {
                         return <li 
-                        className={"list-group-item" + (item === selectedItem ? ' active' : '')}
+                        className={"list-group-item clickable" + (item === selectedItem ? ' my-active' : '')}
                         onClick={() => onClick(item)}>{item}</li>;
                     })
                 }

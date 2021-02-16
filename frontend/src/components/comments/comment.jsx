@@ -35,8 +35,7 @@ class Comment extends Component {
                 profilePicUrl={url}
                 onDelete={onDelete}
                 onLike={this.handleLike}
-                likes={likes}
-                />
+                likes={likes}/>
                 <p className="comment-text">{text}</p>
             </div>
          );

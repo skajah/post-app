@@ -1,28 +1,46 @@
 import React, { Component } from 'react'
+import { toast } from 'react-toastify';
 import Comments from '../comments/comments';
 import CreateCommentBox from '../comments/createCommentBox';
 import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';
 import { getLikes } from '../../utils/getLikes';
+import { getUserFromId } from '../../services/userService';
 
 class Post extends Component {
     state = { 
-        username: 'Anonymous',
+        user: {},
         date: new Date(),
         text: '',
+        media: null,
+        comments: [],
+        numberComments: 0,
+        likes: 0,
         commentText: '',
         emptyComment: false,
-        media: null,
-        comments: []
     } 
     componentDidMount() {
         this.populateState();
     }
 
-    populateState(){
-        const { username, date, text, media, comments, likes } = this.props.post;
-        this.setState({ username, date, text, media, comments,  likes: likes || 0 });
+    async populateState(){
+        const { userId, date, text, media, comments, numberComments, likes } = this.props.post;
+        try {
+            const { data: user } = await getUserFromId(userId);
+            this.setState({ 
+                user, 
+                date: date || new Date(), 
+                text, 
+                media, 
+                comments: comments || [],
+                numberComments: numberComments || 0,
+                likes: likes || 0,
+            });
+        } catch (ex) {
+            toast.error(ex.message);
+        }
+        
     }
 
     handleDeleteComment = ({ _id }) => {
@@ -61,22 +79,33 @@ class Post extends Component {
 
     render() { 
         const { text, media, likes } = this.state;
-        const { onDelete } = this.props;
+        const { onDelete, showComments, onPostClick } = this.props;
         const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
-        const { comments, commentText, emptyComment } = this.state;
+        const { 
+            comments, 
+            commentText, 
+            emptyComment, 
+            user, 
+            date, 
+            numberComments } = this.state;
+        const details = { username: user.username, date };
+        // console.log('Date: ', this.state.date, typeof this.state.date);
         const alert = { type: 'warning', message: "Comment can't be empty"};
         return ( 
-            <div className="card bg-light post">
-                <div className="card-header">
+            <div className="card post">
+                <div className="card-header post-header">
                     <ContentDetails 
-                    details={this.state}
+                    details={details}
                     profilePicUrl={url}
                     onDelete={onDelete}
                     onLike={this.handleLike}
-                    likes={likes}/> 
+                    likes={likes}
+                    numberComments={numberComments}
+                    onClick={onPostClick}
+                    showCommentIcon={true}/> 
                 </div>
-                <div className="card-body">
-                    <p>{text}</p> 
+                <div className="card-body post-body">
+                    { text &&  <p>{text}</p> }
                     {
                         media && 
                         <Media 
@@ -84,16 +113,23 @@ class Post extends Component {
                         src={media.src}
                         {...media.attr}/> 
                     }
-                    <Comments 
-                    comments={comments}
-                    onDelete={this.handleDeleteComment}/>
                 </div>
 
-                <div className="card-footer">
-                    <CreateCommentBox 
-                    text={commentText}
-                    onTextChange={this.handleCommentTextChange}
-                    alert={emptyComment && alert}/>
+                <div className="card-footer post-footer">
+                    {
+                        showComments && 
+                        <React.Fragment>      
+                            <CreateCommentBox 
+                            text={commentText}
+                            onTextChange={this.handleCommentTextChange}
+                            alert={emptyComment && alert}/>
+
+                            <Comments 
+                            comments={comments}
+                            onDelete={this.handleDeleteComment}/>
+                        </React.Fragment>
+                        
+                    }
                 </div>
             </div>
          );

@@ -19,7 +19,7 @@ class Like extends Icon {
         return (
         <button className="btn" onClick={this.handleLike}>
             <i className={this.getClasses()} />
-            <span className="fa-layers-counter"> {this.props.likes || null} </span>
+            <span className="fa-layers-counter like-counter"> {this.props.likes || null} </span>
         </button>
         );
 

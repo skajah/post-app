@@ -11,7 +11,7 @@ class TabNav extends Component {
                     tabs.map(tab => {
                         return <p 
                         key={tab}
-                        className={"tab-nav-item" + (tab === currentTab ? " tab-nav-active" : '')}
+                        className={"tab-nav-item clickable" + (tab === currentTab ? " tab-nav-active" : '')}
                         onClick={() => onClick(tab)}>{tab}</p>
                     })
                 }

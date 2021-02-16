@@ -41,7 +41,7 @@ class ProfileEdit extends Form {
         // const user = auth.getCurrentUser();
         // if (!user) return <Redirect to="/login"/>;
         return ( 
-            <div className="form">
+            <div className="form form-profile-edit center">
                 <h1>Edit Profile</h1>
                 <form onSubmit={this.doSubmit}>
                     {this.renderInput('email', 'Email')}
@@ -49,6 +49,8 @@ class ProfileEdit extends Form {
                     <label>Profile Description</label>
                     <TextBox 
                     name="profileDescription"
+                    className="text-box"
+                    id="profile-desc-text-box"
                     placeHolder=" Share about yourself"
                     style={{width: '100%', marginBottom: 10}}
                     onTextChange={this.handleDescriptionChange}
