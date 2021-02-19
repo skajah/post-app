@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
-
-import _ from 'lodash';
 import Posts from './posts';
 import PostSearch from './postSearch';
-import CreatePostBox from './createPostBox';
 
 import { getPosts, deletePost } from '../../services/postService';
 
@@ -23,7 +20,7 @@ class PostsPage extends Component {
 
     async componentDidMount() {
         try {
-            const { data: posts } = await getPosts();
+            const { data: posts } = await getPosts({ numberOfComments: true });
             makeDates(posts);
             this.setState({ posts });
         } catch (ex) {
@@ -59,11 +56,6 @@ class PostsPage extends Component {
         this.setState({ posts });
     }
 
-    getNextId(){
-        const { posts } = this.state;
-        return (_.max(posts.map(p => p._id)) + 1) || 0;
-    }
-
     handleSearchByKeyword = text => { 
         const trimmed = text.trim().toLowerCase();
         this.setState({ keywordFilter: trimmed, 
@@ -94,7 +86,7 @@ class PostsPage extends Component {
             posts } = this.state;
 
         if (keywordFilter) 
-            return posts.filter(p => p.username.toLowerCase().includes(keywordFilter));
+            return posts.filter(p => p.user.username.toLowerCase().includes(keywordFilter));
         
         if (relativeDateFilter)
             return filterByRelativeDate(posts, relativeDateFilter);
@@ -119,7 +111,7 @@ class PostsPage extends Component {
     render() {  
         const { relativeDateFilter, posts } = this.state;
 
-        if (!posts) return <p>Loading posts...</p>;
+        if (!posts) return <p className="center">Loading posts...</p>;
 
         return (
             <div className="posts-page">

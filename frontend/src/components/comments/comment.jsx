@@ -5,9 +5,9 @@ import { getLikes } from '../../utils/getLikes';
 
 class Comment extends Component {
     state = {
-        username: 'Anonymous',
         date: new Date(),
-        text: ''
+        text: '',
+        user: {}
     }
 
     componentDidMount() {
@@ -15,8 +15,9 @@ class Comment extends Component {
     }
 
     populateState() {
-        const { username, date, text, likes } = this.props.comment;
-        this.setState({ username, date, text, likes: likes || 0});
+        console.log(this.props.comments);
+        const { user, date, text, likes } = this.props.comment;
+        this.setState({ user, date, text, likes: likes || 0});
     }
 
     handleLike = (liked) => {
@@ -27,11 +28,15 @@ class Comment extends Component {
     render() { 
         const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
         const { onDelete } = this.props;
-        const { likes, text } = this.state;
+        const { likes, text, user, date } = this.state;
+        const details = {
+            username: user.username,
+            date
+        };
         return ( 
             <div className="comment"> 
                 <ContentDetails 
-                details={this.state} 
+                details={details} 
                 profilePicUrl={url}
                 onDelete={onDelete}
                 onLike={this.handleLike}

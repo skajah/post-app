@@ -15,7 +15,7 @@ class Post extends Component {
         text: '',
         media: null,
         comments: [],
-        numberComments: 0,
+        numberOfComments: 0,
         likes: 0,
         commentText: '',
         emptyComment: false,
@@ -25,16 +25,15 @@ class Post extends Component {
     }
 
     async populateState(){
-        const { userId, date, text, media, comments, numberComments, likes } = this.props.post;
+        const { user, date, text, media, comments, numberOfComments, likes } = this.props.post;
         try {
-            const { data: user } = await getUserFromId(userId);
             this.setState({ 
                 user, 
                 date: date || new Date(), 
                 text, 
                 media, 
                 comments: comments || [],
-                numberComments: numberComments || 0,
+                numberOfComments: numberOfComments || 0,
                 likes: likes || 0,
             });
         } catch (ex) {
@@ -78,16 +77,19 @@ class Post extends Component {
     }
 
     render() { 
-        const { text, media, likes } = this.state;
-        const { onDelete, showComments, onPostClick } = this.props;
-        const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
         const { 
+            text, 
+            media, 
+            likes,
             comments, 
             commentText, 
             emptyComment, 
             user, 
             date, 
-            numberComments } = this.state;
+            numberOfComments } = this.state;
+        const { onDelete, showComments, onPostClick } = this.props;
+        const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
+        
         const details = { username: user.username, date };
         // console.log('Date: ', this.state.date, typeof this.state.date);
         const alert = { type: 'warning', message: "Comment can't be empty"};
@@ -100,7 +102,7 @@ class Post extends Component {
                     onDelete={onDelete}
                     onLike={this.handleLike}
                     likes={likes}
-                    numberComments={numberComments}
+                    numberOfComments={numberOfComments}
                     onClick={onPostClick}
                     showCommentIcon={true}/> 
                 </div>

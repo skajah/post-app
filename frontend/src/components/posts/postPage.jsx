@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
 import { getPost } from '../../services/postService';
 import Post from './post';
-import { getComments } from '../../services/commentService';
 import { makeDate, makeDates } from '../../utils/makeDate';
 
 class PostPage extends Component {
     
     state = {
         post: null,
-        comments: null,
-        validId: true,
     }
 
     async componentDidMount(){
@@ -20,13 +16,10 @@ class PostPage extends Component {
     async setPost() {
         try {
             const { id: postId } = this.props.match.params;
-            const { data: post } = await getPost(postId);
-            if (!post) return this.setState({ validId: false }); 
-            const { data: comments } = await getComments(postId);
-            makeDates(comments);
-            post.comments = comments;
+            const { data: post } = await getPost(postId,{ withComments: true });
+            makeDates(post.comments);
             makeDate(post);
-            this.setState({ post, comments });
+            this.setState({ post });
         } catch (ex) { 
             if (ex.response && ex.response.status === 404)
                 this.props.history.replace('/not-found'); // don't want to be able to go back to invalid post
@@ -34,17 +27,17 @@ class PostPage extends Component {
     }
 
     render() { 
-        const { post, comments, validId } = this.state;
+        const { post } = this.state;
 
-        if (!validId) return <Redirect to="/not-found" />;
+        if (!post) return null;
 
-        if (!(post && comments)) return null;
-
+        // console.log(post);
+        
         return (
             <div className="post-page">
                <Post 
                 post={post}
-                comments={comments}
+                comments={post.comments}
                 showComments={true}/>
             </div>
         );

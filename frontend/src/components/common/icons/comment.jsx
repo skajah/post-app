@@ -6,11 +6,11 @@ class Comment extends Icon {
     }
 
     render(){
-        const { onClick, numberComments } = this.props;
+        const { onClick, numberOfComments } = this.props;
         return (
             <button className="btn" onClick={onClick}>
                 <i className={this.getClasses()} />
-                <span className="fa-layers-counter comment-counter"> {numberComments || null} </span>
+                <span className="fa-layers-counter comment-counter"> {numberOfComments || null} </span>
             </button>
             );
     }

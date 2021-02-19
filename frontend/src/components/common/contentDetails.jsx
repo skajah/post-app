@@ -13,7 +13,7 @@ class ContentDetails extends Component {
             onLike, 
             likes, 
             onClick, 
-            numberComments,
+            numberOfComments,
             showCommentIcon} = this.props;
         // console.log(profilePicUrl, comment);
         const { username, date } = details;
@@ -34,7 +34,7 @@ class ContentDetails extends Component {
                 <div className="col-3">
                     { 
                     showCommentIcon &&
-                    <Comment numberComments={numberComments} onClick={onClick}/> 
+                    <Comment numberOfComments={numberOfComments} onClick={onClick}/> 
                     }
                     <Like onClick={onLike} likes={likes}/>
                     { null && <Delete onClick={onDelete}/> } 
