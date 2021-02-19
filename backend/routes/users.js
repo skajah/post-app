@@ -1,41 +1,41 @@
 const express = require('express');
-const { User, create, validate } = require('../models/user');
+const mongoose = require('mongoose');
+const { User, validate } = require('../models/user');
 
 const router = express.Router();
 
 // Should not be able to get all users at once?
 router.get('/:id', async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send('User with that id not found');
-    res.send(user);
-  } catch (ex) {
-    console.log(ex.message);
-    res.status(500).send('Error retrieving user');
-  }
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).send('Invalid Id');
+  const user = await User.findById(id).select('-password');
+  if (!user) return res.status(404).send('User not found');
+  res.send(user);
 });
 
 router.post('/', async (req, res) => {
-  try {
-    const { error } = validate(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const user = await create(req.body);
-    res.send(user);
-  } catch (ex) {
-    console.log(ex.message);
-    res.status(500).send('Error making user');
-  }
+  const { error } = validate(req.body);
+  const { username, email } = req.body;
+  if (error) return res.status(400).send(error.details[0].message);
+  const usernameExists = await User.exists({ username });
+  if (usernameExists)
+    return res.status(400).send(`username: ${username} already exists`);
+  const emailExists = await User.exists({ email });
+  if (emailExists)
+    return res.status(400).send(`email: ${email} already exists`);
+
+  const user = await new User(req.body).save();
+  res.send(user);
 });
 
 router.delete('/:id', async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).send('User with that id not found');
-    res.send(user);
-  } catch (ex) {
-    console.log(ex.message);
-    res.status(500).send('Error deleting user');
-  }
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).send('Invalid Id');
+  const user = await User.findByIdAndDelete(id).select('-password');
+  if (!user) return res.status(404).send('User not found');
+  res.send(user);
 });
 
 module.exports = router;

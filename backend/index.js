@@ -4,6 +4,8 @@ const comments = require('./routes/comments');
 const posts = require('./routes/posts');
 const users = require('./routes/users');
 const cors = require('cors');
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
 
 mongoose
   .connect('mongodb://localhost/post-app')

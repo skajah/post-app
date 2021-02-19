@@ -1,38 +1,31 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 
-function intValidator(min) {
-  return {
-    validator: function (v) {
-      // console.log(v, typeof v);
-      return Number.isInteger(v) && v >= min;
-    },
-    message: `Must be an integer >= ${min}`,
-  };
-}
-
 const postSchema = new mongoose.Schema({
-  userId: { type: String, required: true }, // revisit
+  user: {
+    type: new mongoose.Schema({
+      username: {
+        type: String,
+        minlength: 5,
+        maxlength: 30,
+      },
+    }),
+    required: true,
+  },
   date: { type: Date, default: Date.now },
   text: String,
   likes: {
     type: Number,
     default: 0,
-    validate: intValidator(0),
-  },
-  numberComments: {
-    type: Number,
-    default: 0,
-    validate: intValidator(0),
+    min: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Must be an integer >= 0',
+    },
   },
 });
 
 const Post = mongoose.model('Post', postSchema);
-
-async function createPost(postObject) {
-  const post = new Post(postObject);
-  return await post.save();
-}
 
 function validatePost(post) {
   const schema = Joi.object({
@@ -48,4 +41,3 @@ function validatePost(post) {
 
 exports.Post = Post;
 exports.validate = validatePost;
-exports.create = createPost;

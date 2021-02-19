@@ -5,27 +5,25 @@ const commentSchema = new mongoose.Schema({
   postId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    validate: {
-      isAsync: true,
-      validator: function (id, callback) {
-        Post.findOne({ _id: id })
-          .then((result) => callback(result !== null))
-          .catch((err) => `Error validating postId: ${err.message}`);
-      },
-      message: 'Must reference a valid post',
-    },
   },
-  userId: { type: String, required: true }, // revisit
+  user: {
+    type: new mongoose.Schema({
+      username: {
+        type: String,
+        minlength: 5,
+        maxlength: 30,
+      },
+    }),
+    required: true,
+  },
   date: { type: Date, default: Date.now },
-  text: { type: String, required: true, minlength: 1 },
+  text: { type: String, required: true, minlength: 1, maxlength: 2000 },
   likes: {
     type: Number,
     default: 0,
+    min: 0,
     validate: {
-      validator: function (v) {
-        // console.log(v, typeof v);
-        return Number.isInteger(v) && v >= 0;
-      },
+      validator: Number.isInteger,
       message: 'Must be an integer >= 0',
     },
   },
@@ -33,15 +31,12 @@ const commentSchema = new mongoose.Schema({
 
 const Comment = mongoose.model('Comment', commentSchema);
 
-async function createComment(commentObject) {
-  const comment = new Comment(commentObject);
-  return await comment.save();
-}
-
 function validateComment(comment) {
   const schema = Joi.object({
-    postId: Joi.string().required(),
-    userId: Joi.string().required(),
+    postId: Joi.objectId().required().messages({
+      any: '"postId" must be a valid objectId',
+    }),
+    userId: Joi.objectId().required(),
     date: Joi.date().default(Date.now),
     text: Joi.string().required(),
     likes: Joi.number().integer().min(0).default(0),
@@ -52,4 +47,3 @@ function validateComment(comment) {
 
 exports.Comment = Comment;
 exports.validate = validateComment;
-exports.create = createComment;
