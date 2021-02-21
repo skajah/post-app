@@ -1,5 +1,7 @@
 import http from './httpService';
-import { postApiEndpoint } from '../config.json';
+import { apiUrl } from '../config.json';
+
+const postApiEndpoint = apiUrl + '/posts';
 
 export function getPosts({ numberOfComments }) {
   return http.get(

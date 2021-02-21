@@ -1,20 +1,19 @@
-// import http from './httpService';
-// import { authEndPoint } from '../config.json';
+import http from './httpService';
+import { apiUrl } from '../config.json';
 import jwtDecode from 'jwt-decode';
-import sign from 'jwt-encode';
 
 const tokenKey = 'token';
-const secret = 'secret';
+const authApiEndpoint = apiUrl + '/auth';
 
 // get rid of bi-directional dependency
-// http.setJwt(getJwt());
+http.setJwt(getJwt());
 
 export function getJwt() {
   return localStorage.getItem(tokenKey);
 }
 
-export function login(user) {
-  const jwt = sign(user, secret);
+export async function login(email, password) {
+  const { data: jwt } = await http.post(authApiEndpoint, { email, password });
   localStorage.setItem(tokenKey, jwt);
 }
 

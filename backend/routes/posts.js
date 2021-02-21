@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const mongoose = require('mongoose');
 const { Post, validate } = require('../models/post');
@@ -18,7 +19,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(400).send('Invalid Id');
-  let post = await Post.findById(id);
+  let post = await Post.findById(id).select('-__v');
   if (!post) return res.status(404).send('Post not found');
   const { withComments } = req.query;
 
@@ -33,10 +34,11 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const user = await User.findById(req.body.userId).select('_id username');
+  const postObject = _.pick(req.body, ['userId', 'date', 'text', 'likes']);
+  const user = await User.findById(postObject.userId).select('_id username');
   if (!user) res.status(400).send('Invalid userId for post');
-  req.body.user = user;
-  const post = await new Post(req.body).save();
+  postObject.user = user;
+  const post = await new Post(postObject).save();
   res.send(post);
 });
 
@@ -44,12 +46,8 @@ router.delete('/:id', async (req, res) => {
   const postId = req.params.id;
   if (!mongoose.Types.ObjectId.isValid(postId))
     return res.status(400).send('Invalid Id');
-  const postExists = await Post.exists({ _id: postId });
-  if (!postExists) return res.status(404).send('Post not found');
-
-  Post.findByIdAndDelete(postId)
-    .then((post) => res.send(post))
-    .catch((err) => console.log(`Failed to delete post\n${err.message}`));
+  const post = await Post.findByIdAndDelete(postId);
+  if (!post) return res.status(404).send('Post not found');
 
   Comment.deleteMany({ postId })
     .then()
@@ -58,6 +56,7 @@ router.delete('/:id', async (req, res) => {
         `Failed to delete post [${postId}]'s comments\n${err.message}`
       )
     );
+  res.send(post);
 });
 
 module.exports = router;

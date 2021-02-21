@@ -1,5 +1,3 @@
 {
-    "postApiEndpoint": "http://localhost:4000/api/posts",
-    "commentApiEndpoint": "http://localhost:4000/api/comments",
-    "userApiEndpoint": "http://localhost:4000/api/users"
+    "apiUrl": "http://localhost:4000/api"
 }

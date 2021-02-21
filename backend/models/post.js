@@ -7,13 +7,17 @@ const postSchema = new mongoose.Schema({
       username: {
         type: String,
         minlength: 5,
-        maxlength: 30,
+        maxlength: 255,
+        required: true,
       },
     }),
     required: true,
   },
   date: { type: Date, default: Date.now },
-  text: String,
+  text: {
+    type: String,
+    maxlength: 3000,
+  },
   likes: {
     type: Number,
     default: 0,
@@ -29,11 +33,10 @@ const Post = mongoose.model('Post', postSchema);
 
 function validatePost(post) {
   const schema = Joi.object({
-    userId: Joi.string().required(),
+    userId: Joi.objectId().required(),
     date: Joi.date().default(Date.now),
-    text: Joi.string(),
+    text: Joi.string().max(3000),
     likes: Joi.number().integer().min(0).default(0),
-    numberComments: Joi.number().integer().min(0).default(0),
   });
 
   return schema.validate(post);

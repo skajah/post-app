@@ -16,18 +16,23 @@ class Login extends Form {
         password: Joi.string().required().label('Password')
     }
 
-    doSubmit = () => {
-        const data = {...this.state.data};
-        data.username = 'pseudo-username';
-        auth.login(data);
+    doSubmit = async () => {
+        try {
+            const { data } = this.state;
+            await auth.login(data.email, data.password);
 
-        /* 
-            If they had tried to access a protect route, get that url
-            then redirect them that page
-        */
-        const { state } = this.props.location;
+            const { state } = this.props.location;
 
-        window.location = state ? state.from.pathname : '/'
+            window.location = state ? state.from.pathname : '/'; // cause full reload because app's cdm() only called once 
+            // toast.info(jwt);
+            
+        } catch (ex) {
+            if (ex.response && ex.response.status === 400){
+                const errors = {...this.state.errors};
+                errors.email = ex.response.data;
+                this.setState({ errors });
+            }
+        }
     }
 
     render() {

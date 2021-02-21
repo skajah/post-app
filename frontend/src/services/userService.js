@@ -1,6 +1,12 @@
 import http from './httpService';
-import { userApiEndpoint } from '../config.json';
+import { apiUrl } from '../config.json';
 
-export function getUserFromId(id) {
-  return http.get(`${userApiEndpoint}/${id}`);
+const userApiEndpoint = apiUrl + '/users';
+
+export function register(user) {
+  return http.post(userApiEndpoint, {
+    email: user.email,
+    username: user.username,
+    password: user.password,
+  });
 }
