@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import { toast } from 'react-toastify';
 import ContentDetails from '../common/contentDetails';
-import { getLikes } from '../../utils/getLikes';
+import { likeComment } from '../../services/commentService';
 
 
 class Comment extends Component {
@@ -15,13 +16,24 @@ class Comment extends Component {
     }
 
     populateState() {
-        const { user, date, text, likes } = this.props.comment;
-        this.setState({ user, date, text, likes: likes || 0});
+        const { _id, user, date, text, likes } = this.props.comment;
+        this.setState({ _id, user, date, text, likes: likes || 0});
     }
 
-    handleLike = (liked) => {
-        const likes = getLikes(this.state.likes, liked);
-        this.setState({ likes });
+    handleLike = async (liked) => {
+        try {
+            const { data: comment } = await likeComment(this.state._id, liked);
+            const { likes } = comment;
+            this.setState({ likes });
+        } catch (ex) {
+            if (ex.response){
+                const status = ex.response.status;
+                if (status === 400)
+                    console.log(`Error liking comment: ${ex.response.data}`);
+                else if (status === 404)
+                    toast.error("Comment not found. Refresh to get latest content");
+            }
+        }
     }
 
     render() { 

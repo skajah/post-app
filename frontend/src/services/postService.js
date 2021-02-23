@@ -22,3 +22,7 @@ export function createPost(post) {
 export function deletePost(id) {
   return http.delete(`${postApiEndpoint}/${id}`);
 }
+
+export function likePost(id, liked) {
+  return http.patch(`${postApiEndpoint}/${id}?likeDelta=${liked ? 1 : -1}`);
+}

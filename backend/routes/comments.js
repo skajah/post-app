@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
+const validateLikeDelta = require('../middleware/validateLikeDelta');
 const { verifyUserForComment } = require('../middleware/verifyUser');
 const express = require('express');
 const { Comment, validate } = require('../models/comment');
@@ -42,6 +43,22 @@ router.post('/', auth, async (req, res) => {
 
   res.send(comment);
 });
+
+router.patch(
+  '/:id',
+  [auth, validateId, validateLikeDelta],
+  async (req, res) => {
+    const { likeDelta } = req;
+    const comment = await Comment.findById(req.params.id);
+    if (!comment) return res.status(404).send('Comment not found');
+
+    if (likeDelta === -1 && comment.likes === 0)
+      return res.status(400).send("Can't unlike a comment with 0 likes");
+    comment.likes += likeDelta;
+    await comment.save();
+    res.send(comment);
+  }
+);
 
 router.delete(
   '/:id',

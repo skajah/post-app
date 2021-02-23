@@ -5,9 +5,9 @@ import CreateCommentBox from '../comments/createCommentBox';
 import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';
-import { getLikes } from '../../utils/getLikes';
 import { makeDate } from '../../utils/makeDate';
 import auth from '../../services/authService';
+import { likePost } from '../../services/postService';
 import { createComment, deleteComment } from '../../services/commentService';
 
 class Post extends Component {
@@ -83,14 +83,25 @@ class Post extends Component {
             this.setState({ comments, emptyComment: false });
         } catch (ex) {
             // REVISIT
-            if (ex.response && ex.response.status === 400)
-                toast.error(ex.response.message);
+            
         }
     }
 
-    handleLike = (liked) => {
-        const likes = getLikes(this.state.likes, liked);
-        this.setState({ likes });
+    handleLike = async (liked) => {
+        try {
+            const { data: post } = await likePost(this.state._id, liked);
+            const { likes } = post;
+            this.setState({ likes });
+        } catch (ex) {
+            if (ex.response){
+                const status = ex.response.status;
+                if (status === 400)
+                    console.log(`Error liking post: ${ex.response.data}`);
+                else if (status === 404)
+                    toast.error("Post not found. Refresh to get latest content");
+            }
+        }
+    
     }
     
     handleCommentTextChange = commentText => {

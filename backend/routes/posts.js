@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
+const validateLikeDelta = require('../middleware/validateLikeDelta');
 const { verifyUserForPost } = require('../middleware/verifyUser');
 const express = require('express');
 const { Post, validate } = require('../models/post');
@@ -42,6 +43,22 @@ router.post('/', auth, async (req, res) => {
   const post = await new Post(postObject).save();
   res.send(post);
 });
+
+router.patch(
+  '/:id',
+  [auth, validateId, validateLikeDelta],
+  async (req, res) => {
+    const { likeDelta } = req;
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).send('Post not found');
+
+    if (likeDelta === -1 && post.likes === 0)
+      return res.status(400).send("Can't unlike a post with 0 likes");
+    post.likes += likeDelta;
+    await post.save();
+    res.send(post);
+  }
+);
 
 router.delete(
   '/:id',

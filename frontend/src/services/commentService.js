@@ -10,3 +10,7 @@ export function createComment(comment) {
 export function deleteComment(id) {
   return http.delete(`${commentApiEndpoint}/${id}`);
 }
+
+export function likeComment(id, liked) {
+  return http.patch(`${commentApiEndpoint}/${id}?likeDelta=${liked ? 1 : -1}`);
+}
