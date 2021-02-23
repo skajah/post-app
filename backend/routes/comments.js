@@ -1,4 +1,7 @@
 const _ = require('lodash');
+const auth = require('../middleware/auth');
+const validateId = require('../middleware/validateId');
+const { verifyUserForComment } = require('../middleware/verifyUser');
 const express = require('express');
 const { Comment, validate } = require('../models/comment');
 const { Post } = require('../models/post');
@@ -18,7 +21,7 @@ router.get('/', async (req, res) => {
   res.send(comments);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const commentObject = _.pick(req.body, [
@@ -36,16 +39,19 @@ router.post('/', async (req, res) => {
 
   commentObject.user = user;
   const comment = await new Comment(commentObject).save();
+
   res.send(comment);
 });
 
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(400).send('Invalid Id');
-  const comment = await Comment.findByIdAndDelete(id).select('-__v');
-  if (!comment) return res.status(404).send('Comment not found');
-  res.send(comment);
-});
+router.delete(
+  '/:id',
+  [auth, validateId, verifyUserForComment],
+  async (req, res) => {
+    const comment = await Comment.findByIdAndDelete(req.params.id).select(
+      '-__v'
+    );
+    res.send(comment);
+  }
+);
 
 module.exports = router;

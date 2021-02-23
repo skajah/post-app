@@ -15,6 +15,10 @@ export function getPost(id, { withComments }) {
   );
 }
 
+export function createPost(post) {
+  return http.post(postApiEndpoint, post);
+}
+
 export function deletePost(id) {
   return http.delete(`${postApiEndpoint}/${id}`);
 }

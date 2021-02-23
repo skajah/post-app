@@ -15,7 +15,6 @@ class Comment extends Component {
     }
 
     populateState() {
-        console.log(this.props.comments);
         const { user, date, text, likes } = this.props.comment;
         this.setState({ user, date, text, likes: likes || 0});
     }

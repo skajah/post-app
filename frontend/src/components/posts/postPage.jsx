@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { getPost } from '../../services/postService';
+import { toast } from 'react-toastify';
 import Post from './post';
+
+import { getPost, deletePost } from '../../services/postService';
 import { makeDate, makeDates } from '../../utils/makeDate';
 
 class PostPage extends Component {
@@ -26,6 +28,21 @@ class PostPage extends Component {
         } 
     }
 
+    handleDelete = async () => {
+        try {
+            await deletePost(this.state.post._id);
+            this.props.history.replace('/');
+        } catch (ex) {
+            if (ex.response){
+                const status = ex.response.status;
+                if (status === 401)
+                    toast.warn("You can only delete your own posts/comments");
+                else if (status === 404)
+                    toast.error("Post not found. Try refresshing");
+            }
+        }
+    }
+
     render() { 
         const { post } = this.state;
 
@@ -38,7 +55,8 @@ class PostPage extends Component {
                <Post 
                 post={post}
                 comments={post.comments}
-                showComments={true}/>
+                showComments={true}
+                onDelete={this.handleDelete}/>
             </div>
         );
     }

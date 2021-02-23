@@ -280,7 +280,8 @@ main {
 .fa-volume-up,
 .fa-edit,
 .fa-comment-o,
-.comment-counter {
+.comment-counter,
+.fa-trash-o {
   color: whitesmoke;
 }
 

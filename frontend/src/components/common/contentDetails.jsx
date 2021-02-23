@@ -37,7 +37,7 @@ class ContentDetails extends Component {
                     <Comment numberOfComments={numberOfComments} onClick={onClick}/> 
                     }
                     <Like onClick={onLike} likes={likes}/>
-                    { null && <Delete onClick={onDelete}/> } 
+                    <Delete onClick={onDelete}/>
                 </div>
             </div>
          );

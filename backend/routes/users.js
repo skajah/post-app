@@ -37,6 +37,7 @@ router.post('/', async (req, res) => {
 });
 
 // revisit
+/*
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id))
@@ -45,5 +46,5 @@ router.delete('/:id', async (req, res) => {
   if (!user) return res.status(404).send('User not found');
   res.send(user);
 });
-
+*/
 module.exports = router;

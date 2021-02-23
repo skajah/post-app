@@ -6,7 +6,9 @@ import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';
 import { getLikes } from '../../utils/getLikes';
-import { getUserFromId } from '../../services/userService';
+import { makeDate } from '../../utils/makeDate';
+import auth from '../../services/authService';
+import { createComment, deleteComment } from '../../services/commentService';
 
 class Post extends Component {
     state = { 
@@ -25,9 +27,10 @@ class Post extends Component {
     }
 
     async populateState(){
-        const { user, date, text, media, comments, numberOfComments, likes } = this.props.post;
+        const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
         try {
             this.setState({ 
+                _id,
                 user, 
                 date: date || new Date(), 
                 text, 
@@ -42,23 +45,47 @@ class Post extends Component {
         
     }
 
-    handleDeleteComment = ({ _id }) => {
-        // console.log('Deleting: ' + _id);
-        const comments  = this.state.comments.filter(c => c._id !== _id );
+    handleDeleteComment = async ({ _id }) => {
+        const originalComments = this.state.comments;
+        const comments  = originalComments.filter(c => c._id !== _id );
         this.setState({ comments });
+        try {
+            await deleteComment(_id);
+        } catch (ex){
+            if (ex.response){
+                const status = ex.response.status;
+                if (status === 401)
+                    toast.warning("Can only delete your own posts/comments");
+                else if (status === 404)
+                    toast.error("Comment not fond. Refresh to get latest content");
+            }
+            this.setState({ comments: originalComments });
+        }
     }
 
-    handleCreateComment = text => {
+    handleCreateComment = async (text) => {
         if (!text.trim()){
             this.setState({ emptyComment: true });
             return;
         }
 
-        const comments = [...this.state.comments];
-        const nextId = (_.max(comments.map(c => c._id)) + 1) || 0;
-        const newComment = { _id: nextId, username: 'User' + nextId, date: new Date(), text};
-        comments.unshift(newComment);
-        this.setState({ comments, emptyComment: false });
+        try {
+            const newComment = {
+                postId: this.state._id,
+                userId: auth.getCurrentUser()._id,
+                // date: new Date(), // should default to now
+                text
+            };
+            const { data: comment } = await createComment(newComment);
+            makeDate(comment);
+            const comments = [...this.state.comments];
+            comments.unshift(comment);
+            this.setState({ comments, emptyComment: false });
+        } catch (ex) {
+            // REVISIT
+            if (ex.response && ex.response.status === 400)
+                toast.error(ex.response.message);
+        }
     }
 
     handleLike = (liked) => {

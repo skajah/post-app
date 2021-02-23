@@ -3,10 +3,11 @@ import { toast } from 'react-toastify';
 import Posts from './posts';
 import PostSearch from './postSearch';
 
-import { getPosts, deletePost } from '../../services/postService';
+import { getPosts, deletePost, createPost } from '../../services/postService';
+import auth from '../../services/authService';
 
 import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
-import { makeDates } from '../../utils/makeDate';
+import { makeDate, makeDates } from '../../utils/makeDate';
 
 class PostsPage extends Component {
     state = {
@@ -36,24 +37,35 @@ class PostsPage extends Component {
         try {
             await deletePost(_id);
         } catch (ex) {
-            if (ex.response && ex.response.status === 404)
-                toast.error(<p>Post not found<br/>Try refreshing</p>);
+            if (ex.response){
+                const status = ex.response.status;
+                if (status === 401)
+                    toast.warn("You can only delete your own posts/comments");
+                else if (status === 404)
+                    toast.error("Post not found. Refresh to get latest content");
+            }
             this.setState({ posts: originalPosts });
         }
     }
 
-    handleCreatePost = (postText, media) => {
-        const post = {
-            username: 'Anonymous',
-            date : new Date(),
+    handleCreatePost = async (postText, media) => {
+        const newPost = {
+            userId: auth.getCurrentUser()._id,
+            // date : new Date(), // should default to now
             likes: 0,
             text: postText,
             // media,
         };
 
-        const posts = [...this.state.posts];
-        posts.unshift(post);
-        this.setState({ posts });
+        try {
+            const { data: post } = await createPost(newPost);
+            makeDate(post)
+            const posts = [...this.state.posts];
+            posts.unshift(post);
+            this.setState({ posts });
+        } catch (ex) {
+            // REVISIT
+        }
     }
 
     handleSearchByKeyword = text => { 
@@ -98,10 +110,6 @@ class PostsPage extends Component {
 
         // console.log('Current posts: ', posts);
         return posts;
-    }
-
-    getPost = id => {
-        return this.state.posts.find(p => p._id === id);
     }
 
     handlePostClick = ({ _id }) => {
