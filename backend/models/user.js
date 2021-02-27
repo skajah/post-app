@@ -34,6 +34,16 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  likedPosts: {
+    type: Map,
+    of: Number,
+    default: {},
+  },
+  likedComments: {
+    type: Map,
+    of: Number,
+    default: {},
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -46,6 +56,8 @@ userSchema.methods.generateAuthToken = function () {
       description: this.description,
       date: this.date,
       isAdmin: this.isAdmin,
+      likedPosts: this.likedPosts,
+      likedComments: this.likedComments,
     },
     config.get('jwtPrivateKey')
   );
@@ -68,5 +80,21 @@ function validateUser(user) {
   return schema.validate(user);
 }
 
+async function likePost(userId, postId, liked) {
+  const user = await User.findById(userId);
+  if (liked) user.likedPosts.set(postId, 1);
+  else user.likedPosts.delete(postId);
+  await user.save();
+}
+
+async function likeComment(userId, commentId, liked) {
+  const user = await User.findById(userId);
+  if (liked) user.likedComments.set(commentId, 1);
+  else user.likedComments.delete(commentId);
+  await user.save();
+}
+
 exports.User = User;
 exports.validate = validateUser;
+exports.likePost = likePost;
+exports.likeComment = likeComment;

@@ -1,10 +1,11 @@
 import Icon from './icon';
 
 class Like extends Icon {
+
     state = { 
         liked: false,
         classes: "fa fa-heart-o"
-     }
+    }
 
     handleLike = () => {
         let { liked, classes } = this.state;
@@ -16,6 +17,10 @@ class Like extends Icon {
 
     renderIcon() {
         // fa-layers fa-fw ?
+        if (!this.state.initialLike && this.props.initialLike){
+            this.setState({ liked: true, initialLike: true, classes: "fa fa-heart" });
+
+        }
         return (
         <button className="btn" onClick={this.handleLike}>
             <i className={this.getClasses()} />

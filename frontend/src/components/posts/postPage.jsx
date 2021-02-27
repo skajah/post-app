@@ -11,8 +11,9 @@ class PostPage extends Component {
         post: null,
     }
 
-    async componentDidMount(){
-        await this.setPost();
+    componentDidMount(){
+        // console.log('postPage componentDidMount()');
+        this.setPost();
     }
 
     async setPost() {
@@ -47,14 +48,11 @@ class PostPage extends Component {
         const { post } = this.state;
 
         if (!post) return null;
-
-        // console.log(post);
         
         return (
             <div className="post-page">
                <Post 
                 post={post}
-                comments={post.comments}
                 showComments={true}
                 onDelete={this.handleDelete}/>
             </div>

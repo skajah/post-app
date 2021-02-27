@@ -6,14 +6,28 @@ const { verifyUserForPost } = require('../middleware/verifyUser');
 const express = require('express');
 const { Post, validate } = require('../models/post');
 const { Comment } = require('../models/comment');
-const { User } = require('../models/user');
+const { User, likePost } = require('../models/user');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
   const { numberOfComments } = req.query;
-  const posts = await Post.find().sort('-date');
-  if (numberOfComments === 'true') {
-    // TODO
+  const posts = await Post.find().select('-__v').sort('-date');
+  if (numberOfComments !== 'true') return res.send(posts);
+
+  const commentCount = new Map();
+  const comments = await Comment.find().select('postId');
+
+  comments.forEach((c) => {
+    const id = c.postId.toString();
+    const prevCount = commentCount.get(id) || 0;
+    commentCount.set(id, prevCount + 1);
+  });
+
+  for (let i = 0; i < posts.length; i++) {
+    const post = posts[i].toJSON();
+    post._id = post._id.toString();
+    post.numberOfComments = commentCount.get(post._id);
+    posts[i] = post;
   }
   res.send(posts);
 });
@@ -56,6 +70,8 @@ router.patch(
       return res.status(400).send("Can't unlike a post with 0 likes");
     post.likes += likeDelta;
     await post.save();
+    likePost(req.user._id, req.params.id, likeDelta === 1);
+
     res.send(post);
   }
 );

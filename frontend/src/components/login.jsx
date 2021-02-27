@@ -3,9 +3,12 @@ import { Redirect } from 'react-router-dom';
 import Joi from 'joi-browser';
 import Form from './common/form';
 import auth from '../services/authService';
+import UserContext from '../context/userContext';
 
 
 class Login extends Form {
+    static contextType = UserContext;
+
     state = {
         data: { email: '', password: ''},
         errors: {}
@@ -21,8 +24,9 @@ class Login extends Form {
             const { data } = this.state;
             await auth.login(data.email, data.password);
 
-            const { state } = this.props.location;
+            this.context.onLogin(); // notify App that jwt is set
 
+            const { state } = this.props.location;
             window.location = state ? state.from.pathname : '/'; // cause full reload because app's cdm() only called once 
             // toast.info(jwt);
             
@@ -36,7 +40,7 @@ class Login extends Form {
     }
 
     render() {
-        if (auth.getCurrentUser()) return <Redirect to="/"/>;
+        if (auth.hasCurrentUser()) return <Redirect to="/"/>;
 
         return (
             <div className="form form-login center">

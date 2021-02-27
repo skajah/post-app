@@ -1,4 +1,5 @@
 import http from './httpService';
+import { getMe } from './userService';
 import { apiUrl } from '../config.json';
 import jwtDecode from 'jwt-decode';
 
@@ -34,10 +35,15 @@ export function getCurrentUser() {
   }
 }
 
+export function hasCurrentUser() {
+  return localStorage.getItem(tokenKey) !== null;
+}
+
 export default {
   login,
   logout,
   getCurrentUser,
+  hasCurrentUser,
   loginWithJwt,
   getJwt,
 };

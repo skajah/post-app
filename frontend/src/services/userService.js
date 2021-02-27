@@ -10,3 +10,7 @@ export function register(user) {
     password: user.password,
   });
 }
+
+export function getMe() {
+  return http.get(`${userApiEndpoint}/me`);
+}

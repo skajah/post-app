@@ -4,12 +4,15 @@ import Posts from './posts';
 import PostSearch from './postSearch';
 
 import { getPosts, deletePost, createPost } from '../../services/postService';
-import auth from '../../services/authService';
 
 import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
 import { makeDate, makeDates } from '../../utils/makeDate';
 
+import UserContext from '../../context/userContext';
+
 class PostsPage extends Component {
+    static contextType = UserContext;
+
     state = {
         posts: null,
         keywordFilter: null,
@@ -19,7 +22,12 @@ class PostsPage extends Component {
 
     relativeDates = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days']
 
-    async componentDidMount() {
+    componentDidMount() {
+        // console.log('postsPage componentDidMount()');
+        this.populatePosts();
+    }
+
+    populatePosts = async () => {
         try {
             const { data: posts } = await getPosts({ numberOfComments: true });
             makeDates(posts);
@@ -27,7 +35,6 @@ class PostsPage extends Component {
         } catch (ex) {
             // Axios will catch any unexpected erros
         }
-        
     }
 
     handleDelete = async ({ _id }) => {
@@ -50,7 +57,7 @@ class PostsPage extends Component {
 
     handleCreatePost = async (postText, media) => {
         const newPost = {
-            userId: auth.getCurrentUser()._id,
+            userId: this.context.currentUser._id,
             // date : new Date(), // should default to now
             likes: 0,
             text: postText,
@@ -117,6 +124,7 @@ class PostsPage extends Component {
     }
 
     render() {  
+        // console.log('postsPage render()');
         const { relativeDateFilter, posts } = this.state;
 
         if (!posts) return <p className="center">Loading posts...</p>;
@@ -134,7 +142,7 @@ class PostsPage extends Component {
                         selectedDate={relativeDateFilter}
                         onDateSelected={this.handleDateSelected}
                         onDateRange={this.handleDateRange}/>
-             </div>
+            </div>
         );
   
     }

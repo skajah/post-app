@@ -2,8 +2,11 @@ import Joi  from 'joi-browser';
 import Form from '../common/form';
 import TextBox from '../common/textBox';
 import auth from '../../services/authService';
+import UserContext from '../../context/userContext';
 
 class ProfileEdit extends Form {
+    static contextType = UserContext;
+
     state = { 
         data: { email: '', username: '' },
         errors: {},
@@ -17,8 +20,9 @@ class ProfileEdit extends Form {
     }
 
     componentDidMount() {
-        const user = auth.getCurrentUser();
-        if (!user) return
+        // console.log('profileEdit componentDidMount()');
+        const user = this.context.currentUser;;
+        if (!user) return;
 
         const { email, username } = user;
         const data = { email, username };
@@ -38,8 +42,8 @@ class ProfileEdit extends Form {
     }
 
     render() { 
-        // const user = auth.getCurrentUser();
-        // if (!user) return <Redirect to="/login"/>;
+        // console.log('profileEdit render()');
+
         return ( 
             <div className="form form-profile-edit center">
                 <h1>Edit Profile</h1>

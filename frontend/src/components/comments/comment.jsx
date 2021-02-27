@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import ContentDetails from '../common/contentDetails';
 import { likeComment } from '../../services/commentService';
+import UserContext from '../../context/userContext';
 
 
 class Comment extends Component {
+    static contextType = UserContext;
+
     state = {
         date: new Date(),
         text: '',
@@ -24,6 +27,7 @@ class Comment extends Component {
         try {
             const { data: comment } = await likeComment(this.state._id, liked);
             const { likes } = comment;
+            this.context.onLike(comment._id, 'comment', liked);
             this.setState({ likes });
         } catch (ex) {
             if (ex.response){
@@ -39,7 +43,7 @@ class Comment extends Component {
     render() { 
         const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
         const { onDelete } = this.props;
-        const { likes, text, user, date } = this.state;
+        const { _id, likes, text, user, date } = this.state;
         const details = {
             username: user.username,
             date
@@ -50,6 +54,7 @@ class Comment extends Component {
                 details={details} 
                 profilePicUrl={url}
                 onDelete={onDelete}
+                initialLike={this.context.currentUser.likedComments[_id]}
                 onLike={this.handleLike}
                 likes={likes}/>
                 <p className="comment-text">{text}</p>

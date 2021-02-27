@@ -4,7 +4,6 @@ import auth from '../services/authService';
 
 class NavBar extends Component {
     render() { 
-        const user = auth.getCurrentUser();
         return ( 
             <nav className="navbar navbar-expand-lg justify-content-between">
                 <Link className="navbar-brand" to="/posts">
@@ -13,7 +12,7 @@ class NavBar extends Component {
                 </Link>
                 <div className="nav-items">
                     {
-                        user ?
+                        auth.hasCurrentUser() ?
                         <React.Fragment>
                             <NavLink className="nav-link nav-item" to="/profile">Profile</NavLink>
                             <NavLink className="nav-link nav-item" to="/logout">Logout</NavLink>

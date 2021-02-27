@@ -6,7 +6,7 @@ const { verifyUserForComment } = require('../middleware/verifyUser');
 const express = require('express');
 const { Comment, validate } = require('../models/comment');
 const { Post } = require('../models/post');
-const { User } = require('../models/user');
+const { User, likeComment } = require('../models/user');
 const mongoose = require('mongoose');
 const router = express.Router();
 
@@ -56,6 +56,8 @@ router.patch(
       return res.status(400).send("Can't unlike a comment with 0 likes");
     comment.likes += likeDelta;
     await comment.save();
+
+    likeComment(req.user._id, req.params.id, likeDelta === 1);
     res.send(comment);
   }
 );

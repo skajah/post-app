@@ -6,8 +6,11 @@ import Joi from 'joi-browser';
 import Form from './common/form';
 import { register } from '../services/userService';
 import auth from '../services/authService';
+import UserContext from '../context/userContext';
 
 class Register extends Form {
+    static contextType = UserContext;
+    
     state = {
         data: { username: '', email: '', password: '' },
         errors: {}
@@ -24,9 +27,7 @@ class Register extends Form {
         try {
             const response = await register(this.state.data);
             auth.loginWithJwt(response.headers['x-auth-token']);
-            console.log('x-auth-token: ', response.headers['x-auth-token']);
-            console.log('Headers: ', response.headers);
-            console.log('User: ', response.data);
+            this.context.onLogin(); // notify App that jwt is set
             window.location = '/';
         } catch (ex) {
             if (ex.response && ex.response.status === 400){
@@ -38,7 +39,7 @@ class Register extends Form {
     }
 
     render() {
-        if (auth.getCurrentUser()) return <Redirect to='/' />;
+        if (auth.hasCurrentUser()) return <Redirect to='/' />;
         return (
             <div className="form form-register center">
                 <h1>Register</h1>

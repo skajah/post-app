@@ -6,18 +6,19 @@ import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';
 import { makeDate } from '../../utils/makeDate';
-import auth from '../../services/authService';
 import { likePost } from '../../services/postService';
 import { createComment, deleteComment } from '../../services/commentService';
+import UserContext from '../../context/userContext';
 
 class Post extends Component {
+    static contextType = UserContext;
+
     state = { 
         user: {},
         date: new Date(),
         text: '',
         media: null,
         comments: [],
-        numberOfComments: 0,
         likes: 0,
         commentText: '',
         emptyComment: false,
@@ -26,28 +27,24 @@ class Post extends Component {
         this.populateState();
     }
 
-    async populateState(){
+    populateState(){
         const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
-        try {
-            this.setState({ 
-                _id,
-                user, 
-                date: date || new Date(), 
-                text, 
-                media, 
-                comments: comments || [],
-                numberOfComments: numberOfComments || 0,
-                likes: likes || 0,
-            });
-        } catch (ex) {
-            toast.error(ex.message);
-        }
-        
+        this.setState({ 
+            _id,
+            user, 
+            date: date || new Date(), 
+            text, 
+            media, 
+            comments: comments || [],
+            numberOfComments,
+            likes: likes || 0,
+        });
     }
 
     handleDeleteComment = async ({ _id }) => {
         const originalComments = this.state.comments;
         const comments  = originalComments.filter(c => c._id !== _id );
+        
         this.setState({ comments });
         try {
             await deleteComment(_id);
@@ -72,15 +69,17 @@ class Post extends Component {
         try {
             const newComment = {
                 postId: this.state._id,
-                userId: auth.getCurrentUser()._id,
-                // date: new Date(), // should default to now
+                userId: this.context.currentUser._id,
                 text
             };
             const { data: comment } = await createComment(newComment);
             makeDate(comment);
             const comments = [...this.state.comments];
             comments.unshift(comment);
-            this.setState({ comments, emptyComment: false });
+            this.setState({ 
+                comments, 
+                emptyComment: false 
+            });
         } catch (ex) {
             // REVISIT
             
@@ -91,6 +90,7 @@ class Post extends Component {
         try {
             const { data: post } = await likePost(this.state._id, liked);
             const { likes } = post;
+            this.context.onLike(post._id, 'post', liked);
             this.setState({ likes });
         } catch (ex) {
             if (ex.response){
@@ -116,6 +116,7 @@ class Post extends Component {
 
     render() { 
         const { 
+            _id,
             text, 
             media, 
             likes,
@@ -123,7 +124,7 @@ class Post extends Component {
             commentText, 
             emptyComment, 
             user, 
-            date, 
+            date,
             numberOfComments } = this.state;
         const { onDelete, showComments, onPostClick } = this.props;
         const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
@@ -131,6 +132,9 @@ class Post extends Component {
         const details = { username: user.username, date };
         // console.log('Date: ', this.state.date, typeof this.state.date);
         const alert = { type: 'warning', message: "Comment can't be empty"};
+        // console.log('Liked post: ', this.context.currentUser.likedPosts)
+        // console.log('id: ', _id);
+        // console.log('Found: ', this.context.currentUser.likedPosts[_id]);
         return ( 
             <div className="card post">
                 <div className="card-header post-header">
@@ -138,9 +142,10 @@ class Post extends Component {
                     details={details}
                     profilePicUrl={url}
                     onDelete={onDelete}
+                    initialLike={this.context.currentUser.likedPosts[_id]}
                     onLike={this.handleLike}
                     likes={likes}
-                    numberOfComments={numberOfComments}
+                    numberOfComments={numberOfComments || comments.length}
                     onClick={onPostClick}
                     showCommentIcon={true}/> 
                 </div>

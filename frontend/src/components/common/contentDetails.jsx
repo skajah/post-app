@@ -14,7 +14,8 @@ class ContentDetails extends Component {
             likes, 
             onClick, 
             numberOfComments,
-            showCommentIcon} = this.props;
+            showCommentIcon,
+            initialLike} = this.props;
         // console.log(profilePicUrl, comment);
         const { username, date } = details;
         return ( 
@@ -36,7 +37,7 @@ class ContentDetails extends Component {
                     showCommentIcon &&
                     <Comment numberOfComments={numberOfComments} onClick={onClick}/> 
                     }
-                    <Like onClick={onLike} likes={likes}/>
+                    <Like onClick={onLike} likes={likes} initialLike={initialLike}/>
                     <Delete onClick={onDelete}/>
                 </div>
             </div>
