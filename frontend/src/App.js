@@ -66,7 +66,7 @@ class App extends Component {
   render() {
     // console.log('App render()');
 
-    // The user might be set in local storage
+    // The user's jwt might be set in local storage
     // but the state might not have been upadated yet
     if (auth.hasCurrentUser() && !this.state.currentUser) return null;
     return (

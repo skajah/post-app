@@ -19,8 +19,7 @@ class Post extends Component {
         text: '',
         media: null,
         comments: [],
-        likes: 0,
-        commentText: '',
+        likes: 0, // could leaveOut
         emptyComment: false,
     } 
     componentDidMount() {
@@ -103,16 +102,6 @@ class Post extends Component {
         }
     
     }
-    
-    handleCommentTextChange = commentText => {
-        const n = commentText.length;
-        if (commentText[n - 1] === '\n'){
-            this.handleCreateComment(commentText.substring(0, n))
-            this.setState({ commentText: '' });
-            return;
-        } 
-        this.setState({ commentText });
-    }
 
     render() { 
         const { 
@@ -121,7 +110,6 @@ class Post extends Component {
             media, 
             likes,
             comments, 
-            commentText, 
             emptyComment, 
             user, 
             date,
@@ -154,9 +142,9 @@ class Post extends Component {
                     {
                         media && 
                         <Media 
-                        type={media.type}
-                        src={media.src}
-                        {...media.attr}/> 
+                        type={media.mediaType}
+                        src={media.data}
+                        className="post-media"/> 
                     }
                 </div>
 
@@ -165,9 +153,8 @@ class Post extends Component {
                         showComments && 
                         <React.Fragment>      
                             <CreateCommentBox 
-                            text={commentText}
-                            onTextChange={this.handleCommentTextChange}
-                            alert={emptyComment && alert}/>
+                            alert={emptyComment && alert}
+                            onCreate={this.handleCreateComment}/>
 
                             <Comments 
                             comments={comments}

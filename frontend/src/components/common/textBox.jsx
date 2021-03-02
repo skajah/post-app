@@ -34,6 +34,7 @@ class TextBox extends Component {
 
     render() { 
         const { name, placeHolder, value, type, ...rest } = this.props;
+        console.log('textBox render()');
 
         return ( 
             type === 'input' ? 

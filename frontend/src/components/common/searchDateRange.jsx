@@ -4,7 +4,6 @@ import withAlert from '../hoc/withAlert';
 class SearchDateRange extends Component {
 
     // Not in state because no need to rerender on these changes
-
     dateRange = { start: null, end: null }
 
     handleStartDate = e => {

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import Posts from './posts';
 import PostSearch from './postSearch';
+import CreatePostBox from './createPostBox';
 
 import { getPosts, deletePost, createPost } from '../../services/postService';
 
@@ -9,6 +10,7 @@ import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters
 import { makeDate, makeDates } from '../../utils/makeDate';
 
 import UserContext from '../../context/userContext';
+import { readMedia } from '../../utils/media';
 
 class PostsPage extends Component {
     static contextType = UserContext;
@@ -18,6 +20,7 @@ class PostsPage extends Component {
         keywordFilter: null,
         relativeDateFilter: null,
         dateRangeFilter: null,
+        emptyPost: false,
     }
 
     relativeDates = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days']
@@ -55,13 +58,21 @@ class PostsPage extends Component {
         }
     }
 
-    handleCreatePost = async (postText, media) => {
+    handleCreatePost = async (text, media) => {
+        if ( !(text.trim() || media) ) {
+            if (!this.state.emptyPost)
+                this.setState({ emptyPost: true }); // avoid rerender of posts
+            return;
+        }
+        const mediaData =  await readMedia(media.src);
+        // console.log(mediaData);
+
         const newPost = {
             userId: this.context.currentUser._id,
             // date : new Date(), // should default to now
-            likes: 0,
-            text: postText,
-            // media,
+            // likes: 0, // should default to 0
+            text,
+            media: {mediaType: media.type, data: mediaData},
         };
 
         try {
@@ -69,14 +80,16 @@ class PostsPage extends Component {
             makeDate(post)
             const posts = [...this.state.posts];
             posts.unshift(post);
-            this.setState({ posts });
+            this.setState({ posts, emptyPost: false });
         } catch (ex) {
             // REVISIT
+            console.log(ex.response);
         }
     }
 
     handleSearchByKeyword = text => { 
         const trimmed = text.trim().toLowerCase();
+        if (!trimmed) return;
         this.setState({ keywordFilter: trimmed, 
                         relativeDateFilter: null, 
                         dateRangeFilter: null 
@@ -125,23 +138,29 @@ class PostsPage extends Component {
 
     render() {  
         // console.log('postsPage render()');
-        const { relativeDateFilter, posts } = this.state;
+        const { relativeDateFilter, posts, emptyPost } = this.state;
+        const alert = { type: 'warning', message: "Post can't be empty"};
 
         if (!posts) return <p className="center">Loading posts...</p>;
 
         return (
             <div className="posts-page">
+                <div className="posts-with-create">
+                    <CreatePostBox 
+                    onCreate={this.handleCreatePost}
+                    alert={emptyPost && alert}/>
                     <Posts 
                         posts={this.getCurrentPosts()}
                         onDelete={this.handleDelete}
                         onCreatePost={this.handleCreatePost}
                         onPostClick={this.handlePostClick}/>
-                    <PostSearch 
-                        searchByKeyword={this.handleSearchByKeyword}
-                        dates={this.relativeDates}
-                        selectedDate={relativeDateFilter}
-                        onDateSelected={this.handleDateSelected}
-                        onDateRange={this.handleDateRange}/>
+                </div>
+                <PostSearch 
+                    searchByKeyword={this.handleSearchByKeyword}
+                    dates={this.relativeDates}
+                    selectedDate={relativeDateFilter}
+                    onDateSelected={this.handleDateSelected}
+                    onDateRange={this.handleDateRange}/>
             </div>
         );
   

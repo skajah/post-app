@@ -96,14 +96,14 @@ main {
 }
 
 .post-media {
-  max-width: 50%;
-  max-height: 50%;
+  max-width: 80%;
+  max-height: 80%;
 }
 
-.posts {
+.posts-with-create {
   width: 50%;
   margin-right: 10px;
-  height: 90vh;
+  /* height: 90vh; */
 }
 
 .create-post-box,
@@ -139,12 +139,14 @@ main {
 .create-post-button:hover {
   background: rgba(255, 217, 0, 0.9) !important;
 }
-.clear-media-button {
+.clear-media-button,
+.btn-comment {
   background: whitesmoke !important;
   color: var(--dark-gray);
 }
 
-.clear-media-button:hover {
+.clear-media-button:hover,
+.btn-comment:hover {
   background: rgba(245, 245, 245, 0.95) !important;
 }
 
@@ -194,31 +196,34 @@ main {
 #profile-desc-text-box {
   height: 5rem;
 }
-.create-comment-text-box,
-.search-keyword-text-box {
+.create-comment-text-box {
   flex-grow: 3;
 }
 
-/* post seach */
+/* post search */
 
-.post-search-box {
+.post-search {
   display: flex;
-  position: fixed;
-  left: 75%;
   flex-direction: column;
+  position: fixed;
+  left: 70%;
 }
 
 .search-keyword {
   display: flex;
   align-items: center;
 }
+.search-keyword .with-alert {
+  width: 100%;
+}
 
 .search-keyword-text-box {
-  margin-left: 10px;
+  width: 100%;
 }
 
 .search-date-range {
   margin: 1.5rem 0;
+  font-size: 0.8rem;
 }
 
 .post-page {

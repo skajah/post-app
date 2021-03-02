@@ -29,7 +29,7 @@ class PostSearch extends Component {
         const alert = { type: 'danger', message: "Start date can't be after end date "};
 
         return ( 
-            <div className="post-search-box">
+            <div className="post-search">
                 <p
                 style={{
                     fontWeight: 'bold',
@@ -38,7 +38,7 @@ class PostSearch extends Component {
                 >Search for posts</p>
                 <SearchKeyword 
                 placeHolder=" Enter a username"
-                searchByKeyword={searchByKeyword}/>
+                onKeywordSearch={searchByKeyword}/>
 
                 <p
                 style={{margin: '1.5rem 0 .5rem', fontWeight: '500'}}

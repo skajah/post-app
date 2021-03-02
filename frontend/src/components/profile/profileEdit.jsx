@@ -1,7 +1,6 @@
 import Joi  from 'joi-browser';
 import Form from '../common/form';
 import TextBox from '../common/textBox';
-import auth from '../../services/authService';
 import UserContext from '../../context/userContext';
 
 class ProfileEdit extends Form {

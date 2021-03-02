@@ -4,8 +4,13 @@ import Search from './icons/search';
 
 class SearchKeyword extends Component {
 
+    text = ''
     handleSearchTextChange = text => {
-        this.props.searchByKeyword(text);
+        this.text = text;
+    }
+
+    handleKeywordSearch = () => {
+        this.props.onKeywordSearch(this.text);
     }
     
     render() { 
@@ -13,8 +18,6 @@ class SearchKeyword extends Component {
 
         return ( 
             <div className="search-keyword">
-                <Search disabled={true} size="lg"/> 
-
                 <TextBox 
                 name="searchKeyword" 
                 placeHolder={placeHolder} 
@@ -22,6 +25,7 @@ class SearchKeyword extends Component {
                 type="input"
                 onTextChange={this.handleSearchTextChange}
                 />
+                <Search size="lg" onClick={this.handleKeywordSearch}/> 
             </div>
          );
     }

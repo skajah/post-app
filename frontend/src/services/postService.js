@@ -9,6 +9,10 @@ export function getPosts({ numberOfComments }) {
   );
 }
 
+export function getMyPosts() {
+  return http.get(`${postApiEndpoint}/me`);
+}
+
 export function getPost(id, { withComments }) {
   return http.get(
     `${postApiEndpoint}/${id}${withComments ? '?withComments=true' : ''}`
