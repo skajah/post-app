@@ -1,6 +1,7 @@
 const config = require('config');
 const mongoose = require('mongoose');
 const express = require('express');
+const bodyParser = require('body-parser');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 const comments = require('./routes/comments');
@@ -21,10 +22,10 @@ mongoose
 
 const app = express();
 
-app.use(express.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 
-// Comment routes
+// routes
 app.use('/api/comments', comments);
 app.use('/api/posts', posts);
 app.use('/api/users', users);

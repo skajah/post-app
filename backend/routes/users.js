@@ -20,7 +20,6 @@ router.post('/', async (req, res) => {
     'username',
     'email',
     'password',
-    'sex',
     'description',
     'date',
     'isAdmin',

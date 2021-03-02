@@ -20,11 +20,6 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   password: { type: String, minlength: 8, maxlength: 1024, required: true },
-  sex: {
-    type: String,
-    enum: ['M', 'F'],
-    // required: true
-  },
   description: {
     type: String,
     maxlength: 3000,
@@ -52,7 +47,6 @@ userSchema.methods.generateAuthToken = function () {
       _id: this._id,
       username: this.username,
       email: this.email,
-      sex: this.sex,
       description: this.description,
       date: this.date,
       isAdmin: this.isAdmin,
@@ -71,7 +65,6 @@ function validateUser(user) {
     username: Joi.string().min(5).max(255).required(),
     email: Joi.string().email().min(8).max(255).required(),
     password: Joi.string().min(8).max(255).required(),
-    sex: Joi.string().valid('M', 'F'),
     description: Joi.string().max(3000),
     date: Joi.date().default(Date.now),
     isAdmin: Joi.boolean().default(false),

@@ -32,6 +32,11 @@ router.get('/', async (req, res) => {
   res.send(posts);
 });
 
+router.get('/me', auth, async (req, res) => {
+  const posts = await Post.find({ 'user._id': req.user._id });
+  res.send(posts);
+});
+
 router.get('/:id', validateId, async (req, res) => {
   const { id } = req.params;
 
@@ -50,10 +55,17 @@ router.get('/:id', validateId, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const postObject = _.pick(req.body, ['userId', 'date', 'text', 'likes']);
+  const postObject = _.pick(req.body, [
+    'userId',
+    'date',
+    'text',
+    'likes',
+    'media',
+  ]);
   const user = await User.findById(postObject.userId).select('_id username');
   if (!user) res.status(400).send('Invalid userId for post');
   postObject.user = user;
+  console.log(postObject.media);
   const post = await new Post(postObject).save();
   res.send(post);
 });
