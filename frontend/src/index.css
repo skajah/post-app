@@ -31,20 +31,25 @@ main {
   border: 1px solid var(--lighter-maroon);
 }
 
-.btn-form {
-  width: 100%;
+.btn-form,
+.btn-profile-edit {
   padding: 5px;
   border: none;
-  border-radius: 40px;
+  border-radius: 30px;
   background: var(--lighter-maroon);
   color: whitesmoke;
+}
+
+.btn-form {
+  width: 100%;
 }
 
 .btn-form:disabled {
   background: var(--lightest-maroon);
 }
 
-.btn-form:enabled:hover {
+.btn-form:enabled:hover,
+.btn-profile-edit:enabled:hover {
   background: var(--light-maroon);
 }
 
@@ -256,6 +261,38 @@ main {
 .profile-details .username {
   color: whitesmoke;
   font-weight: bold;
+}
+
+.profile-edit {
+  width: 35%;
+  display: grid;
+  grid-template-columns: 8fr 2fr;
+  column-gap: 10px;
+}
+
+.profile-edit-text-boxes {
+  display: grid;
+  grid-template-columns: 2fr 8fr;
+  gap: 10px;
+}
+
+.profile-edit-text-boxes label {
+  text-align: right;
+  font-weight: 500;
+}
+
+.profile-edit-text-boxes input,
+.profile-edit-text-boxes textarea {
+  width: 100%;
+}
+
+.profile-edit-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-edit-buttons button {
+  margin-bottom: 10px;
 }
 
 .tab-nav {

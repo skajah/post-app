@@ -87,7 +87,80 @@ async function likeComment(userId, commentId, liked) {
   await user.save();
 }
 
+async function updateEmail(userId, email) {
+  email = email.trim();
+  let result = {};
+  const schema = Joi.object({
+    email: Joi.string().email().min(8).max(255).required(),
+  });
+  const error = schema.validate({ email }).error;
+  if (error) {
+    result.error = error.details[0].message;
+    return result;
+  }
+  const user = await User.findById(userId).select('email');
+  if (user.email === email) {
+    result.error = 'New email should not be the same as old';
+    return result;
+  }
+  const emailTaken = await User.exists({ email });
+  if (emailTaken) {
+    result.error = 'Email already taken';
+    return result;
+  }
+  await User.findByIdAndUpdate(userId, { email });
+  result.email = email;
+  return result;
+}
+
+async function updateUsername(userId, username) {
+  username = username.trim();
+  let result = {};
+  const schema = Joi.object({
+    username: Joi.string().min(5).max(255).required(),
+  });
+  const error = schema.validate({ username }).error;
+  if (error) {
+    result.error = error.details[0].message;
+    return result;
+  }
+  const user = await User.findById(userId).select('username');
+  if (user.username === username) {
+    result.error = 'New username should not be the same as old';
+    return result;
+  }
+  const emailTaken = await User.exists({ username });
+  if (emailTaken) {
+    result.error = 'Username already taken';
+    return result;
+  }
+  await User.findByIdAndUpdate(userId, { username });
+  result.username = username;
+  return result;
+}
+
+async function updateDescription(userId, description) {
+  description = description.trim();
+  let result = {};
+  const schema = Joi.object({
+    description: Joi.string().allow('').max(3000),
+  });
+  const error = schema.validate({ description }).error;
+  if (error) {
+    result.error = error.details[0].message;
+    return result;
+  }
+  await User.findByIdAndUpdate(userId, { description });
+  result.description = description;
+  return result;
+}
+
 exports.User = User;
 exports.validate = validateUser;
 exports.likePost = likePost;
 exports.likeComment = likeComment;
+exports.update = {
+  email: updateEmail,
+  username: updateUsername,
+  description: updateDescription,
+};

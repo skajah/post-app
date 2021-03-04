@@ -65,7 +65,7 @@ router.post('/', auth, async (req, res) => {
   const user = await User.findById(postObject.userId).select('_id username');
   if (!user) res.status(400).send('Invalid userId for post');
   postObject.user = user;
-  console.log(postObject.media);
+  // console.log(postObject.media);
   const post = await new Post(postObject).save();
   res.send(post);
 });

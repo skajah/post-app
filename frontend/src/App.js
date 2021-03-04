@@ -63,6 +63,13 @@ class App extends Component {
     this.setState({ currentUser });
   };
 
+  updateUser = (property, value) => {
+    const currentUser = { ...this.state.currentUser };
+    currentUser[property] = value;
+    console.log(`Chaning [${property}] to [${value}]`);
+    this.setState({ currentUser });
+  };
+
   render() {
     // console.log('App render()');
 
@@ -75,6 +82,7 @@ class App extends Component {
           currentUser: this.state.currentUser,
           onLogin: this.handleLogin,
           onLike: this.handleLike,
+          updateUser: this.updateUser,
         }}
       >
         <React.Fragment>

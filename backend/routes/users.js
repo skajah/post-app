@@ -2,7 +2,7 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const mongoose = require('mongoose');
-const { User, validate } = require('../models/user');
+const { User, validate, update } = require('../models/user');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -11,6 +11,27 @@ router.get('/me', auth, async (req, res) => {
   const user = await User.findById(req.user._id);
   const token = user.generateAuthToken();
   res.send(token);
+});
+
+router.patch('/me', auth, async (req, res) => {
+  let { email, username, description } = req.body;
+  if (email !== undefined) {
+    const result = await update.email(req.user._id, email);
+    if (result.error) return res.status(400).send(result.error);
+    return res.send(result.email);
+  }
+  if (username !== undefined) {
+    const result = await update.username(req.user._id, username);
+    if (result.error) return res.status(400).send(result.error);
+    return res.send(result.username);
+  }
+  if (description !== undefined) {
+    const result = await update.description(req.user._id, description);
+    if (result.error) return res.status(400).send(result.error);
+    return res.send(result.description);
+  }
+
+  return res.send('Nothing to update');
 });
 
 router.post('/', async (req, res) => {
@@ -42,15 +63,4 @@ router.post('/', async (req, res) => {
     .send(_.pick(user, ['_id', 'username', 'email']));
 });
 
-// revisit
-/*
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(400).send('Invalid Id');
-  const user = await User.findByIdAndDelete(id).select('-password -__v');
-  if (!user) return res.status(404).send('User not found');
-  res.send(user);
-});
-*/
 module.exports = router;
