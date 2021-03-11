@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
-const validateLikeDelta = require('../middleware/validateLikeDelta');
+const { likeDelta } = require('../middleware/validateDelta');
 const { verifyUserForPost } = require('../middleware/verifyUser');
 const express = require('express');
 const { Post, validate } = require('../models/post');
@@ -10,25 +10,8 @@ const { User, likePost } = require('../models/user');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { numberOfComments } = req.query;
+  // Implement paginations
   const posts = await Post.find().select('-__v').sort('-date');
-  if (numberOfComments !== 'true') return res.send(posts);
-
-  const commentCount = new Map();
-  const comments = await Comment.find().select('postId');
-
-  comments.forEach((c) => {
-    const id = c.postId.toString();
-    const prevCount = commentCount.get(id) || 0;
-    commentCount.set(id, prevCount + 1);
-  });
-
-  for (let i = 0; i < posts.length; i++) {
-    const post = posts[i].toJSON();
-    post._id = post._id.toString();
-    post.numberOfComments = commentCount.get(post._id);
-    posts[i] = post;
-  }
   res.send(posts);
 });
 
@@ -70,23 +53,20 @@ router.post('/', auth, async (req, res) => {
   res.send(post);
 });
 
-router.patch(
-  '/:id',
-  [auth, validateId, validateLikeDelta],
-  async (req, res) => {
-    const { likeDelta } = req;
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).send('Post not found');
+router.patch('/:id', [auth, validateId, likeDelta], async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  if (!post) return res.status(404).send('Post not found');
 
-    if (likeDelta === -1 && post.likes === 0)
-      return res.status(400).send("Can't unlike a post with 0 likes");
-    post.likes += likeDelta;
-    await post.save();
-    likePost(req.user._id, req.params.id, likeDelta === 1);
+  const likeDelta = req.likeDelta;
 
-    res.send(post);
-  }
-);
+  if (likeDelta === -1 && post.likes === 0)
+    return res.status(400).send("Can't unlike a post with 0 likes");
+  post.likes += likeDelta;
+  await post.save();
+  likePost(req.user._id, req.params.id, likeDelta === 1);
+
+  res.send(post);
+});
 
 router.delete(
   '/:id',

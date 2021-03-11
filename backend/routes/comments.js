@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
-const validateLikeDelta = require('../middleware/validateLikeDelta');
+const { likeDelta } = require('../middleware/validateDelta');
 const { verifyUserForComment } = require('../middleware/verifyUser');
 const express = require('express');
 const { Comment, validate } = require('../models/comment');
@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
       .status(400)
       .send('Specify postId in query string to get comments');
   if (!mongoose.Types.ObjectId.isValid(postId))
+    // move to validateId
     return res.status(400).send('Invalid Id');
   const comments = await Comment.find({ postId }).select('-__v');
   res.send(comments);
@@ -41,26 +42,27 @@ router.post('/', auth, async (req, res) => {
   commentObject.user = user;
   const comment = await new Comment(commentObject).save();
 
+  await Post.findByIdAndUpdate(comment.postId, {
+    $inc: { numberOfComments: 1 },
+  });
+
   res.send(comment);
 });
 
-router.patch(
-  '/:id',
-  [auth, validateId, validateLikeDelta],
-  async (req, res) => {
-    const { likeDelta } = req;
-    const comment = await Comment.findById(req.params.id);
-    if (!comment) return res.status(404).send('Comment not found');
+router.patch('/:id', [auth, validateId, likeDelta], async (req, res) => {
+  const comment = await Comment.findById(req.params.id);
+  if (!comment) return res.status(404).send('Comment not found');
 
-    if (likeDelta === -1 && comment.likes === 0)
-      return res.status(400).send("Can't unlike a comment with 0 likes");
-    comment.likes += likeDelta;
-    await comment.save();
+  const likeDelta = req.likeDelta;
 
-    likeComment(req.user._id, req.params.id, likeDelta === 1);
-    res.send(comment);
-  }
-);
+  if (likeDelta === -1 && comment.likes === 0)
+    return res.status(400).send("Can't unlike a comment with 0 likes");
+  comment.likes += likeDelta;
+  await comment.save();
+  likeComment(req.user._id, req.params.id, likeDelta === 1);
+
+  res.send(comment);
+});
 
 router.delete(
   '/:id',
@@ -69,6 +71,9 @@ router.delete(
     const comment = await Comment.findByIdAndDelete(req.params.id).select(
       '-__v'
     );
+    await Post.findByIdAndUpdate(comment.postId, {
+      $inc: { numberOfComments: -1 },
+    });
     res.send(comment);
   }
 );

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -155,6 +156,22 @@ async function updateDescription(userId, description) {
   return result;
 }
 
+async function updatePassword(userId, password) {
+  let result = {};
+  const schema = Joi.object({
+    password: Joi.string().min(8).max(255),
+  });
+  const error = schema.validate({ password }).error;
+  if (error) {
+    result.error = error.details[0].message;
+    return result;
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(password, salt);
+  await User.findByIdAndUpdate(userId, { password: hashed });
+  return result;
+}
+
 exports.User = User;
 exports.validate = validateUser;
 exports.likePost = likePost;
@@ -163,4 +180,5 @@ exports.update = {
   email: updateEmail,
   username: updateUsername,
   description: updateDescription,
+  password: updatePassword,
 };

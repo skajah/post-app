@@ -11,6 +11,10 @@ export function deleteComment(id) {
   return http.delete(`${commentApiEndpoint}/${id}`);
 }
 
-export function likeComment(id, liked) {
-  return http.patch(`${commentApiEndpoint}/${id}?likeDelta=${liked ? 1 : -1}`);
+export function likeComment(id) {
+  return http.patch(`${commentApiEndpoint}/${id}`, { liked: true });
+}
+
+export function unlikeComment(id) {
+  return http.patch(`${commentApiEndpoint}/${id}`, { liked: false });
 }

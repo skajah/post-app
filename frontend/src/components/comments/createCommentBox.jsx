@@ -43,6 +43,7 @@ class CreateCommentBox extends Component {
                     className="text-box create-comment-text-box"
                     onTextChange={this.handleTextChange}
                     // Pass down alert so that it is aligned with text box
+                    type="textbox"
                     alert={alert}/> 
                     
                     <button 

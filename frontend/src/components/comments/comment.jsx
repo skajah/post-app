@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import ContentDetails from '../common/contentDetails';
-import { likeComment } from '../../services/commentService';
+import { likeComment, unlikeComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
 
 
@@ -25,7 +25,12 @@ class Comment extends Component {
 
     handleLike = async (liked) => {
         try {
-            const { data: comment } = await likeComment(this.state._id, liked);
+            const id = this.state._id;
+
+            const { data: comment } = liked ? 
+            await likeComment(id) :
+            await unlikeComment(id);
+
             const { likes } = comment;
             this.context.onLike(comment._id, 'comment', liked);
             this.setState({ likes });

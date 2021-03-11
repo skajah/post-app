@@ -6,7 +6,7 @@ import ContentDetails from '../common/contentDetails';
 import _ from 'lodash';
 import Media from '../common/media';
 import { makeDate } from '../../utils/makeDate';
-import { likePost } from '../../services/postService';
+import { likePost, unlikePost } from '../../services/postService';
 import { createComment, deleteComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
 
@@ -66,8 +66,9 @@ class Post extends Component {
         }
 
         try {
+            const postId = this.state._id;
             const newComment = {
-                postId: this.state._id,
+                postId,
                 userId: this.context.currentUser._id,
                 text
             };
@@ -87,7 +88,12 @@ class Post extends Component {
 
     handleLike = async (liked) => {
         try {
-            const { data: post } = await likePost(this.state._id, liked);
+            const id = this.state._id;
+
+            const { data: post } = liked ? 
+            await likePost(id):
+            await unlikePost(id);
+
             const { likes } = post;
             this.context.onLike(post._id, 'post', liked);
             this.setState({ likes });

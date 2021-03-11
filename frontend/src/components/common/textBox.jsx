@@ -13,19 +13,19 @@ class TextBox extends Component {
         return (
             <textarea
             name={name}
-            value={value}
+            defaultValue={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
             {...rest}/>
         );
     }
     
-    renderInput = (name, placeHolder, value, rest) => {
+    renderInput = (name, placeHolder, value, type, rest) => {
         return (
             <input
-            type="text"
+            type={type}
             name={name}
-            value={value}
+            defaultValue={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
             {...rest}/>
@@ -33,13 +33,13 @@ class TextBox extends Component {
     }
 
     render() { 
-        const { name, placeHolder, value, type, ...rest } = this.props;
+        const { name, placeHolder, label, value, type, ...rest } = this.props;
         console.log('textBox render()');
 
         return ( 
-            type === 'input' ? 
-            this.renderInput(name, placeHolder, value, rest) :
-            this.renderTextArea(name, placeHolder, value, rest)
+            type === 'textarea' ?
+                this.renderTextArea(name, placeHolder, value, rest):
+                this.renderInput(name, placeHolder, value, type, rest)
          );
     }
 }

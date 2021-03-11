@@ -60,6 +60,7 @@ class CreatePostBox extends Component {
                     value={clear ? '' : null}
                     onTextChange={this.handleTextChange}
                     className="text-box"
+                    type="textbox"
                     id="create-post-text-box"/>
 
                     { media && <Media type={media.type} src={URL.createObjectURL(media.src)} {...media.attr}/> }

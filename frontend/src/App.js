@@ -17,6 +17,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import auth from './services/authService';
 import { getMe } from './services/userService';
+import EditUsername from './components/profile/editUsername';
+import EditEmail from './components/profile/editEmail';
+import EditPassword from './components/profile/editPassword';
+import EditDescription from './components/profile/editDescription';
 
 class App extends Component {
   state = {
@@ -66,7 +70,7 @@ class App extends Component {
   updateUser = (property, value) => {
     const currentUser = { ...this.state.currentUser };
     currentUser[property] = value;
-    console.log(`Chaning [${property}] to [${value}]`);
+    console.log(`Changing [${property}] to [${value}]`);
     this.setState({ currentUser });
   };
 
@@ -101,6 +105,27 @@ class App extends Component {
                 component={ProfileEdit}
                 exact
               />
+              <ProtectedRoute
+                path="/profile/edit/username"
+                component={EditUsername}
+                exact
+              />
+              <ProtectedRoute
+                path="/profile/edit/email"
+                component={EditEmail}
+                exact
+              />
+              <ProtectedRoute
+                path="/profile/edit/description"
+                component={EditDescription}
+                exact
+              />
+              <ProtectedRoute
+                path="/profile/edit/password"
+                component={EditPassword}
+                exact
+              />
+
               <Route path="/not-found" component={NotFound} />
               <Redirect from="/" to="/posts" exact />
               <Redirect to="/not-found" />

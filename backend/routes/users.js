@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const mongoose = require('mongoose');
 const { User, validate, update } = require('../models/user');
+const { Post } = require('../models/post');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -14,7 +15,7 @@ router.get('/me', auth, async (req, res) => {
 });
 
 router.patch('/me', auth, async (req, res) => {
-  let { email, username, description } = req.body;
+  let { email, username, description, password } = req.body;
   if (email !== undefined) {
     const result = await update.email(req.user._id, email);
     if (result.error) return res.status(400).send(result.error);
@@ -23,6 +24,10 @@ router.patch('/me', auth, async (req, res) => {
   if (username !== undefined) {
     const result = await update.username(req.user._id, username);
     if (result.error) return res.status(400).send(result.error);
+    await Post.updateMany(
+      { 'user._id': req.user._id },
+      { 'user.username': result.username }
+    );
     return res.send(result.username);
   }
   if (description !== undefined) {
@@ -30,8 +35,13 @@ router.patch('/me', auth, async (req, res) => {
     if (result.error) return res.status(400).send(result.error);
     return res.send(result.description);
   }
+  if (password !== undefined) {
+    const result = await update.password(req.user._id, password);
+    if (result.error) return res.status(400).send(result.error);
+    return res.status(200).send('Password changed');
+  }
 
-  return res.send('Nothing to update');
+  res.status(400).send('No data given to update');
 });
 
 router.post('/', async (req, res) => {

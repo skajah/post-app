@@ -27,6 +27,15 @@ const postSchema = new mongoose.Schema({
       message: 'Must be an integer >= 0',
     },
   },
+  numberOfComments: {
+    type: Number,
+    default: 0,
+    min: 0,
+    validate: {
+      validator: Number.isInteger,
+      message: 'Must be an integer >=0',
+    },
+  },
   media: {
     mediaType: String,
     data: String,
@@ -41,6 +50,7 @@ function validatePost(post) {
     date: Joi.date().default(Date.now),
     text: Joi.string().max(3000).allow(''),
     likes: Joi.number().integer().min(0).default(0),
+    numberOfComments: Joi.number().integer().min(0).default(0),
     media: Joi.object().keys({
       mediaType: Joi.string().equal('image', 'video', 'audio').required(),
       data: Joi.string().required(),

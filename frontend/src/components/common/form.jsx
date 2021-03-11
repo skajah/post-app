@@ -1,38 +1,48 @@
 import React, { Component } from 'react'
 import Joi from 'joi-browser';
-import Input from './input';
 import SelectInput from './selectInput';
+import FormInput from './formInput';
 
 class Form extends Component {
     state = { 
-        data: {},
-        errors: {}
+        errors: {},
+        data: {}
      }
+
+    data = {}
+
+
 
      renderButton = label => {
         return (
         <button 
         type="submit" 
-        className="btn-form"
-        disabled={this.validate()}>{label}</button>
+        className="btn-form">{label}</button>
         );
      }
 
-     renderInput = (name, label, type='text') => {
-        const { data, errors } = this.state;
+     renderInput = (name, label, options={}) => {
+        const { errors } = this.state;
         // console.log(options)
 
-        return <Input 
-        type={type}
+        alert = !errors[name] ? null : { type: 'danger', message: errors[name]};
+
+        // console.log('renderInput(): data: ', data);
+
+        // console.log('option: ', options);
+
+        return <FormInput 
+        {...options}
         name={name}
-        value={data[name]}
         label={label}
         onChange={this.handleChange}
-        error={errors[name]}/>;
+        className="text-box"
+        alert={alert}/>;
      }
 
+
      renderSelectInput = (name, label, options) => {
-         const { data, errors } = this.state;
+         const {errors, data } = this.state;
 
          return <SelectInput 
          name={name}
@@ -44,8 +54,8 @@ class Form extends Component {
      }
 
      validate = () => {
-        const options = { abortEarly: false };
-        const { error } = Joi.validate(this.state.data, this.schema, options);
+        // const options = { abortEarly: false };
+        const { error } = Joi.validate(this.data, this.schema);
 
         if (!error)
             return null;
@@ -87,20 +97,17 @@ class Form extends Component {
     }
 
     handleChange = ({ currentTarget: input }) => { // e.currentTarget
+        this.data[input.name] = input.value;
+        /*
         const errors = {...this.state.errors};
 
-        const errorMessage = this.validateProperty(input);
-
-        if (errorMessage)
-            errors[input.name] = errorMessage;
-        else
-            delete errors[input.name];
-
+        
         const data = {...this.state.data}; 
         data[input.name] = input.value;
 
         // console.log(errors);
         this.setState({ data, errors });
+        */
     }
 
 }

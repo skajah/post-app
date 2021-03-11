@@ -18,6 +18,7 @@ nav {
 main {
   margin: 80px 10px 0;
   overflow-y: auto;
+  height: 100vh;
 }
 
 /* forms */
@@ -31,8 +32,7 @@ main {
   border: 1px solid var(--lighter-maroon);
 }
 
-.btn-form,
-.btn-profile-edit {
+.btn-form {
   padding: 5px;
   border: none;
   border-radius: 30px;
@@ -48,8 +48,7 @@ main {
   background: var(--lightest-maroon);
 }
 
-.btn-form:enabled:hover,
-.btn-profile-edit:enabled:hover {
+.btn-form:enabled:hover {
   background: var(--light-maroon);
 }
 
@@ -65,12 +64,14 @@ main {
 .navbar {
   background: whitesmoke;
 }
-.navbar a {
+.navbar a,
+#change-password-text {
   color: var(--dark-gray);
 }
 
 .navbar a:hover,
-.nav-item:hover {
+.nav-item:hover,
+#change-password-text:hover {
   color: var(--light-maroon);
 }
 
@@ -197,8 +198,7 @@ main {
   width: 100%;
 }
 
-#create-post-text-box,
-#profile-desc-text-box {
+#create-post-text-box {
   height: 5rem;
 }
 .create-comment-text-box {
@@ -263,38 +263,6 @@ main {
   font-weight: bold;
 }
 
-.profile-edit {
-  width: 35%;
-  display: grid;
-  grid-template-columns: 8fr 2fr;
-  column-gap: 10px;
-}
-
-.profile-edit-text-boxes {
-  display: grid;
-  grid-template-columns: 2fr 8fr;
-  gap: 10px;
-}
-
-.profile-edit-text-boxes label {
-  text-align: right;
-  font-weight: 500;
-}
-
-.profile-edit-text-boxes input,
-.profile-edit-text-boxes textarea {
-  width: 100%;
-}
-
-.profile-edit-buttons {
-  display: flex;
-  flex-direction: column;
-}
-
-.profile-edit-buttons button {
-  margin-bottom: 10px;
-}
-
 .tab-nav {
   display: flex;
   justify-content: space-evenly;
@@ -313,6 +281,30 @@ main {
   color: white;
 }
 
+.profile-summary {
+  width: 60%;
+  border: 1px var(--dark-gray) solid;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.profile-summary div:not(:first-child) {
+  display: grid;
+  grid-template-columns: 2fr 8fr 1fr;
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.profile-summary div:not(:first-child):hover {
+  background: rgba(211, 211, 211, 0.212);
+}
+
+.profile-summary div:not(:last-child) {
+  border-bottom: 1px lightgray solid;
+}
 /* icon colors */
 .fa-heart,
 .fa-heart-o,

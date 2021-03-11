@@ -32,7 +32,7 @@ class PostsPage extends Component {
 
     populatePosts = async () => {
         try {
-            const { data: posts } = await getPosts({ numberOfComments: true });
+            const { data: posts } = await getPosts();
             makeDates(posts);
             this.setState({ posts });
         } catch (ex) {
@@ -64,16 +64,18 @@ class PostsPage extends Component {
                 this.setState({ emptyPost: true }); // avoid rerender of posts
             return;
         }
-        const mediaData =  await readMedia(media.src);
-        // console.log(mediaData);
 
         const newPost = {
             userId: this.context.currentUser._id,
-            // date : new Date(), // should default to now
-            // likes: 0, // should default to 0
-            text,
-            media: {mediaType: media.type, data: mediaData},
+            text
         };
+
+        let mediaData;
+
+        if (media){
+            mediaData =  await readMedia(media.src);
+            newPost.media = { mediaType: media.type, data: mediaData };
+        }
 
         try {
             const { data: post } = await createPost(newPost);
