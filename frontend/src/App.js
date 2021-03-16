@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+
 import NavBar from './components/navbar';
 import Login from './components/login';
 import Register from './components/register';
@@ -21,6 +22,8 @@ import EditUsername from './components/profile/editUsername';
 import EditEmail from './components/profile/editEmail';
 import EditPassword from './components/profile/editPassword';
 import EditDescription from './components/profile/editDescription';
+import { decompress } from './utils/media';
+import profilePic from './images/profile_default.jpg';
 
 class App extends Component {
   state = {
@@ -28,14 +31,18 @@ class App extends Component {
   };
 
   componentDidMount() {
-    // console.log('App componentDidMount()');
+    console.log('App componentDidMount()');
+    console.log('User?: ', auth.hasCurrentUser());
     if (auth.hasCurrentUser()) this.setUser();
   }
 
   setUser = async () => {
     try {
+      console.log('Getting jwt');
       const { data: jwt } = await getMe();
+      console.log('Got jwt');
       auth.loginWithJwt(jwt);
+      console.log('Logging in with jwt');
       this.handleLogin();
       console.log('User set: ');
     } catch (ex) {
@@ -46,11 +53,18 @@ class App extends Component {
           console.log('Unabled to get current user');
       }
       console.log('Error: ', ex);
+      console.log('Logging out...');
+      auth.logout();
     }
   };
 
   handleLogin = () => {
-    this.setState({ currentUser: auth.getCurrentUser() });
+    console.log('handleLogin()');
+    const currentUser = auth.getCurrentUser();
+    if (currentUser.profilePic)
+      currentUser.profilePic = decompress(currentUser.profilePic);
+    else currentUser.profilePic = profilePic;
+    this.setState({ currentUser });
   };
 
   handleLike = (id, type, liked) => {
@@ -70,7 +84,7 @@ class App extends Component {
   updateUser = (property, value) => {
     const currentUser = { ...this.state.currentUser };
     currentUser[property] = value;
-    console.log(`Changing [${property}] to [${value}]`);
+    // console.log(`Changing [${property}] to [${value}]`);
     this.setState({ currentUser });
   };
 

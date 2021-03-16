@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(postId))
     // move to validateId
     return res.status(400).send('Invalid Id');
-  const comments = await Comment.find({ postId }).select('-__v');
+  const comments = await Comment.find({ postId }).select('-__v').sort('-date');
   res.send(comments);
 });
 
@@ -36,7 +36,9 @@ router.post('/', auth, async (req, res) => {
   const postExists = await Post.exists({ _id: commentObject.postId });
   if (!postExists) return res.status(400).send('Invalid postId for comment');
 
-  const user = await User.findById(commentObject.userId).select('_id username');
+  const user = await User.findById(commentObject.userId).select(
+    '_id username profilePic'
+  );
   if (!user) return res.status(400).send('Invalid userId for comment');
 
   commentObject.user = user;

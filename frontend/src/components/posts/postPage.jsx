@@ -4,6 +4,7 @@ import Post from './post';
 
 import { getPost, deletePost } from '../../services/postService';
 import { makeDate, makeDates } from '../../utils/makeDate';
+import { decompress } from '../../utils/media';
 
 class PostPage extends Component {
     

@@ -3,6 +3,8 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const bcrypt = require('bcrypt');
+const { Post } = require('./post');
+const { Comment } = require('./comment');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -40,6 +42,7 @@ const userSchema = new mongoose.Schema({
     of: Number,
     default: {},
   },
+  profilePic: String,
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -53,6 +56,7 @@ userSchema.methods.generateAuthToken = function () {
       isAdmin: this.isAdmin,
       likedPosts: this.likedPosts,
       likedComments: this.likedComments,
+      profilePic: this.profilePic,
     },
     config.get('jwtPrivateKey')
   );
@@ -110,7 +114,7 @@ async function updateEmail(userId, email) {
     return result;
   }
   await User.findByIdAndUpdate(userId, { email });
-  result.email = email;
+  result.value = email;
   return result;
 }
 
@@ -136,7 +140,13 @@ async function updateUsername(userId, username) {
     return result;
   }
   await User.findByIdAndUpdate(userId, { username });
-  result.username = username;
+  await Post.updateMany({ 'user._id': userId }, { 'user.username': username });
+  await Comment.updateMany(
+    { 'user._id': userId },
+    { 'user.username': username }
+  );
+
+  result.value = username;
   return result;
 }
 
@@ -152,14 +162,14 @@ async function updateDescription(userId, description) {
     return result;
   }
   await User.findByIdAndUpdate(userId, { description });
-  result.description = description;
+  result.value = description;
   return result;
 }
 
 async function updatePassword(userId, password) {
   let result = {};
   const schema = Joi.object({
-    password: Joi.string().min(8).max(255),
+    password: Joi.string().min(8).max(255).required(),
   });
   const error = schema.validate({ password }).error;
   if (error) {
@@ -172,6 +182,29 @@ async function updatePassword(userId, password) {
   return result;
 }
 
+async function updateProfilePic(userId, profilePic) {
+  let result = {};
+  const schema = Joi.object({
+    profilePic: Joi.string().required(),
+  });
+  const error = schema.validate({ profilePic }).error;
+  if (error) {
+    result.error = error.details[0].message;
+    return result;
+  }
+  await User.findByIdAndUpdate(userId, { profilePic });
+  await Post.updateMany(
+    { 'user._id': userId },
+    { 'user.profilePic': profilePic }
+  );
+  await Comment.updateMany(
+    { 'user._id': userId },
+    { 'user.profilePic': profilePic }
+  );
+  result.value = profilePic;
+  return result;
+}
+
 exports.User = User;
 exports.validate = validateUser;
 exports.likePost = likePost;
@@ -181,4 +214,5 @@ exports.update = {
   username: updateUsername,
   description: updateDescription,
   password: updatePassword,
+  profilePic: updateProfilePic,
 };

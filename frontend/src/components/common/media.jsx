@@ -36,6 +36,7 @@ class Media extends Component {
 
     render() {
         const { type, src, ...attr } = this.props;
+        // console.log('Media: ', { type, src });
         return this.renderMedia(type, src, attr);
     }
 }

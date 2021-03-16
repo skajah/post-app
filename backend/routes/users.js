@@ -3,42 +3,44 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const mongoose = require('mongoose');
 const { User, validate, update } = require('../models/user');
-const { Post } = require('../models/post');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
 
 router.get('/me', auth, async (req, res) => {
+  // console.log('Getting "me"');
   const user = await User.findById(req.user._id);
   const token = user.generateAuthToken();
   res.send(token);
 });
 
 router.patch('/me', auth, async (req, res) => {
-  let { email, username, description, password } = req.body;
+  let { email, username, description, password, profilePic } = req.body;
   if (email !== undefined) {
     const result = await update.email(req.user._id, email);
     if (result.error) return res.status(400).send(result.error);
-    return res.send(result.email);
+    return res.send(result.value);
   }
   if (username !== undefined) {
     const result = await update.username(req.user._id, username);
     if (result.error) return res.status(400).send(result.error);
-    await Post.updateMany(
-      { 'user._id': req.user._id },
-      { 'user.username': result.username }
-    );
-    return res.send(result.username);
+    return res.send(result.value);
   }
   if (description !== undefined) {
     const result = await update.description(req.user._id, description);
     if (result.error) return res.status(400).send(result.error);
-    return res.send(result.description);
+    return res.send(result.value);
   }
   if (password !== undefined) {
     const result = await update.password(req.user._id, password);
     if (result.error) return res.status(400).send(result.error);
-    return res.status(200).send('Password changed');
+    return res.send('Password changed');
+  }
+
+  if (profilePic !== undefined) {
+    const result = await update.profilePic(req.user._id, profilePic);
+    if (result.error) return res.status(400).send(result.error);
+    return res.send(result.value);
   }
 
   res.status(400).send('No data given to update');

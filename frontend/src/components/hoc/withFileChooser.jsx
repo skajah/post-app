@@ -7,7 +7,7 @@ function withFileChooser(Component) {
         render() {
             const { extensions, maxFileSize, onFileChosen, ...rest } = this.props; 
             return (
-            <div>
+            <div className="file-chooser">
                 <FilePicker 
                 extensions={extensions}
                 maxSize={maxFileSize}

@@ -10,7 +10,7 @@ import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters
 import { makeDate, makeDates } from '../../utils/makeDate';
 
 import UserContext from '../../context/userContext';
-import { readMedia } from '../../utils/media';
+import { readMedia, compress, decompress } from '../../utils/media';
 
 class PostsPage extends Component {
     static contextType = UserContext;
@@ -65,21 +65,31 @@ class PostsPage extends Component {
             return;
         }
 
+        const { currentUser } = this.context;
         const newPost = {
-            userId: this.context.currentUser._id,
+            userId: currentUser._id,
             text
         };
 
         let mediaData;
+        let compressedData;
 
         if (media){
             mediaData =  await readMedia(media.src);
-            newPost.media = { mediaType: media.type, data: mediaData };
+            compressedData = compress(mediaData);
+            newPost.media = { 
+                mediaType: media.type, 
+                data: compressedData
+            };
         }
 
         try {
             const { data: post } = await createPost(newPost);
-            makeDate(post)
+            makeDate(post);
+
+            if (media)
+                post.media.data = mediaData;
+
             const posts = [...this.state.posts];
             posts.unshift(post);
             this.setState({ posts, emptyPost: false });

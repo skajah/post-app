@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Arrow from '../common/icons/arrow';
 import UserContext from '../../context/userContext';
+import ProfilePic from '../common/profilePic';
+import { EditRow, EditRowWithFile } from './editRow';
+import { compress, readMedia } from '../../utils/media';
 import { updateMe } from '../../services/userService';
 
 
@@ -11,48 +14,70 @@ class ProfileEdit extends Component {
         this.props.history.push(`/profile/edit/${page}`);
     }
 
+    handleProfilePicUpload = async file => {
+        try {
+            const profilePic = await readMedia(file);
+            this.context.updateUser('profilePic', profilePic);
+            await updateMe({ profilePic: compress(profilePic) });
+        } catch (ex) {
+            if (ex.response)
+                console.log('Error: ', ex.response);
+            else
+                console.log('Error: ', ex);
+        }
+        
+
+    }
+
     render() { 
         // console.log('profileEdit render()');
-        const { email, username, description } = this.context.currentUser;
+        const { email, username, description, profilePic } = this.context.currentUser;
 
         return ( 
             <div className="profile-summary center">
                 <div className="profile-summary-header">
                     <p style={{width: '100%', fontSize: '1.5rem', fontWeight: 500}}>My Profile</p>
                 </div>
-                <div className="profile-summary-photo clickable">
-                    <span>Photo</span>
-                    <span>Your photo will be shown on your posts and comments</span>
-                    <span>Picture</span>
-                </div>
-                <div 
+                <EditRowWithFile
+                label="Photo"
+                text="Your photo will be shown on your posts and comments"
+                icon={<ProfilePic src={profilePic} />}
+                className="profile-summary-photo clickable"
+                extensions={['jpg', 'jpeg', 'gif', 'png']}
+                maxFileSize={10}
+                onFileChosen={this.handleProfilePicUpload}
+                />
+                
+                <EditRow 
+                label="Username"
+                text={ username }
+                icon={<Arrow direction="right" disabled={true}/>}
                 className="profile-summary-username clickable"
-                onClick={() => this.goToUpdate('username')}>
-                    <span>Username</span>
-                    <span>{ username }</span>
-                    <Arrow direction="right" disabled={true}/>
-                </div>
-                <div 
+                onClick={() => this.goToUpdate('username')}
+                />
+                <EditRow 
+                label="Email"
+                text={ email }
+                icon={<Arrow direction="right" disabled={true}/>}
                 className="profile-summary-email clickable"
-                onClick={() => this.goToUpdate('email')}>
-                    <span>Email</span>
-                    <span>{ email }</span>
-                    <Arrow direction="right" disabled={true}/>
-                </div>
-                <div 
+                onClick={() => this.goToUpdate('email')}
+                />
+                <EditRow 
+                label="Description"
+                text={ description }
+                icon={<Arrow direction="right" disabled={true}/>}
                 className="profile-summary-description clickable"
-                onClick={() => this.goToUpdate('description')}>
-                    <span>Description</span>
-                    <span>{ description }</span>
-                    <Arrow direction="right" disabled={true}/>
-                </div>
-                <div 
+                onClick={() => this.goToUpdate('description')}
+                />
+
+                <EditRow 
+                label="Password"
+                text="Click to change"
+                icon={<Arrow direction="right" disabled={true}/>}
                 className="profile-summary-password clickable"
-                onClick={() => this.goToUpdate('password')}>
-                    <span>Password</span>
-                    <span>Click to change</span>
-                    <Arrow direction="right" disabled={true}/>
-                </div>
+                onClick={() => this.goToUpdate('password')}
+                />
+                
             </div>
          );
     }

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
 import ContentDetails from '../common/contentDetails';
 import { likeComment, unlikeComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
-
+import { decompress } from '../../utils/media';
+import profilePic from '../../images/profile_default.jpg';
 
 class Comment extends Component {
     static contextType = UserContext;
@@ -20,6 +22,10 @@ class Comment extends Component {
 
     populateState() {
         const { _id, user, date, text, likes } = this.props.comment;
+        if (user.profilePic)
+            user.profilePic = decompress(user.profilePic);
+        else
+            user.profilePic = profilePic
         this.setState({ _id, user, date, text, likes: likes || 0});
     }
 
@@ -46,18 +52,18 @@ class Comment extends Component {
     }
 
     render() { 
-        const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
         const { onDelete } = this.props;
         const { _id, likes, text, user, date } = this.state;
         const details = {
             username: user.username,
             date
         };
+        if (_.isEmpty(user)) return null; 
         return ( 
             <div className="comment"> 
                 <ContentDetails 
                 details={details} 
-                profilePicUrl={url}
+                profilePic={user.profilePic}
                 onDelete={onDelete}
                 initialLike={this.context.currentUser.likedComments[_id]}
                 onLike={this.handleLike}

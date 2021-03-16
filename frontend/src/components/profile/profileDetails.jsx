@@ -13,7 +13,7 @@ class ProfileDetails extends Component {
         return ( 
             <div className="profile-details">
                 <div>
-                    <ProfilePic />
+                    <ProfilePic src={ this.context.currentUser.profilePic } />
                     <span className="username">{ user.username }</span>
                 </div>
                 <Link to="/profile/edit"> <Edit size="lg"/> </Link>

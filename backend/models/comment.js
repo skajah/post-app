@@ -14,6 +14,7 @@ const commentSchema = new mongoose.Schema({
         maxlength: 255,
         required: true,
       },
+      profilePic: String,
     }),
     required: true,
   },

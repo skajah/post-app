@@ -29,6 +29,7 @@ class Register extends Form {
 
     doSubmit = async () => {
         try {
+            // const data = {...this.data, profilePic: compress(profilePic)};
             const response = await register(this.data);
             auth.loginWithJwt(response.headers['x-auth-token']);
             this.context.onLogin(); // notify App that jwt is set
@@ -38,6 +39,7 @@ class Register extends Form {
                 const alert = makeAlert('danger', ex.response.data);
                 this.setState({ alert });
             }
+            console.log('Error: ', ex);
         }
     }
 
@@ -45,7 +47,7 @@ class Register extends Form {
         if (auth.hasCurrentUser()) return <Redirect to='/' />;
 
         const { alert, errors } = this.state;
-        console.log(errors);
+        // console.log(errors);
         return (
             <div className="form form-register center">
                 <h1>Register</h1>

@@ -2,14 +2,17 @@ import React, { Component } from 'react';
 import Comment from './icons/comment';
 import Delete from './icons/delete';
 import Like from './icons/like';
+import UserContext from '../../context/userContext';
 import ProfilePic from './profilePic';
 
 class ContentDetails extends Component {
+    static contextType = UserContext;
+
     render() { 
         const { 
             details, 
-            profilePicUrl, 
             onDelete, 
+            profilePic,
             onLike, 
             likes, 
             onClick, 
@@ -24,7 +27,7 @@ class ContentDetails extends Component {
                 className={"col-9" + (onClick ? ' clickable' : '')}
                 onClick={onClick}>
 
-                    <ProfilePic src={profilePicUrl}/>
+                    <ProfilePic src={profilePic} />
                     <div className="date-time">   
                         <span className="username">{username}</span>    
                         <span className="time">{date.toLocaleTimeString()}</span>

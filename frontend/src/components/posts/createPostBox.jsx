@@ -6,11 +6,14 @@ import VideoCamera from '../common/icons/videoCamera';
 import Volume from '../common/icons/volume';
 import withAlert from '../hoc/withAlert';
 import Media from '../common/media';
+import UserContext from '../../context/userContext';
 
 class CreatePostBox extends Component {
+    static contextType = UserContext;
+
     state = {
         clear: false,
-        media: null
+        media: null,
     }
 
     text = ''
@@ -37,14 +40,12 @@ class CreatePostBox extends Component {
     }
 
     render() { 
-        const url = "https://i.pinimg.com/736x/65/8f/56/658f56ab9e1c31865e8bf86fe88ad2ae.jpg";
-
         const { clear, media } = this.state;
 
         return ( 
             <div className="card bg-light create-post-box">
                 <div className="card-header create-post-header">
-                    <ProfilePic src={url}/>  
+                    <ProfilePic src={this.context.currentUser.profilePic} /> 
                     {
                         media && 
                         <button 
@@ -60,7 +61,7 @@ class CreatePostBox extends Component {
                     value={clear ? '' : null}
                     onTextChange={this.handleTextChange}
                     className="text-box"
-                    type="textbox"
+                    type="textarea"
                     id="create-post-text-box"/>
 
                     { media && <Media type={media.type} src={URL.createObjectURL(media.src)} {...media.attr}/> }

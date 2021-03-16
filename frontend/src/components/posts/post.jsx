@@ -9,6 +9,8 @@ import { makeDate } from '../../utils/makeDate';
 import { likePost, unlikePost } from '../../services/postService';
 import { createComment, deleteComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
+import { decompress } from '../../utils/media';
+import profilePic from '../../images/profile_default.jpg';
 
 class Post extends Component {
     static contextType = UserContext;
@@ -28,6 +30,14 @@ class Post extends Component {
 
     populateState(){
         const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
+        if (media)
+            media.data = decompress(media.data);
+        // user.profilePic = decompress(user.profilePic);
+        if (user.profilePic)
+            user.profilePic = decompress(user.profilePic);
+        else 
+            user.profilePic = profilePic;
+
         this.setState({ 
             _id,
             user, 
@@ -120,22 +130,21 @@ class Post extends Component {
             user, 
             date,
             numberOfComments } = this.state;
-        const { onDelete, showComments, onPostClick } = this.props;
-        const url = "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80";
-        
+        const { onDelete, showComments, onPostClick } = this.props;        
         const details = { username: user.username, date };
         // console.log('Date: ', this.state.date, typeof this.state.date);
         const alert = { type: 'warning', message: "Comment can't be empty"};
         // console.log('Liked post: ', this.context.currentUser.likedPosts)
         // console.log('id: ', _id);
         // console.log('Found: ', this.context.currentUser.likedPosts[_id]);
+        if (_.isEmpty(user)) return null;
         return ( 
             <div className="card post">
                 <div className="card-header post-header">
                     <ContentDetails 
                     details={details}
-                    profilePicUrl={url}
                     onDelete={onDelete}
+                    profilePic={user.profilePic}
                     initialLike={this.context.currentUser.likedPosts[_id]}
                     onLike={this.handleLike}
                     likes={likes}

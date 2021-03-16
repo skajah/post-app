@@ -294,8 +294,11 @@ main {
   display: grid;
   grid-template-columns: 2fr 8fr 1fr;
   align-items: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+}
+
+.profile-summary div:not(:first-child, :nth-child(2)) {
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 .profile-summary div:not(:first-child):hover {
@@ -305,6 +308,11 @@ main {
 .profile-summary div:not(:last-child) {
   border-bottom: 1px lightgray solid;
 }
+
+.profile-summary .file-chooser div {
+  grid-column: 1 / span 3;
+}
+
 /* icon colors */
 .fa-heart,
 .fa-heart-o,

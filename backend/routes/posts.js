@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/me', auth, async (req, res) => {
-  const posts = await Post.find({ 'user._id': req.user._id });
+  const posts = await Post.find({ 'user._id': req.user._id }).sort('-date');
   res.send(posts);
 });
 
@@ -29,7 +29,7 @@ router.get('/:id', validateId, async (req, res) => {
 
   if (withComments === 'true') {
     post = post.toJSON();
-    const comments = await Comment.find({ postId: id });
+    const comments = await Comment.find({ postId: id }).sort('-date');
     post.comments = comments;
   }
   res.send(post);
@@ -45,7 +45,9 @@ router.post('/', auth, async (req, res) => {
     'likes',
     'media',
   ]);
-  const user = await User.findById(postObject.userId).select('_id username');
+  const user = await User.findById(postObject.userId).select(
+    '_id username profilePic'
+  );
   if (!user) res.status(400).send('Invalid userId for post');
   postObject.user = user;
   // console.log(postObject.media);
