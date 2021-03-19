@@ -1,3 +1,4 @@
 {
-    "jwtPrivateKey":  ""
+    "jwtPrivateKey":  "",
+    "dbConnectionString": "mongodb://localhost/post-app"
 }
