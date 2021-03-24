@@ -23,7 +23,7 @@ import EditEmail from './components/profile/editEmail';
 import EditPassword from './components/profile/editPassword';
 import EditDescription from './components/profile/editDescription';
 import { decompress } from './utils/media';
-import profilePic from './images/profile_default.jpg';
+import profilePicSrc from './images/profile_default.jpg';
 
 class App extends Component {
   state = {
@@ -32,19 +32,18 @@ class App extends Component {
 
   componentDidMount() {
     console.log('App componentDidMount()');
-    console.log('User?: ', auth.hasCurrentUser());
-    if (auth.hasCurrentUser()) this.setUser();
+    this.setUser();
+    // auth.logout();
   }
 
   setUser = async () => {
+    console.log('Setting user...');
+    if (!auth.hasCurrentUser()) {
+      console.log('No user found');
+      return;
+    }
     try {
-      console.log('Getting jwt');
-      const { data: jwt } = await getMe();
-      console.log('Got jwt');
-      auth.loginWithJwt(jwt);
-      console.log('Logging in with jwt');
       this.handleLogin();
-      console.log('User set: ');
     } catch (ex) {
       if (ex.response) {
         const status = ex.response.status;
@@ -58,12 +57,24 @@ class App extends Component {
     }
   };
 
-  handleLogin = () => {
+  handleLogin = async () => {
     console.log('handleLogin()');
-    const currentUser = auth.getCurrentUser();
-    if (currentUser.profilePic)
-      currentUser.profilePic = decompress(currentUser.profilePic);
-    else currentUser.profilePic = profilePic;
+    console.log('Getting me...');
+    const currentUser = await getMe([
+      '_id',
+      'username',
+      'email',
+      'profilePic',
+      'likedPosts',
+      'likedComments',
+      'following',
+      'followers',
+    ]);
+    console.log('Got me');
+
+    currentUser.profilePic = currentUser.profilePic
+      ? decompress(currentUser.profilePic)
+      : profilePicSrc;
     this.setState({ currentUser });
   };
 
@@ -81,6 +92,21 @@ class App extends Component {
     this.setState({ currentUser });
   };
 
+  handleFollow = (id) => {
+    const currentUser = { ...this.state.currentUser };
+    const isFollowing = currentUser.following[id];
+    if (isFollowing) delete currentUser.following[id];
+    else currentUser.following[id] = 1;
+
+    if (currentUser._id === id) {
+      // follow/unfollow self; need to update followers
+      if (isFollowing) delete currentUser.followers[id];
+      else currentUser.followers[id] = 1;
+    }
+
+    this.setState({ currentUser });
+  };
+
   updateUser = (property, value) => {
     const currentUser = { ...this.state.currentUser };
     currentUser[property] = value;
@@ -89,17 +115,16 @@ class App extends Component {
   };
 
   render() {
-    // console.log('App render()');
-
-    // The user's jwt might be set in local storage
-    // but the state might not have been upadated yet
+    console.log('App render()');
     if (auth.hasCurrentUser() && !this.state.currentUser) return null;
+
     return (
       <UserContext.Provider
         value={{
           currentUser: this.state.currentUser,
           onLogin: this.handleLogin,
           onLike: this.handleLike,
+          onFollow: this.handleFollow,
           updateUser: this.updateUser,
         }}
       >
@@ -113,10 +138,14 @@ class App extends Component {
               <Route path="/register" component={Register} exact />
               <ProtectedRoute path="/posts" component={PostsPage} exact />
               <ProtectedRoute path="/posts/:id" component={PostPage} exact />
-              <ProtectedRoute path="/profile" component={ProfilePage} exact />
               <ProtectedRoute
                 path="/profile/edit"
                 component={ProfileEdit}
+                exact
+              />
+              <ProtectedRoute
+                path="/profile/:id"
+                component={ProfilePage}
                 exact
               />
               <ProtectedRoute

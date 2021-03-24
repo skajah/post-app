@@ -9,8 +9,8 @@ module.exports = function () {
       handleExceptions: true,
       handleRejections: true,
       format: winston.format.combine(
-        winston.format.simple(),
-        winston.format.colorize()
+        winston.format.colorize(),
+        winston.format.simple()
       ),
     })
   );

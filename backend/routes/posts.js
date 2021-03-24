@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
 const { likeDelta } = require('../middleware/validateDelta');
@@ -11,11 +12,22 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   // Implement paginations
-  const posts = await Post.find().select('-__v').sort('-date');
+  const { userId } = req.query;
+  let posts;
+  if (!userId) posts = await Post.find().select('-__v').sort('-date');
+  else if (!mongoose.Types.ObjectId.isValid(userId))
+    return res.status(400).send('Invalid userId');
+  else {
+    const user = await User.exists({ _id: userId });
+    if (!user) return res.status(400).send('User not found');
+    posts = await Post.find({ 'user._id': userId })
+      .select('-__v')
+      .sort('-date');
+  }
   res.send(posts);
 });
 
-router.get('/me', auth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const posts = await Post.find({ 'user._id': req.user._id }).sort('-date');
   res.send(posts);
 });

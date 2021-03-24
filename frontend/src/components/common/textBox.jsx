@@ -14,6 +14,7 @@ class TextBox extends Component {
             <textarea
             name={name}
             defaultValue={value}
+            value={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
             {...rest}/>
@@ -26,6 +27,7 @@ class TextBox extends Component {
             type={type}
             name={name}
             defaultValue={value}
+            value={value}
             placeHolder={placeHolder}
             onChange={this.handleTextChange}
             {...rest}/>

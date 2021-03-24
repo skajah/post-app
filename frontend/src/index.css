@@ -4,6 +4,9 @@
   --light-maroon: #800000cf;
   --lighter-maroon: #800000be;
   --lightest-maroon: #8000008c;
+  --hover-white: rgba(245, 245, 245, 0.9);
+  --hover-gray: rgba(211, 211, 211, 0.5);
+  --hover-gray-light: rgba(211, 211, 211, 0.25);
 }
 #root {
   background: whitesmoke;
@@ -14,11 +17,9 @@ nav {
   z-index: 2;
   width: 100vw;
 }
-
 main {
   margin: 80px 10px 0;
-  overflow-y: auto;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 /* forms */
@@ -53,7 +54,7 @@ main {
 }
 
 .profile-pic {
-  margin-right: 10px;
+  margin-right: 0.5rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 100%;
@@ -86,6 +87,12 @@ main {
 }
 .content-details div:first-child {
   display: flex;
+}
+
+.post-icons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .post .username,
@@ -137,23 +144,26 @@ main {
   flex-grow: 3;
 }
 
-.create-post-button {
+.btn-create-post {
   background: gold !important;
   color: var(--dark-gray) !important;
 }
 
-.create-post-button:hover {
+.btn-create-post:hover {
   background: rgba(255, 217, 0, 0.9) !important;
 }
-.clear-media-button,
-.btn-comment {
+.btn-clear-media,
+.btn-comment,
+.dropdown-content button,
+.btn-follow {
   background: whitesmoke !important;
   color: var(--dark-gray);
 }
 
-.clear-media-button:hover,
-.btn-comment:hover {
-  background: rgba(245, 245, 245, 0.95) !important;
+.btn-clear-media:hover,
+.btn-comment:hover,
+.btn-follow:hover {
+  background: var(--hover-white) !important;
 }
 
 .card .post-header,
@@ -179,10 +189,14 @@ main {
   background: var(--light-maroon);
   border: 1px solid whitesmoke;
   border-radius: 5px;
-  padding: 5px;
+  padding: 0.75rem;
   margin-top: 10px;
 }
 
+.comment p {
+  margin-left: 3rem;
+  margin-top: 0.5rem;
+}
 .create-comment-box {
   display: flex;
 }
@@ -220,6 +234,7 @@ main {
 }
 .search-keyword .with-alert {
   width: 100%;
+  margin-right: 0.5rem;
 }
 
 .search-keyword-text-box {
@@ -240,6 +255,7 @@ main {
 .profile-page {
   width: 50%;
   margin: 0 auto;
+  min-height: 100vh;
 }
 
 .profile-page .card {
@@ -261,6 +277,15 @@ main {
 .profile-details .username {
   color: whitesmoke;
   font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.profile-simple {
+  padding: 10px;
+}
+
+.profile-simple:hover {
+  background: var(--hover-gray-light);
 }
 
 .tab-nav {
@@ -296,13 +321,14 @@ main {
   align-items: center;
 }
 
-.profile-summary div:not(:first-child, :nth-child(2)) {
+.profile-summary div {
   padding-top: 15px;
   padding-bottom: 15px;
+  padding-left: 5px;
 }
 
 .profile-summary div:not(:first-child):hover {
-  background: rgba(211, 211, 211, 0.212);
+  background: var(--hover-gray-light);
 }
 
 .profile-summary div:not(:last-child) {
@@ -311,6 +337,10 @@ main {
 
 .profile-summary .file-chooser div {
   grid-column: 1 / span 3;
+}
+
+.profile-summary i {
+  justify-self: center;
 }
 
 /* icon colors */
@@ -323,7 +353,9 @@ main {
 .fa-edit,
 .fa-comment-o,
 .comment-counter,
-.fa-trash-o {
+.fa-trash-o,
+.fa-ellipsis-h,
+.fa-ellipsis-v {
   color: whitesmoke;
 }
 
@@ -361,4 +393,28 @@ main {
 
 .text-box {
   height: 2rem;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  z-index: 100;
+  position: absolute;
+  background: whitesmoke;
+  border: 1px solid var(--dark-gray);
+}
+
+.dropdown-content button:hover {
+  background: var(--hover-gray) !important;
+}
+
+.dropdown-content button {
+  width: 100%;
+}
+
+.show {
+  display: block;
 }

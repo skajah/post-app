@@ -4,7 +4,7 @@ import Comment from './comment';
 class Comments extends Component {
 
     render() { 
-        const { comments, onDelete } = this.props;
+        const { comments, onDelete, onProfile } = this.props;
         // console.log(comments);
         return ( 
             <div className="comments">
@@ -13,7 +13,8 @@ class Comments extends Component {
                         return <Comment 
                         key={comment._id}
                         comment={comment}
-                        onDelete={() => onDelete(comment)}/>
+                        onDelete={() => onDelete(comment)}
+                        onProfile={onProfile}/>
                     })
                 }
             </div>

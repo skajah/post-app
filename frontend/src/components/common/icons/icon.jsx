@@ -12,13 +12,11 @@ class Icon extends Component {
 
     renderIcon() {
         const { onClick, disabled } = this.props;
-        const icon = <i className={this.getClasses()}/>
-        return (
-            disabled ? icon :
-            <button className="btn" onClick={onClick}>
-                { icon }
-            </button>
-        );
+        const icon = disabled ? 
+        <i className={this.getClasses()}/> : 
+        <i className={this.getClasses() + " clickable"}
+        onClick={onClick}/>
+        return icon;
     }
 
     render(){

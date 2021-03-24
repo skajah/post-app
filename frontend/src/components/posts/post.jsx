@@ -11,6 +11,7 @@ import { createComment, deleteComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
 import { decompress } from '../../utils/media';
 import profilePic from '../../images/profile_default.jpg';
+import Delete from '../common/icons/delete';
 
 class Post extends Component {
     static contextType = UserContext;
@@ -130,8 +131,8 @@ class Post extends Component {
             user, 
             date,
             numberOfComments } = this.state;
-        const { onDelete, showComments, onPostClick } = this.props;        
-        const details = { username: user.username, date };
+        const { showComments, onPostClick, onProfile, onDelete, hideOptionMenu, headerIconSpan } = this.props;        
+        const details = { username: user.username, date, userId: user._id };
         // console.log('Date: ', this.state.date, typeof this.state.date);
         const alert = { type: 'warning', message: "Comment can't be empty"};
         // console.log('Liked post: ', this.context.currentUser.likedPosts)
@@ -143,14 +144,17 @@ class Post extends Component {
                 <div className="card-header post-header">
                     <ContentDetails 
                     details={details}
-                    onDelete={onDelete}
                     profilePic={user.profilePic}
                     initialLike={this.context.currentUser.likedPosts[_id]}
+                    onDelete={onDelete}
                     onLike={this.handleLike}
                     likes={likes}
+                    onProfile={onProfile}
                     numberOfComments={numberOfComments || comments.length}
                     onClick={onPostClick}
-                    showCommentIcon={true}/> 
+                    showCommentIcon={true}
+                    hideOptionMenu={hideOptionMenu}
+                    headerIconSpan={headerIconSpan}/> 
                 </div>
                 <div className="card-body post-body">
                     { text &&  <p>{text}</p> }
@@ -173,7 +177,8 @@ class Post extends Component {
 
                             <Comments 
                             comments={comments}
-                            onDelete={this.handleDeleteComment}/>
+                            onDelete={this.handleDeleteComment}
+                            onProfile={onProfile}/>
                         </React.Fragment>
                         
                     }

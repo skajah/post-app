@@ -10,6 +10,7 @@ import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters
 import { makeDate, makeDates } from '../../utils/makeDate';
 
 import UserContext from '../../context/userContext';
+import HistoryContext from '../../context/historyContext';
 import { readMedia, compress, decompress } from '../../utils/media';
 
 class PostsPage extends Component {
@@ -89,7 +90,6 @@ class PostsPage extends Component {
 
             if (media)
                 post.media.data = mediaData;
-
             const posts = [...this.state.posts];
             posts.unshift(post);
             this.setState({ posts, emptyPost: false });
@@ -147,6 +147,9 @@ class PostsPage extends Component {
     handlePostClick = ({ _id }) => {
         this.props.history.push(`/posts/${_id}`);
     }
+    handleProfileClick = id => {
+        this.props.history.push(`/profile/${id}`);
+    }
 
     render() {  
         // console.log('postsPage render()');
@@ -156,16 +159,19 @@ class PostsPage extends Component {
         if (!posts) return <p className="center">Loading posts...</p>;
 
         return (
-            <div className="posts-page">
+            <HistoryContext.Provider value={this.props.history}>
+                <div className="posts-page">
                 <div className="posts-with-create">
                     <CreatePostBox 
                     onCreate={this.handleCreatePost}
                     alert={emptyPost && alert}/>
+
                     <Posts 
                         posts={this.getCurrentPosts()}
                         onDelete={this.handleDelete}
                         onCreatePost={this.handleCreatePost}
-                        onPostClick={this.handlePostClick}/>
+                        onPostClick={this.handlePostClick}
+                        onProfile={this.handleProfileClick}/>
                 </div>
                 <PostSearch 
                     searchByKeyword={this.handleSearchByKeyword}
@@ -173,7 +179,8 @@ class PostsPage extends Component {
                     selectedDate={relativeDateFilter}
                     onDateSelected={this.handleDateSelected}
                     onDateRange={this.handleDateRange}/>
-            </div>
+                </div>
+            </HistoryContext.Provider>
         );
   
     }

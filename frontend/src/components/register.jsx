@@ -32,7 +32,7 @@ class Register extends Form {
             // const data = {...this.data, profilePic: compress(profilePic)};
             const response = await register(this.data);
             auth.loginWithJwt(response.headers['x-auth-token']);
-            this.context.onLogin(); // notify App that jwt is set
+            await this.context.onLogin(); // notify App that jwt is set
             window.location = '/';
         } catch (ex) {
             if (ex.response && ex.response.status === 400){

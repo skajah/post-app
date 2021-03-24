@@ -49,7 +49,7 @@ class CreatePostBox extends Component {
                     {
                         media && 
                         <button 
-                        className="btn clear-media-button"
+                        className="btn btn-clear-media"
                         onClick={this.handleClearMedia}>Clear Media</button>
                     }
                     
@@ -89,7 +89,7 @@ class CreatePostBox extends Component {
                     </span>
                     
                     <button 
-                    className="btn create-post-button" 
+                    className="btn btn-create-post" 
                     onClick={this.handleCreate}>Post</button>
                 </div>
             </div>

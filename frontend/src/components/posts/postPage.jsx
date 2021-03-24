@@ -45,6 +45,10 @@ class PostPage extends Component {
         }
     }
 
+    handleProfileClick = id => {
+        this.props.history.push(`/profile/${id}`);
+    }
+
     render() { 
         const { post } = this.state;
 
@@ -55,7 +59,8 @@ class PostPage extends Component {
                <Post 
                 post={post}
                 showComments={true}
-                onDelete={this.handleDelete}/>
+                onDelete={this.handleDelete}
+                onProfile={this.handleProfileClick}/>
             </div>
         );
     }

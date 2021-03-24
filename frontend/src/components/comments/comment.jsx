@@ -52,11 +52,12 @@ class Comment extends Component {
     }
 
     render() { 
-        const { onDelete } = this.props;
+        const { onDelete, onProfile } = this.props;
         const { _id, likes, text, user, date } = this.state;
         const details = {
             username: user.username,
-            date
+            date,
+            userId: user._id
         };
         if (_.isEmpty(user)) return null; 
         return ( 
@@ -67,7 +68,9 @@ class Comment extends Component {
                 onDelete={onDelete}
                 initialLike={this.context.currentUser.likedComments[_id]}
                 onLike={this.handleLike}
-                likes={likes}/>
+                likes={likes}
+                headerIconSpan={2}
+                onProfile={onProfile}/>
                 <p className="comment-text">{text}</p>
             </div>
          );

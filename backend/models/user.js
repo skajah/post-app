@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
@@ -5,6 +6,7 @@ const config = require('config');
 const bcrypt = require('bcrypt');
 const { Post } = require('./post');
 const { Comment } = require('./comment');
+const { func } = require('joi');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -35,14 +37,24 @@ const userSchema = new mongoose.Schema({
   likedPosts: {
     type: Map,
     of: Number,
-    default: {},
+    default: new Map(),
   },
   likedComments: {
     type: Map,
     of: Number,
-    default: {},
+    default: new Map(),
   },
   profilePic: String,
+  followers: {
+    type: Map,
+    of: Number,
+    default: new Map(),
+  },
+  following: {
+    type: Map,
+    of: Number,
+    default: new Map(),
+  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -51,16 +63,14 @@ userSchema.methods.generateAuthToken = function () {
       _id: this._id,
       username: this.username,
       email: this.email,
-      description: this.description,
-      date: this.date,
-      isAdmin: this.isAdmin,
-      likedPosts: this.likedPosts,
-      likedComments: this.likedComments,
-      profilePic: this.profilePic,
     },
     config.get('jwtPrivateKey')
   );
   return token;
+};
+
+userSchema.methods.getProperties = function (properties) {
+  return _.pick(this, properties);
 };
 
 const User = mongoose.model('User', userSchema);
@@ -205,6 +215,31 @@ async function updateProfilePic(userId, profilePic) {
   return result;
 }
 
+async function updateFollowing(userId, following) {
+  const result = {};
+  const user = await User.findById(userId).select('following');
+  const followedUser = await User.findById(following.id).select('followers');
+  if (!followedUser) {
+    result.error = "Cannot follow/unfollow a user that doesn't exist";
+    return result;
+  }
+  if (following.follow === true) {
+    user.following.set(following.id, 1);
+    followedUser.followers.set(userId, 1);
+    result.value = 'Following';
+  } else if (following.follow === false) {
+    user.following.delete(following.id);
+    followedUser.followers.delete(userId);
+    result.value = 'Unfollowed';
+  } else {
+    result.error = '"following" must be true or false';
+    return result;
+  }
+  await user.save();
+  await followedUser.save();
+  return result;
+}
+
 exports.User = User;
 exports.validate = validateUser;
 exports.likePost = likePost;
@@ -215,4 +250,5 @@ exports.update = {
   description: updateDescription,
   password: updatePassword,
   profilePic: updateProfilePic,
+  following: updateFollowing,
 };

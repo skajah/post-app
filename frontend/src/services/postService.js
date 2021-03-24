@@ -7,8 +7,8 @@ export function getPosts() {
   return http.get(postApiEndpoint);
 }
 
-export function getMyPosts() {
-  return http.get(`${postApiEndpoint}/me`);
+export function getUserPosts(id) {
+  return http.get(`${postApiEndpoint}?userId=${id}`);
 }
 
 export function getPost(id, { withComments }) {

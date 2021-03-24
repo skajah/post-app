@@ -4,7 +4,7 @@ import Post from './post';
 class Posts extends Component {
 
     render() { 
-        const { posts, onDelete, onPostClick } = this.props;
+        const { posts, onDelete, onPostClick, onProfile, hideOptionMenu, headerIconSpan } = this.props;
 
         return ( 
             <div className="posts">
@@ -14,7 +14,10 @@ class Posts extends Component {
                         key={post._id} 
                         post={post}
                         onDelete={() => onDelete(post)}
-                        onPostClick={() => onPostClick(post)}/>;
+                        onPostClick={() => onPostClick(post)}
+                        onProfile={() => onProfile(post.user._id)}
+                        hideOptionMenu={hideOptionMenu}
+                        headerIconSpan={headerIconSpan}/>;
                     }) 
                 }
             </div>

@@ -28,7 +28,7 @@ class Login extends Form {
             const { email, password } = this.data;
             await auth.login(email, password);
 
-            this.context.onLogin(); // notify App that jwt is set
+            await this.context.onLogin(); // notify App that jwt is set
 
             const { state } = this.props.location;
             window.location = state ? state.from.pathname : '/'; // cause full reload because app's cdm() only called once 
