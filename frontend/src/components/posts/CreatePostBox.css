@@ -1,0 +1,16 @@
+.create-post-box {
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+}
+
+.card .create-post-header,
+.card .create-post-footer {
+  display: flex;
+  background: var(--lighter-maroon);
+  justify-content: space-between;
+  align-items: center;
+}
+
+#create-post-text-box {
+  height: 5rem;
+}

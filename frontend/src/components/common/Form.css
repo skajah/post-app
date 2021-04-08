@@ -1,0 +1,15 @@
+.form {
+  max-width: 300px;
+  width: 100%;
+}
+
+.text-box {
+  border: 1px solid var(--lighter-maroon);
+  border-radius: 0.5rem;
+  height: 3rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.form h1 {
+  text-align: center;
+}

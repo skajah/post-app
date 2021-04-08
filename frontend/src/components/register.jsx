@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom';
 
 import _ from 'lodash';
 import Joi from 'joi-browser';
-import Form from './common/form';
+import Form from './common/Form';
 import { register } from '../services/userService';
 import auth from '../services/authService';
 import UserContext from '../context/userContext';
@@ -53,7 +53,7 @@ class Register extends Form {
                 <h1>Register</h1>
                 <form onSubmit={this.handleSubmit}>
                     { _.isEmpty(errors) && alert }
-                    {this.renderInput('username', 'Username')}
+                    {this.renderInput('username', 'Username', { autoFocus: true })}
                     {this.renderInput('email', 'Email')}
                     {this.renderInput('password', 'Password', { type: 'password' })}
                     {//this.renderInput('confirmPassword', 'Confirm Password', 'password')

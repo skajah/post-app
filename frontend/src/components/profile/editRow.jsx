@@ -5,8 +5,8 @@ const EditRow = (props) => {
     const { label, text, icon, ...rest } = props;
     return ( 
         <div {...rest}>
-            <span>{ label }</span>
-            <span>{ text }</span>
+            <span className="edit-row-label">{ label }</span>
+            <span className="edit-row-text">{ text }</span>
             { icon }
         </div>
      );

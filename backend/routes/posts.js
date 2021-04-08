@@ -27,11 +27,6 @@ router.get('/', async (req, res) => {
   res.send(posts);
 });
 
-router.get('/', auth, async (req, res) => {
-  const posts = await Post.find({ 'user._id': req.user._id }).sort('-date');
-  res.send(posts);
-});
-
 router.get('/:id', validateId, async (req, res) => {
   const { id } = req.params;
 
@@ -89,6 +84,7 @@ router.delete(
     const postId = req.params.id;
 
     post = await Post.findByIdAndDelete(postId);
+    if (!post) return res.status(404).send('Post not found');
 
     Comment.deleteMany({ postId })
       .then()

@@ -6,7 +6,6 @@ const config = require('config');
 const bcrypt = require('bcrypt');
 const { Post } = require('./post');
 const { Comment } = require('./comment');
-const { func } = require('joi');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -184,6 +183,12 @@ async function updatePassword(userId, password) {
   const error = schema.validate({ password }).error;
   if (error) {
     result.error = error.details[0].message;
+    return result;
+  }
+  const user = await User.findById(userId).select('password');
+  const samePassword = await bcrypt.compare(password, user.password);
+  if (samePassword) {
+    result.error = 'New password should not be same as old';
     return result;
   }
   const salt = await bcrypt.genSalt(10);

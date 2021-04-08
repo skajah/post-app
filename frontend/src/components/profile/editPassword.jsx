@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from '../common/form';
+import Form from '../common/Form';
 import _ from 'lodash';
 import UserContext from '../../context/userContext';
 import { makeAlert } from '../../utils/alert';

@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import ContentDetails from '../common/contentDetails';
 import { likeComment, unlikeComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
-import { decompress } from '../../utils/media';
-import profilePic from '../../images/profile_default.jpg';
+import './Comment.css';
+import ContentDetailsHeader from '../common/ContentDetailsHeader';
 
 class Comment extends Component {
     static contextType = UserContext;
@@ -20,12 +19,8 @@ class Comment extends Component {
         this.populateState();
     }
 
-    populateState() {
+    async populateState() {
         const { _id, user, date, text, likes } = this.props.comment;
-        if (user.profilePic)
-            user.profilePic = decompress(user.profilePic);
-        else
-            user.profilePic = profilePic
         this.setState({ _id, user, date, text, likes: likes || 0});
     }
 
@@ -57,20 +52,19 @@ class Comment extends Component {
         const details = {
             username: user.username,
             date,
-            userId: user._id
+            userId: user._id,
+            profilePic: user.profilePic
         };
         if (_.isEmpty(user)) return null; 
         return ( 
             <div className="comment"> 
-                <ContentDetails 
+                <ContentDetailsHeader
                 details={details} 
-                profilePic={user.profilePic}
                 onDelete={onDelete}
+                onProfile={onProfile}
                 initialLike={this.context.currentUser.likedComments[_id]}
                 onLike={this.handleLike}
-                likes={likes}
-                headerIconSpan={2}
-                onProfile={onProfile}/>
+                likes={likes}/>
                 <p className="comment-text">{text}</p>
             </div>
          );

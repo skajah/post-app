@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import Post from './post';
+import Post from './Post';
 
 class Posts extends Component {
 
     render() { 
         const { posts, onDelete, onPostClick, onProfile, hideOptionMenu, headerIconSpan } = this.props;
-
         return ( 
             <div className="posts">
                 {

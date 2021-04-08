@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
-import Posts from './posts';
-import PostSearch from './postSearch';
-import CreatePostBox from './createPostBox';
+
+import Posts from './Posts';
+import PostSearch from './PostSearch';
+import CreatePostBox from './CreatePostBox';
 
 import { getPosts, deletePost, createPost } from '../../services/postService';
 
 import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
-import { makeDate, makeDates } from '../../utils/makeDate';
+import { makeDate } from '../../utils/makeDate';
 
 import UserContext from '../../context/userContext';
-import HistoryContext from '../../context/historyContext';
 import { readMedia, compress, decompress } from '../../utils/media';
+
+import './PostsPage.css';
 
 class PostsPage extends Component {
     static contextType = UserContext;
@@ -19,6 +21,7 @@ class PostsPage extends Component {
     state = {
         posts: null,
         keywordFilter: null,
+        postTypeFilter: null,
         relativeDateFilter: null,
         dateRangeFilter: null,
         emptyPost: false,
@@ -34,7 +37,13 @@ class PostsPage extends Component {
     populatePosts = async () => {
         try {
             const { data: posts } = await getPosts();
-            makeDates(posts);
+            for (const post of posts) {
+                makeDate(post);
+                if (post.media)
+                    post.media.data = await decompress(post.media.data);
+                if (post.user.profilePic)
+                    post.user.profilePic = await decompress(post.user.profilePic);
+            }
             this.setState({ posts });
         } catch (ex) {
             // Axios will catch any unexpected erros
@@ -77,7 +86,7 @@ class PostsPage extends Component {
 
         if (media){
             mediaData =  await readMedia(media.src);
-            compressedData = compress(mediaData);
+            compressedData = await compress(mediaData);
             newPost.media = { 
                 mediaType: media.type, 
                 data: compressedData
@@ -90,9 +99,13 @@ class PostsPage extends Component {
 
             if (media)
                 post.media.data = mediaData;
+            post.user.profilePic = currentUser.profilePic;
             const posts = [...this.state.posts];
             posts.unshift(post);
-            this.setState({ posts, emptyPost: false });
+            this.setState({ 
+                posts, 
+                emptyPost: false
+                });
         } catch (ex) {
             // REVISIT
             console.log(ex.response);
@@ -103,28 +116,44 @@ class PostsPage extends Component {
         const trimmed = text.trim().toLowerCase();
         if (!trimmed) return;
         this.setState({ keywordFilter: trimmed, 
+                        postTypeFilter: null,
                         relativeDateFilter: null, 
-                        dateRangeFilter: null 
+                        dateRangeFilter: null,
+                        showSearch: false 
                     });
+    }
+
+    handlePostType = type => {
+        this.setState({ keywordFilter: null, 
+            postTypeFilter: type,
+            relativeDateFilter: null, 
+            dateRangeFilter: null,
+            showSearch: false  
+        });
     }
 
     handleDateSelected = date => {
         this.setState({ keywordFilter: null, 
+                        postTypeFilter: null,
                         relativeDateFilter: date, 
-                        dateRangeFilter: null 
+                        dateRangeFilter: null,
+                        showSearch: false  
                     });
     }
 
     handleDateRange = (start, end) => {
         this.setState({ keywordFilter: null,
+                        postTypeFilter: null,
                         relativeDateFilter: null,
-                        dateRangeFilter: [start, end] 
+                        dateRangeFilter: [start, end],
+                        showSearch: false  
                     });
     }
 
     getCurrentPosts = () => {
         const { 
             keywordFilter, 
+            postTypeFilter,
             relativeDateFilter, 
             dateRangeFilter, 
             posts } = this.state;
@@ -132,6 +161,15 @@ class PostsPage extends Component {
         if (keywordFilter) 
             return posts.filter(p => p.user.username.toLowerCase().includes(keywordFilter));
         
+        if (postTypeFilter){
+            if (postTypeFilter === 'All')
+                return posts;
+            else if (postTypeFilter === 'My Posts')
+                return posts.filter(p => p.user._id === this.context.currentUser._id);
+            else if (postTypeFilter === 'Liked Posts')
+                return posts.filter(p => this.context.currentUser.likedPosts[p._id]);
+        }
+
         if (relativeDateFilter)
             return filterByRelativeDate(posts, relativeDateFilter);
         
@@ -151,36 +189,53 @@ class PostsPage extends Component {
         this.props.history.push(`/profile/${id}`);
     }
 
+    handleShowSearch = () => {
+        this.setState({ showSearch: !this.state.showSearch });
+    }
+
     render() {  
         // console.log('postsPage render()');
-        const { relativeDateFilter, posts, emptyPost } = this.state;
+        const { relativeDateFilter, posts, emptyPost, showSearch } = this.state;
         const alert = { type: 'warning', message: "Post can't be empty"};
 
-        if (!posts) return <p className="center">Loading posts...</p>;
-
+        if (!posts) 
+            return (
+                <p style={{ textAlign: 'center' }}>Loading posts...</p>
+            );
         return (
-            <HistoryContext.Provider value={this.props.history}>
-                <div className="posts-page">
-                <div className="posts-with-create">
-                    <CreatePostBox 
-                    onCreate={this.handleCreatePost}
-                    alert={emptyPost && alert}/>
-
-                    <Posts 
-                        posts={this.getCurrentPosts()}
-                        onDelete={this.handleDelete}
-                        onCreatePost={this.handleCreatePost}
-                        onPostClick={this.handlePostClick}
-                        onProfile={this.handleProfileClick}/>
-                </div>
-                <PostSearch 
+            <div className="posts-page">
+                <div className={!showSearch && "hide"}>
+                    <div className="btn-post-search">
+                        <span onClick={this.handleShowSearch} className="clickable">
+                            Show posts
+                        </span>
+                    </div>
+                    <PostSearch 
                     searchByKeyword={this.handleSearchByKeyword}
+                    onPostType={this.handlePostType}
                     dates={this.relativeDates}
                     selectedDate={relativeDateFilter}
                     onDateSelected={this.handleDateSelected}
                     onDateRange={this.handleDateRange}/>
                 </div>
-            </HistoryContext.Provider>
+                <div className={showSearch && "hide"}>
+                    <div className="btn-post-search">
+                        <span onClick={this.handleShowSearch} className="clickable">
+                            Search for posts
+                        </span>
+                    </div>
+                    <CreatePostBox 
+                    onCreate={this.handleCreatePost}
+                    alert={emptyPost && alert}/>
+
+                    <Posts 
+                    posts={this.getCurrentPosts()}
+                    onDelete={this.handleDelete}
+                    onCreatePost={this.handleCreatePost}
+                    onPostClick={this.handlePostClick}
+                    onProfile={this.handleProfileClick}/>
+                </div>
+            </div>
         );
   
     }

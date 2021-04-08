@@ -73,6 +73,7 @@ router.delete(
     const comment = await Comment.findByIdAndDelete(req.params.id).select(
       '-__v'
     );
+    if (!comment) return res.status(404).send('Comment not found');
     await Post.findByIdAndUpdate(comment.postId, {
       $inc: { numberOfComments: -1 },
     });

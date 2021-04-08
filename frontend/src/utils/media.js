@@ -14,10 +14,20 @@ export function readMedia(file) {
 }
 
 export function compress(data, outputEncoding = 'StorageBinaryString') {
-  return LZUTF8.compress(data, { outputEncoding });
+  return new Promise((resolve, reject) => {
+    LZUTF8.compressAsync(data, { outputEncoding }, (result, error) => {
+      if (error) reject(error);
+      else resolve(result);
+    });
+  });
 }
 
 export function decompress(data, inputEncoding = 'StorageBinaryString') {
-  return LZUTF8.decompress(data, { inputEncoding });
+  return new Promise((resolve, reject) => {
+    LZUTF8.decompressAsync(data, { inputEncoding }, (result, error) => {
+      if (error) reject(error);
+      else resolve(result);
+    });
+  });
 }
 // StorageBinaryString

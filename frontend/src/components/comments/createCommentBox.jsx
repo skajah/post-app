@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import TextBox from '../common/textBox';
-import UserContext from '../../context/userContext';
 import ProfilePic from '../common/profilePic';
+import './CreateCommentBox.css';
+import Button from '../common/Button';
 
 class CreateCommentBox extends Component {
-    static contextType = UserContext
     
     text = ''
 
@@ -30,13 +30,7 @@ class CreateCommentBox extends Component {
 
         return ( 
             <div className="create-comment-box">
-                <ProfilePic src={ this.context.currentUser.profilePic } />
-                <div style={{
-                    width: "100%", 
-                    display: 'flex',
-                    flexDirection: 'column'
-                    }}>
-                    <TextBox 
+                <TextBox 
                     name="commentText"
                     placeHolder=" Comment on this post..."
                     value={clear ? '' : null}
@@ -44,16 +38,13 @@ class CreateCommentBox extends Component {
                     onTextChange={this.handleTextChange}
                     // Pass down alert so that it is aligned with text box
                     type="textarea"
-                    alert={alert}/> 
-                    
-                    <button 
-                    className="btn btn-comment" 
-                    style={{alignSelf: 'end'}}
-                    onClick={this.handleCreate}>
-                        Comment
-                    </button>
-                </div> 
-
+                    alert={alert}/>
+                <Button
+                color="primary"
+                size="btn--small"
+                onClick={this.handleCreate}>
+                    Comment
+                </Button>
             </div>
          );
     }

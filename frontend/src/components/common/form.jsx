@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import Joi from 'joi-browser';
 import SelectInput from './selectInput';
 import FormInput from './formInput';
+import Button from './Button';
+import './Form.css';
 
 class Form extends Component {
     state = { 
@@ -15,9 +17,12 @@ class Form extends Component {
 
      renderButton = label => {
         return (
-        <button 
-        type="submit" 
-        className="btn-form">{label}</button>
+            <Button
+            style="btn--rounded"
+            color="primary"
+            size="btn--wide">
+                {label}
+            </Button>
         );
      }
 

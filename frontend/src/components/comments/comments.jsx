@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Comment from './comment';
+import Comment from './Comment';
 
 class Comments extends Component {
 

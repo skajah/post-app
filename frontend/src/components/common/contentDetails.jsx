@@ -6,6 +6,7 @@ import UserContext from '../../context/userContext';
 import ProfilePic from './profilePic';
 import { updateMe } from '../../services/userService';
 import Dropdown from './dropdown';
+import './ContentDetails.css';
 
 class ContentDetails extends Component {
     static contextType = UserContext
@@ -36,7 +37,6 @@ class ContentDetails extends Component {
     render() { 
         const { 
             details, 
-            profilePic,
             onLike, 
             likes, 
             onClick, 
@@ -48,7 +48,7 @@ class ContentDetails extends Component {
             headerIconSpan } = this.props;
         // console.log(profilePicUrl, comment);
         const { currentUser } = this.context;
-        const { username, date, userId } = details;
+        const { username, date, userId, profilePic } = details;
         const following = currentUser.following[userId] || false;
         const options = [following ? 'Unfollow' : 'Follow', 'Profile'];
         const sameUser = userId === currentUser._id;

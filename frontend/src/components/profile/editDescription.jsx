@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import Form from '../common/form';
+import Form from '../common/Form';
 import UserContext from '../../context/userContext';
 import Joi from 'joi-browser';
 import { updateMe } from '../../services/userService';
@@ -17,7 +17,7 @@ class EditDescription extends Form {
     data = {}
 
     schema = {
-        description: Joi.string()
+        description: Joi.string().allow('')
     }
 
     componentDidMount(){

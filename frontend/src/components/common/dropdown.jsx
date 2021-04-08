@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Dots from './icons/dots';
+import './Dropdown.css';
 
 class Dropdown extends Component {
     state = { 
@@ -36,8 +37,9 @@ class Dropdown extends Component {
         const { options } = this.props;
         const { showOptions } = this.state;
         return ( 
-            <div className="dropdown" ref={this.dropdown}>
-                <Dots vertical={true} onClick={this.handleDropdown}/>
+            <div 
+            className="dropdown" 
+            ref={this.dropdown}>
                 <div className={`dropdown-content${showOptions ? ' show': ''}`}>
                     {
                         options.map(o => {
@@ -50,6 +52,7 @@ class Dropdown extends Component {
                         })
                     }
                 </div>
+                <Dots vertical={true} onClick={this.handleDropdown}/>
             </div>
          );
     }

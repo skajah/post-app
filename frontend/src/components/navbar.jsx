@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Link, NavLink } from 'react-router-dom';
 import auth from '../services/authService';
 import UserContext from '../context/userContext';
+import './Navbar.css';
 
 class NavBar extends Component {
     static contextType = UserContext

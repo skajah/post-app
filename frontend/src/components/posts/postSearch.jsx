@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import SearchKeyword from '../common/searchKeyword';
 import SearchRelativeDate from '../common/searchRelativeDate';
 import SearchDateRange from '../common/searchDateRange';
+import DropdownList from '../common/dropdownList';
 
 class PostSearch extends Component {
 
@@ -23,7 +24,8 @@ class PostSearch extends Component {
             searchByKeyword, 
             dates, 
             selectedDate, 
-            onDateSelected } = this.props;
+            onDateSelected,
+            onPostType } = this.props;
 
         const { dateRangeError } = this.state;
         const alert = { type: 'danger', message: "Start date can't be after end date "};
@@ -40,9 +42,14 @@ class PostSearch extends Component {
                 placeHolder=" Enter a username"
                 onKeywordSearch={searchByKeyword}/>
 
-                <p
-                style={{margin: '1.5rem 0 .5rem', fontWeight: '500'}}
-                >Select a date</p>
+                <p>Post Type</p>
+
+                <DropdownList 
+                options={['All', 'My Posts', 'Liked Posts']}
+                className="dropdown-list"
+                onSelect={onPostType}/>
+
+                <p>Select a date</p>
 
                 <SearchRelativeDate 
                 dates={dates} 

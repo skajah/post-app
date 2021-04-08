@@ -7,50 +7,33 @@
   --hover-white: rgba(245, 245, 245, 0.9);
   --hover-gray: rgba(211, 211, 211, 0.5);
   --hover-gray-light: rgba(211, 211, 211, 0.25);
+  --my-primary: var(--lighter-maroon);
+  --hover-primary: var(--light-maroon);
+  --hover--whitesmoke: rgba(245, 245, 245, 0.9);
 }
+
+/* General */
+
 #root {
   background: whitesmoke;
 }
-nav {
-  position: fixed;
-  top: 0;
-  z-index: 2;
-  width: 100vw;
-}
+
 main {
-  margin: 80px 10px 0;
+  margin: 20px 0 5px;
   min-height: 100vh;
 }
 
-/* forms */
-
-.form {
-  width: 25%;
+footer {
+  color: var(--dark-gray);
+  min-height: 20vh;
 }
 
-.form input,
-.form textarea {
-  border: 1px solid var(--lighter-maroon);
-}
-
-.btn-form {
-  padding: 5px;
-  border: none;
-  border-radius: 30px;
-  background: var(--lighter-maroon);
-  color: whitesmoke;
-}
-
-.btn-form {
+.with-alert {
   width: 100%;
 }
 
-.btn-form:disabled {
-  background: var(--lightest-maroon);
-}
-
-.btn-form:enabled:hover {
-  background: var(--light-maroon);
+.text-box {
+  width: 100%;
 }
 
 .profile-pic {
@@ -60,287 +43,19 @@ main {
   border-radius: 100%;
 }
 
-/* navbar */
-
-.navbar {
-  background: whitesmoke;
-}
-.navbar a,
-#change-password-text {
-  color: var(--dark-gray);
-}
-
-.navbar a:hover,
-.nav-item:hover,
-#change-password-text:hover {
-  color: var(--light-maroon);
-}
-
-.nav-items {
-  display: flex;
-}
-
-/* posts page */
-
-.posts-page {
-  display: flex;
-}
-.content-details div:first-child {
-  display: flex;
-}
-
-.post-icons {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.post .username,
-.profile .username {
-  color: whitesmoke;
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.post .date,
-.post .time {
-  color: var(--text-muted);
-  font-size: 95%;
-}
-
-.post-media {
-  max-width: 80%;
-  max-height: 80%;
-}
-
-.posts-with-create {
-  width: 50%;
-  margin-right: 10px;
-  /* height: 90vh; */
-}
-
-.create-post-box,
-.post {
-  border: 1.5px solid var(--dark-gray) !important;
-  margin-bottom: 15px;
-}
-
-.card .create-post-header,
-.card .create-post-footer {
-  display: flex;
-  background: var(--lighter-maroon);
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card .create-post-body,
-.card .post-body {
-  background: whitesmoke;
-}
-
-.card .upload-icons {
-  display: flex;
-  justify-content: space-evenly;
-  flex-grow: 3;
-}
-
-.btn-create-post {
-  background: gold !important;
-  color: var(--dark-gray) !important;
-}
-
-.btn-create-post:hover {
-  background: rgba(255, 217, 0, 0.9) !important;
-}
-.btn-clear-media,
-.btn-comment,
-.dropdown-content button,
-.btn-follow {
-  background: whitesmoke !important;
-  color: var(--dark-gray);
-}
-
-.btn-clear-media:hover,
-.btn-comment:hover,
-.btn-follow:hover {
-  background: var(--hover-white) !important;
-}
-
 .card .post-header,
-.card .post-footer {
-  background: var(--light-maroon);
+.card .create-post-header {
+  padding: 0.5rem 1.25rem 0.5rem 0.5rem;
 }
 
-/* post page (singular) */
-
-.post-page .post {
-  width: 60%;
-}
-
-/* Comments */
-
-.comments {
-  margin-left: 50px;
-  color: var(--dark-gray);
-}
-
-.comment {
+.username {
+  font-weight: 700;
   color: whitesmoke;
-  background: var(--light-maroon);
-  border: 1px solid whitesmoke;
-  border-radius: 5px;
-  padding: 0.75rem;
-  margin-top: 10px;
 }
 
-.comment p {
-  margin-left: 3rem;
-  margin-top: 0.5rem;
-}
-.create-comment-box {
-  display: flex;
-}
-
-.text-box,
-.search-date-range input {
-  border: 1.5px solid var(--lightest-maroon);
-  border-radius: 5px;
-}
-
-.create-comment-text-box,
-#create-post-text-box {
-  width: 100%;
-}
-
-#create-post-text-box {
-  height: 5rem;
-}
-.create-comment-text-box {
-  flex-grow: 3;
-}
-
-/* post search */
-
-.post-search {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  left: 70%;
-}
-
-.search-keyword {
-  display: flex;
-  align-items: center;
-}
-.search-keyword .with-alert {
-  width: 100%;
-  margin-right: 0.5rem;
-}
-
-.search-keyword-text-box {
-  width: 100%;
-}
-
-.search-date-range {
-  margin: 1.5rem 0;
-  font-size: 0.8rem;
-}
-
-.post-page {
-  padding: 10px;
-}
-
-/* profile page */
-
-.profile-page {
-  width: 50%;
-  margin: 0 auto;
-  min-height: 100vh;
-}
-
-.profile-page .card {
-  border: 1.5px solid var(--dark-gray);
-}
-
-.profile-page .card-header {
-  background: var(--lighter-maroon);
-}
-.profile-page .card-body {
-  background: whitesmoke;
-}
-
-.profile-details {
-  display: flex;
-  justify-content: space-between;
-}
-
-.profile-details .username {
-  color: whitesmoke;
-  font-weight: bold;
-  margin-right: 0.5rem;
-}
-
-.profile-simple {
-  padding: 10px;
-}
-
-.profile-simple:hover {
-  background: var(--hover-gray-light);
-}
-
-.tab-nav {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-}
-
-.tab-nav-item {
-  padding: 10px;
-  border: 1px solid maroon;
-  border-radius: 5px;
-  color: var(--dark-gray);
-}
-
-.tab-nav-active {
-  background: var(--lighter-maroon);
-  color: white;
-}
-
-.profile-summary {
-  width: 60%;
-  border: 1px var(--dark-gray) solid;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.profile-summary div:not(:first-child) {
-  display: grid;
-  grid-template-columns: 2fr 8fr 1fr;
-  align-items: center;
-}
-
-.profile-summary div {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  padding-left: 5px;
-}
-
-.profile-summary div:not(:first-child):hover {
-  background: var(--hover-gray-light);
-}
-
-.profile-summary div:not(:last-child) {
-  border-bottom: 1px lightgray solid;
-}
-
-.profile-summary .file-chooser div {
-  grid-column: 1 / span 3;
-}
-
-.profile-summary i {
-  justify-self: center;
+.date {
+  font-size: 90%;
+  color: var(--text-muted);
 }
 
 /* icon colors */
@@ -359,29 +74,9 @@ main {
   color: whitesmoke;
 }
 
-.fa-comment-o {
-  margin-bottom: 6px;
+.hide {
+  display: none;
 }
-
-/* post search */
-
-/* Relative date search*/
-
-.list-group {
-  border: 1px solid black;
-}
-
-.list-group-item {
-  background-color: whitesmoke;
-  border: 0.5px solid var(--dark-gray) !important;
-}
-
-.list-group-item.my-active {
-  background-color: var(--lighter-maroon);
-  color: whitesmoke;
-}
-
-/* Miscelaneous/General */
 
 .center {
   margin: 0 auto;
@@ -389,32 +84,4 @@ main {
 
 .clickable {
   cursor: pointer;
-}
-
-.text-box {
-  height: 2rem;
-}
-
-.dropdown {
-  position: relative;
-}
-
-.dropdown-content {
-  display: none;
-  z-index: 100;
-  position: absolute;
-  background: whitesmoke;
-  border: 1px solid var(--dark-gray);
-}
-
-.dropdown-content button:hover {
-  background: var(--hover-gray) !important;
-}
-
-.dropdown-content button {
-  width: 100%;
-}
-
-.show {
-  display: block;
 }

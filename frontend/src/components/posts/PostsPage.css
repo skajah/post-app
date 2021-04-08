@@ -1,0 +1,66 @@
+.posts-page {
+  max-width: 320px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.btn-post-search {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-date-range input,
+.post-search .dropdown-list {
+  border: 1.5px solid var(--lightest-maroon);
+  border-radius: 5px;
+}
+
+/* post search */
+
+.post-search {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.search-keyword {
+  display: flex;
+  align-items: center;
+}
+
+.search-keyword .with-alert {
+  width: 100%;
+  margin-right: 0.5rem;
+}
+
+.search-keyword-text-box {
+  width: 100%;
+}
+
+.post-search p:not(:first-child) {
+  margin: 1.5rem 0 0.5rem;
+  font-weight: 500;
+}
+
+.search-date-range {
+  margin: 1.5rem 0;
+  font-size: 0.8rem;
+}
+
+.list-group {
+  box-shadow: 0 0 1px 1px var(--lightest-maroon);
+}
+
+.list-group-item {
+  background-color: whitesmoke;
+}
+
+.list-group-item:not(:last-child) {
+  border-bottom: 0.5px solid var(--lighter-maroon) !important;
+}
+
+.list-group-item.my-active {
+  background-color: var(--lighter-maroon);
+  color: whitesmoke;
+}

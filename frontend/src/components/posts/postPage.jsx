@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
-import Post from './post';
+import Post from './Post';
 
 import { getPost, deletePost } from '../../services/postService';
-import { makeDate, makeDates } from '../../utils/makeDate';
+import { makeDate } from '../../utils/makeDate';
 import { decompress } from '../../utils/media';
+import './PostPage.css';
 
 class PostPage extends Component {
     
@@ -21,8 +22,20 @@ class PostPage extends Component {
         try {
             const { id: postId } = this.props.match.params;
             const { data: post } = await getPost(postId,{ withComments: true });
-            makeDates(post.comments);
             makeDate(post);
+
+            if (post.user.profilePic)
+                post.user.profilePic = await decompress(post.user.profilePic);
+            
+            if (post.media)
+                post.media.data = await decompress(post.media.data);
+
+            const { comments } = post;
+            for (const comment of comments) {
+                makeDate(comment);
+                if (comment.user.profilePic)
+                    comment.user.profilePic = await decompress(comment.user.profilePic);
+            }
             this.setState({ post });
         } catch (ex) { 
             if (ex.response && ex.response.status === 404)

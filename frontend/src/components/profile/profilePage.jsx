@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
-import ProfileDetails from './profileDetails';
+import ProfileDetails from './ProfileDetails';
 import TabNav from '../common/tabNav';
 import UserContext from '../../context/userContext';
-import Posts from '../posts/posts';
+import Posts from '../posts/Posts';
 import _ from 'lodash';
 
 import { getUserPosts, deletePost } from '../../services/postService';
 import { getUser, getFollowers, getFollowing, updateMe } from '../../services/userService';
-import { makeDates } from '../../utils/makeDate';
+import { makeDate } from '../../utils/makeDate';
 import { decompress } from '../../utils/media';
-import ProfileSimple from './profileSimple';
+import ProfileSimple from './ProfileSimple';
+import './ProfilePage.css';
 
 class ProfilePage extends Component {
     static contextType = UserContext;
@@ -21,22 +22,40 @@ class ProfilePage extends Component {
         user: null,
         following: null,
         followers: null,
-    }
+    }   
 
     tabs = ['Posts', 'Following', 'Followers']
 
+    componentWillMount(){
+        this.unlisten = this.props.history.listen((location, action) => {
+            console.log('History change: ', location.pathname);
+            let path = location.pathname;
+            if (path.startsWith('/profile')){
+                path = location.pathname.endsWith('/') ?
+                location.pathname.substring(1, location.pathname.length) : 
+                location.pathname.substring(1);
+                const parts = path.split('/');
+                if (parts.length === 2 && parts[1] !== 'edit')
+                    this.setUser(parts[1]);
+            }
+        });
+    }
+    componentWillUnmount(){
+        this.unlisten();
+    }
+
     componentDidMount(){
         console.log('profilePage componentDidMount()');
-        this.setUser();
-        this.setPosts();
+        this.setUser(this.props.match.params.id);
     }
 
     handleTabChange = tab => {
         const {  posts, following, followers } = this.state;
-
-        if (tab === this.tabs[0] && !posts) this.setPosts();
-        else if (tab === this.tabs[1] && !following) this.setFollowing();
-        else if (tab === this.tabs[2] && !followers) this.setFollowers();
+        const { id } = this.props.match.params;
+        
+        if (tab === 'Posts' && !posts) this.setPosts(id);
+        else if (tab === 'Following' && !following) this.setFollowing(id);
+        else if (tab === 'Followers' && !followers) this.setFollowers(id);
         this.setState({ currentTab: tab });
 
     }
@@ -63,40 +82,50 @@ class ProfilePage extends Component {
         this.props.history.push(`/posts/${_id}`);
     }
 
-    setPosts = async () => {
+    setFollowing = async (id) => {
         try {
-            const { data: posts } = await getUserPosts(this.props.match.params.id);
-            makeDates(posts);
-            this.setState({ posts });
+            const { data: following } = await getFollowing(id);
+            for (const profile of following) {
+                if (profile.profilePic)
+                    profile.profilePic = await decompress(profile.profilePic);
+            }
+            this.setState({ following });
         } catch (ex) {
-            // REVISIT
             console.log('Error: ', ex);
         }
     }
 
-    setFollowing = async () => {
-        const { data: following } = await getFollowing(this.props.match.params.id);
-        following.forEach(profile => {
-            if (profile.profilePic)
-                profile.profilePic = decompress(profile.profilePic);
-        });
-        this.setState({ following });
-    }
-    setFollowers = async () => {
-        const { data: followers } = await getFollowers(this.props.match.params.id);
-        followers.forEach(profile => {
-            if (profile.profilePic)
-                profile.profilePic = decompress(profile.profilePic);
-        });
-        this.setState({ followers });
+    setFollowers = async (id) => {
+        try {
+            const { data: followers } = await getFollowers(id);
+            for (const profile of followers) {
+                if (profile.profilePic)
+                    profile.profilePic = await decompress(profile.profilePic);
+            }
+            this.setState({ followers });
+        } catch (ex) {
+            console.log('Error: ', ex);
+        }
     }
 
-    setUser = async () => {
-        const { data: user } = await getUser(this.props.match.params.id);
-        if (user.profilePic)
-            user.profilePic = decompress(user.profilePic);
-        this.setState({ user, posts: null, following: null, followers: null, currentTab: 'Posts'});
-        
+    setUser = async (id) => {
+        try {
+            const { data: user } = await getUser(id);
+            if (user.profilePic)
+                user.profilePic = await decompress(user.profilePic);
+            
+            const { data: posts } = await getUserPosts(id);        
+            for (const post of posts) {
+                makeDate(post);
+                if (post.media)
+                    post.media.data = await decompress(post.media.data);
+                if (post.user.profilePic)
+                    post.user.profilePic = await decompress(post.user.profilePic);
+            }
+            this.setState({ user, posts, following: null, followers: null, currentTab: 'Posts'});
+        } catch (ex) {
+            console.log('Error: ', ex);
+        }
     }
 
     handleFollow = async () => {
@@ -132,91 +161,78 @@ class ProfilePage extends Component {
         // console.log('profilePage render()');
         const { user, currentTab, posts, following, followers  } = this.state;
 
+        if (!user) return null;
 
-        if (user && user._id !== this.props.match.params.id){
-            this.setUser();
-            this.setPosts();
-            return null;
-        }
-
-        const sameUser = user ? this.context.currentUser._id === user._id : false;
+        const sameUser = this.context.currentUser._id === user._id || false;
 
         return ( 
             <div className="profile-page">
-                <div className="card center">
-                    <div className="card-header"> 
-                        { 
-                        user &&
-                        <ProfileDetails user={user} onFollow={this.handleFollow}/>
-                        }    
-                    </div>
-                    <div className="card-body">
-                        <TabNav 
-                        tabs={this.tabs}
-                        currentTab={currentTab}
-                        onClick={this.handleTabChange}/>
-                        {
-                            (currentTab === this.tabs[0]) && 
-                            (
-                                !posts ? <p>Loading posts...</p> :
-                                <React.Fragment>
-                                    <p>
-                                        {
-                                         !posts.length ?
-                                         "No posts" :
-                                        `${posts.length} Post(s)`
-                                        }
-                                    </p>
-                                    <Posts 
-                                    posts={posts}
-                                    onDelete={this.handleDelete}
-                                    onPostClick={this.handlePostClick}
-                                    hideOptionMenu={true}
-                                    headerIconSpan={ sameUser ? 4 : 3 }/>
-                                </React.Fragment>
-                                
-                            )
-                            
-                        }
-                        {
-                            (currentTab === this.tabs[1]) && 
-                            (
-                                !following ? <p>Loading followings...</p> :
-                                <React.Fragment>
-                                    <p>
-                                        {
-                                         !following.length ?
-                                         "No followings" :
-                                        `Following ${following.length} user(s)`
-                                        }
-                                    </p>
-                                    {
-                                    following.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                                    }
-                                </React.Fragment>
-                            )
-                        }
-                        {
-                            (currentTab === this.tabs[2]) && 
-                            (
-                                !followers ? <p>Loading followers..</p> :
-                                <React.Fragment>
-                                    <p>
-                                        {
-                                         !followers.length ?
-                                         "No followers" :
-                                        `${followers.length} follower(s)`
-                                        }
-                                    </p>
-                                    {
-                                    followers.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                                    }
-                                    </React.Fragment>
-                                
-                            )
-                        }
-                    </div>
+                <div className="profile-page-header">
+                    <ProfileDetails user={user} onFollow={this.handleFollow}/>
+                    <TabNav 
+                    tabs={this.tabs}
+                    currentTab={currentTab}
+                    onClick={this.handleTabChange}/>
                 </div>
+                {
+                    (currentTab === 'Posts') && 
+                    (
+                        !posts ? <p>Loading posts...</p> :
+                        <React.Fragment>
+                            <p>
+                                {
+                                 !posts.length ?
+                                 "No posts" :
+                                `${posts.length} Post(s)`
+                                }
+                            </p>
+                            <Posts 
+                            posts={posts}
+                            onDelete={this.handleDelete}
+                            onPostClick={this.handlePostClick}
+                            hideOptionMenu={true}/>
+                        </React.Fragment>
+                        
+                    )
+                    
+                }
+                {
+                    (currentTab === 'Following') && 
+                    (
+                        !following ? <p>Loading followings...</p> :
+                        <React.Fragment>
+                            <p>
+                                {
+                                 !following.length ?
+                                 "No followings" :
+                                `Following ${following.length} user(s)`
+                                }
+                            </p>
+                            {
+                            following.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
+                            }
+                        </React.Fragment>
+                    )
+                }
+                {
+                    (currentTab === 'Followers') && 
+                    (
+                        !followers ? <p>Loading followers..</p> :
+                        <React.Fragment>
+                            <p>
+                                {
+                                 !followers.length ?
+                                 "No followers" :
+                                `${followers.length} follower(s)`
+                                }
+                            </p>
+                            {
+                            followers.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
+                            }
+                            </React.Fragment>
+                        
+                    )
+                }
             </div>
          );
     }

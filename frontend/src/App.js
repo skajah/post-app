@@ -2,26 +2,25 @@ import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
-import NavBar from './components/navbar';
-import Login from './components/login';
-import Register from './components/register';
-import ProfilePage from './components/profile/profilePage';
-import ProfileEdit from './components/profile/profileEdit';
-import NotFound from './components/notFound';
-import PostPage from './components/posts/postPage';
-import PostsPage from './components/posts/postsPage';
-import Logout from './components/logout';
+import NavBar from './components/Navbar';
+import Login from './components/Login';
+import Register from './components/Register';
+import ProfilePage from './components/profile/ProfilePage';
+import ProfileEdit from './components/profile/ProfileEdit';
+import NotFound from './components/NotFound';
+import PostPage from './components/posts/PostPage';
+import PostsPage from './components/posts/PostsPage';
+import Logout from './components/Logout';
 import ProtectedRoute from './components/common/protectedRoute';
 import UserContext from './context/userContext';
 
 import 'react-toastify/dist/ReactToastify.css';
-import './App.css';
 import auth from './services/authService';
 import { getMe } from './services/userService';
-import EditUsername from './components/profile/editUsername';
-import EditEmail from './components/profile/editEmail';
-import EditPassword from './components/profile/editPassword';
-import EditDescription from './components/profile/editDescription';
+import EditUsername from './components/profile/EditUsername';
+import EditEmail from './components/profile/EditEmail';
+import EditPassword from './components/profile/EditPassword';
+import EditDescription from './components/profile/EditDescription';
 import { decompress } from './utils/media';
 import profilePicSrc from './images/profile_default.jpg';
 
@@ -64,6 +63,7 @@ class App extends Component {
       '_id',
       'username',
       'email',
+      'description',
       'profilePic',
       'likedPosts',
       'likedComments',
@@ -73,7 +73,7 @@ class App extends Component {
     console.log('Got me');
 
     currentUser.profilePic = currentUser.profilePic
-      ? decompress(currentUser.profilePic)
+      ? await decompress(currentUser.profilePic)
       : profilePicSrc;
     this.setState({ currentUser });
   };

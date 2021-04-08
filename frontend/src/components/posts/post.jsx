@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
 import { toast } from 'react-toastify';
 import Comments from '../comments/comments';
-import CreateCommentBox from '../comments/createCommentBox';
-import ContentDetails from '../common/contentDetails';
+import CreateCommentBox from '../comments/CreateCommentBox';
 import _ from 'lodash';
 import Media from '../common/media';
 import { makeDate } from '../../utils/makeDate';
 import { likePost, unlikePost } from '../../services/postService';
 import { createComment, deleteComment } from '../../services/commentService';
 import UserContext from '../../context/userContext';
-import { decompress } from '../../utils/media';
-import profilePic from '../../images/profile_default.jpg';
-import Delete from '../common/icons/delete';
+import './Post.css';
+import ContentDetailsHeader from '../common/ContentDetailsHeader';
+import ContentDetailsFooter from '../common/ContentDetailsFooter';
 
 class Post extends Component {
     static contextType = UserContext;
@@ -29,15 +28,8 @@ class Post extends Component {
         this.populateState();
     }
 
-    populateState(){
+    async populateState(){
         const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
-        if (media)
-            media.data = decompress(media.data);
-        // user.profilePic = decompress(user.profilePic);
-        if (user.profilePic)
-            user.profilePic = decompress(user.profilePic);
-        else 
-            user.profilePic = profilePic;
 
         this.setState({ 
             _id,
@@ -55,7 +47,7 @@ class Post extends Component {
         const originalComments = this.state.comments;
         const comments  = originalComments.filter(c => c._id !== _id );
         
-        this.setState({ comments });
+        this.setState({ comments, numberOfComments: comments.length });
         try {
             await deleteComment(_id);
         } catch (ex){
@@ -66,7 +58,7 @@ class Post extends Component {
                 else if (status === 404)
                     toast.error("Comment not fond. Refresh to get latest content");
             }
-            this.setState({ comments: originalComments });
+            this.setState({ comments: originalComments, numberOfComments: originalComments.length });
         }
     }
 
@@ -78,21 +70,24 @@ class Post extends Component {
 
         try {
             const postId = this.state._id;
+            const { currentUser } = this.context;
             const newComment = {
                 postId,
-                userId: this.context.currentUser._id,
+                userId: currentUser._id,
                 text
             };
             const { data: comment } = await createComment(newComment);
             makeDate(comment);
+            comment.user.profilePic = currentUser.profilePic;
             const comments = [...this.state.comments];
             comments.unshift(comment);
             this.setState({ 
                 comments, 
-                emptyComment: false 
+                emptyComment: false,
+                numberOfComments: comments.length
             });
         } catch (ex) {
-            // REVISIT
+            // REVIS IT
             
         }
     }
@@ -132,58 +127,61 @@ class Post extends Component {
             date,
             numberOfComments } = this.state;
         const { showComments, onPostClick, onProfile, onDelete, hideOptionMenu, headerIconSpan } = this.props;        
-        const details = { username: user.username, date, userId: user._id };
-        // console.log('Date: ', this.state.date, typeof this.state.date);
+        const details = { username: user.username, date, userId: user._id, profilePic: user.profilePic };
+        const initialLike = this.context.currentUser.likedPosts[_id];
         const alert = { type: 'warning', message: "Comment can't be empty"};
+        const sameUser = this.context.currentUser._id === user._id;
         // console.log('Liked post: ', this.context.currentUser.likedPosts)
         // console.log('id: ', _id);
         // console.log('Found: ', this.context.currentUser.likedPosts[_id]);
         if (_.isEmpty(user)) return null;
-        return ( 
-            <div className="card post">
-                <div className="card-header post-header">
-                    <ContentDetails 
-                    details={details}
-                    profilePic={user.profilePic}
-                    initialLike={this.context.currentUser.likedPosts[_id]}
-                    onDelete={onDelete}
-                    onLike={this.handleLike}
-                    likes={likes}
-                    onProfile={onProfile}
-                    numberOfComments={numberOfComments || comments.length}
-                    onClick={onPostClick}
-                    showCommentIcon={true}
-                    hideOptionMenu={hideOptionMenu}
-                    headerIconSpan={headerIconSpan}/> 
-                </div>
-                <div className="card-body post-body">
-                    { text &&  <p>{text}</p> }
-                    {
-                        media && 
-                        <Media 
-                        type={media.mediaType}
-                        src={media.data}
-                        className="post-media"/> 
-                    }
-                </div>
 
-                <div className="card-footer post-footer">
-                    {
-                        showComments && 
-                        <React.Fragment>      
-                            <CreateCommentBox 
-                            alert={emptyComment && alert}
-                            onCreate={this.handleCreateComment}/>
+        return (
+            <React.Fragment>
+                <div className="card post">
+                    <div className="card-header post-header">
+                        <ContentDetailsHeader 
+                        details={details}
+                        onDelete={onDelete}
+                        onProfile={onProfile}
+                        onPostClick={onPostClick}
+                        hideOptionMenu={hideOptionMenu}
+                        />
+                    </div>
+                    <div className="card-body post-body">
+                        { text &&  <p>{text}</p> }
+                        {
+                            media && 
+                            <Media 
+                            type={media.mediaType}
+                            src={media.data}
+                            className="post-media"/> 
+                        }
+                    </div>
 
-                            <Comments 
-                            comments={comments}
-                            onDelete={this.handleDeleteComment}
-                            onProfile={onProfile}/>
-                        </React.Fragment>
-                        
-                    }
+                    <div className="card-footer post-footer">
+                        <ContentDetailsFooter 
+                        likes={likes}
+                        numberOfComments={numberOfComments}
+                        initialLike={initialLike}
+                        onLike={this.handleLike}
+                        onDelete={ sameUser && onDelete}/>
+                    </div>
                 </div>
-            </div>
+                {
+                    showComments &&
+                    <React.Fragment>
+                        <CreateCommentBox 
+                        alert={emptyComment && alert}
+                        onCreate={this.handleCreateComment}/>
+
+                        <Comments 
+                        comments={comments}
+                        onDelete={this.handleDeleteComment}
+                        onProfile={onProfile}/>
+                    </React.Fragment>
+                }
+            </React.Fragment>
          );
     }
 }

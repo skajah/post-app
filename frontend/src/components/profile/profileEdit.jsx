@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import Arrow from '../common/icons/arrow';
 import UserContext from '../../context/userContext';
 import ProfilePic from '../common/profilePic';
-import { EditRow, EditRowWithFile } from './editRow';
+import { EditRow, EditRowWithFile } from './EditRow';
 import { compress, readMedia } from '../../utils/media';
 import { updateMe } from '../../services/userService';
+import './ProfileEdit.css';
 
 
 class ProfileEdit extends Component {
@@ -40,7 +41,7 @@ class ProfileEdit extends Component {
                 </div>
                 <EditRowWithFile
                 label="Photo"
-                text="Your photo will be shown on your posts and comments"
+                text="Shown on your posts and comments"
                 icon={<ProfilePic src={profilePic} />}
                 className="profile-summary-photo clickable"
                 extensions={['jpg', 'jpeg', 'gif', 'png']}
@@ -69,7 +70,6 @@ class ProfileEdit extends Component {
                 className="profile-summary-description clickable"
                 onClick={() => this.goToUpdate('description')}
                 />
-
                 <EditRow 
                 label="Password"
                 text="Click to change"

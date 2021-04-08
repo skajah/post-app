@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'react-router-dom';
 import Joi from 'joi-browser';
 import _ from 'lodash';
-import Form from './common/form';
+import Form from './common/Form';
 import auth from '../services/authService';
 import UserContext from '../context/userContext';
 import { makeAlert } from '../utils/alert';
@@ -51,7 +51,7 @@ class Login extends Form {
                 <h1>Login</h1>
                 <form onSubmit={this.handleSubmit}>
                     {  _.isEmpty(errors) && alert }
-                    {this.renderInput('email', 'Email')}
+                    {this.renderInput('email', 'Email', { autoFocus: true })}
                     {this.renderInput('password', 'Password', { type: 'password' })}
                     {this.renderButton('Login')}
                 </form>

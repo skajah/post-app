@@ -5,10 +5,10 @@ class Comment extends Icon {
         classes: "fa fa-comment-o"
     }
 
-    render(){
-        const { onClick, numberOfComments } = this.props;
+    renderIcon(){
+        const { onClick, numberOfComments, disabled } = this.props;
         return (
-            <span className="clickable" onClick={onClick}>
+            <span className={ !disabled && "clickable"} onClick={ !disabled && onClick}>
                 <i className={this.getClasses()} />
                 <span className="fa-layers-counter comment-counter"> {numberOfComments || null} </span>
             </span>

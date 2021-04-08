@@ -7,6 +7,8 @@ import Volume from '../common/icons/volume';
 import withAlert from '../hoc/withAlert';
 import Media from '../common/media';
 import UserContext from '../../context/userContext';
+import './CreatePostBox.css';
+import Button from '../common/Button';
 
 class CreatePostBox extends Component {
     static contextType = UserContext;
@@ -48,9 +50,11 @@ class CreatePostBox extends Component {
                     <ProfilePic src={this.context.currentUser.profilePic} /> 
                     {
                         media && 
-                        <button 
-                        className="btn btn-clear-media"
-                        onClick={this.handleClearMedia}>Clear Media</button>
+                        <Button
+                        color="whitesmoke"
+                        size="btn--xsmall"
+                        onClick={this.handleClearMedia}>Clear Media
+                        </Button>
                     }
                     
                 </div>
@@ -68,29 +72,30 @@ class CreatePostBox extends Component {
 
                 </div>
                 <div className="card-footer create-post-footer">
-                    <span className="upload-icons">
-                        <Camera 
-                        extensions={['jpg', 'jpeg', 'png', 'gif']}
-                        onFileChosen={src => this.handleMediaUpload(src, 'image')}
-                        maxFileSize={10}
-                        size="lg"/>
+                    <Camera 
+                    extensions={['jpg', 'jpeg', 'png', 'gif']}
+                    onFileChosen={src => this.handleMediaUpload(src, 'image')}
+                    maxFileSize={10}
+                    size="lg"/>
 
-                        <VideoCamera 
-                        extensions={['mp4', 'mov', 'mpg']}
-                        onFileChosen={src => this.handleMediaUpload(src, 'video')}
-                        maxFileSize={10}
-                        size="lg"/>
+                    <VideoCamera 
+                    extensions={['mp4', 'mov', 'mpg']}
+                    onFileChosen={src => this.handleMediaUpload(src, 'video')}
+                    maxFileSize={10}
+                    size="lg"/>
 
-                        <Volume
-                        extensions={['mp3', 'wav', 'ogg']}
-                        onFileChosen={src => this.handleMediaUpload(src, 'audio')}
-                        maxFileSize={10}
-                        size="lg"/>
-                    </span>
-                    
-                    <button 
-                    className="btn btn-create-post" 
-                    onClick={this.handleCreate}>Post</button>
+                    <Volume
+                    extensions={['mp3', 'wav', 'ogg']}
+                    onFileChosen={src => this.handleMediaUpload(src, 'audio')}
+                    maxFileSize={10}
+                    size="lg"/>
+
+                    <Button
+                    style="btn--outline"
+                    size="btn--xsmall"
+                    onClick={this.handleCreate}>
+                        Post
+                    </Button>
                 </div>
             </div>
          );

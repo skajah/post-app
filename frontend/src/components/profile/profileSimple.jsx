@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import ProfilePic from '../common/profilePic';
-import UserContext from '../../context/userContext';
 
 class ProfileSimple extends Component {
-    static contextType = UserContext;
 
     render() { 
         const { user, onClick } = this.props;

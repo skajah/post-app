@@ -1,0 +1,16 @@
+.content-details {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+}
+
+.username {
+  color: whitesmoke;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.date,
+.time {
+  color: var(--text-muted);
+  font-size: 95%;
+}

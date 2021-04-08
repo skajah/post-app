@@ -24,13 +24,13 @@ router.get('/:id', validateId, async (req, res) => {
   const user = await User.findById(req.params.id).select(
     '_id username profilePic'
   );
-  if (!user) return res.status(400).send('User not found');
+  if (!user) return res.status(404).send('User not found');
   res.send(user);
 });
 
 router.get('/:id/following', validateId, async (req, res) => {
   const user = await User.findById(req.params.id).select('following');
-  if (!user) return res.status(400).send('User not found');
+  if (!user) return res.status(404).send('User not found');
   const userFollowing = [...user.following.keys()];
   const following = await User.find({ _id: { $in: userFollowing } }).select(
     '_id username profilePic'
@@ -40,7 +40,7 @@ router.get('/:id/following', validateId, async (req, res) => {
 
 router.get('/:id/followers', validateId, async (req, res) => {
   const user = await User.findById(req.params.id).select('followers');
-  if (!user) return res.status(400).send('User not found');
+  if (!user) return res.status(404).send('User not found');
   const userFollowers = [...user.followers.keys()];
   const followers = await User.find({ _id: { $in: userFollowers } }).select(
     '_id username profilePic'

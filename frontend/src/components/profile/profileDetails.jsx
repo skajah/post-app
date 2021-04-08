@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Edit from '../common/icons/edit';
 import ProfilePic from '../common/profilePic';
 import UserContext from '../../context/userContext';
+import Button from '../common/Button';
 
 class ProfileDetails extends Component {
     static contextType = UserContext;
@@ -20,13 +21,14 @@ class ProfileDetails extends Component {
                     <Link to="/profile/edit"> <Edit size="lg"/> </Link>
                     }
                 </div>
-                <button 
-                className="btn btn-follow"
+                <Button
+                color="whitesmoke"
+                size="btn--xsmall"
                 onClick={onFollow}>
                     {
                         currentUser.following[user._id] ? 'Unfollow' : 'Follow'
                     }
-                </button>
+                </Button>
                 
             </div>
          );
