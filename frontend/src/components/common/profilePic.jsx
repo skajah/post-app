@@ -1,14 +1,21 @@
-import Media from './media';
-import profileDefault from '../../images/profile_default.jpg';
+import React from 'react';
+import profileDefault from '../../images/profileDefault.jpg';
 
-class ProfilePic extends Media {
-    render() { 
-        const { src, alt } = this.props;
-
-        const attr = {className: 'profile-pic', alt: alt || 'Profile pic'};
-
-        return this.renderMedia('image', src || profileDefault, attr);
-    }
+export default function ProfilePic({
+    src,
+    onClick
+}) {
+    return (
+        <img 
+        src={src || profileDefault} 
+        alt="Profile Pic" 
+        className="profile-pic clickable" 
+        onClick={ () => onClick() }
+        style={{
+            width: '4rem',
+            height: '4rem',
+            borderRadius: '100%',
+            marginRight: '10px'
+        }}/>
+    );
 }
- 
-export default ProfilePic;

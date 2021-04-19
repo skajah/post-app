@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import 'normalize.css';
 import './index.css';
-import 'bootstrap/dist/css/bootstrap.css'; // for bootstrap, duh
-import 'font-awesome/css/font-awesome.css'; // for icons
+import 'animate.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
 
 ReactDOM.render(
   <BrowserRouter>

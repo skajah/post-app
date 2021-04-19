@@ -1,50 +1,47 @@
-.profile-page {
-  margin: 0 auto;
-  padding: 10px;
-  max-width: 550px;
+.profile-card__header {
+  border-radius: 7px;
+  box-shadow: 0 0 5px 1px var(--outline-gray);
+  background: rgba(0, 128, 128, 0.01);
 }
 
-.profile-page-header {
-  background: var(--lighter-maroon);
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
+.profile-card__body {
+  padding-left: 0;
+  padding-right: 0;
 }
-
 .profile-details {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 3rem;
 }
 
 .profile-details .username {
-  color: whitesmoke;
-  font-weight: bold;
-  margin-right: 0.5rem;
+  margin-right: 1rem;
 }
 
 .profile-simple {
+  display: flex;
+  align-items: center;
   padding: 10px;
 }
 
 .profile-simple:hover {
-  background: var(--hover-gray-light);
+  background: var(--light-gray);
 }
 
-.tab-nav {
+.tabnav {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
 
-.tab-nav-item {
-  padding: 10px;
-  border: 1px solid whitesmoke;
-  border-radius: 5px;
-  color: whitesmoke;
+.tabnav__item {
+  padding: 10px 15px;
+  border-radius: 20px;
+  transition: background-color 0.05s;
 }
 
-.tab-nav-active {
-  background: whitesmoke;
-  color: var(--lighter-maroon);
+.tabnav__item--active {
+  background: var(--accent-hover);
+  color: whitesmoke;
 }

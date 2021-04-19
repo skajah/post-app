@@ -1,24 +1,37 @@
-nav {
+.navbar {
   position: fixed;
   top: 0;
-  z-index: 2;
-  width: 100vw;
-}
-
-.navbar {
-  background: whitesmoke;
-}
-.navbar a,
-#change-password-text {
-  color: var(--dark-gray);
-}
-
-.navbar a:hover,
-.nav-item:hover,
-#change-password-text:hover {
-  color: var(--light-maroon);
-}
-
-.nav-items {
+  z-index: 100;
+  width: 100%;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--secondary-hover);
+  color: whitesmoke;
+}
+
+.navbar__brand {
+  padding: 10px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.navbar .icon {
+  margin-right: 5px;
+}
+
+.nav__item {
+  transition: background-color 0.1s;
+}
+
+.nav__item:hover {
+  background: whitesmoke;
+  color: var(--color-primary);
+}
+
+.nav__item {
+  padding: 1.5rem 2rem;
 }

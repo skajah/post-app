@@ -1,16 +1,12 @@
 import React, { Component } from 'react'
-import TextBox from '../common/textBox';
-import ProfilePic from '../common/profilePic';
-import './CreateCommentBox.css';
+import TextBox from '../common/TextBox';
 import Button from '../common/Button';
 
 class CreateCommentBox extends Component {
     
     text = ''
 
-    state = {
-        clear: false
-    }
+    state = { }
 
     handleTextChange = text => {
         this.text = text;
@@ -29,19 +25,20 @@ class CreateCommentBox extends Component {
         const { clear } = this.state;
 
         return ( 
-            <div className="create-comment-box">
+            <div className="create-comment">
                 <TextBox 
-                    name="commentText"
-                    placeHolder=" Comment on this post..."
-                    value={clear ? '' : null}
-                    className="text-box create-comment-text-box"
-                    onTextChange={this.handleTextChange}
-                    // Pass down alert so that it is aligned with text box
-                    type="textarea"
-                    alert={alert}/>
+                name="commentText"
+                placeholder=" Comment on this post..."
+                className="text-box create-comment-text-box"
+                onTextChange={this.handleTextChange}
+                clear={clear}
+                // Pass down alert so that it is aligned with text box
+                type="textarea"
+                alert={alert}/>
+
                 <Button
-                color="primary"
-                size="btn--small"
+                color="accent"
+                size="small"
                 onClick={this.handleCreate}>
                     Comment
                 </Button>

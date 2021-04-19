@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from '../common/Form';
 import _ from 'lodash';
-import UserContext from '../../context/userContext';
+import UserContext from '../../context/UserContext';
 import { makeAlert } from '../../utils/alert';
 import { updateMe } from '../../services/userService';
 import Joi  from 'joi-browser';
@@ -32,7 +32,7 @@ class EditPassword extends Form {
             
             await updateMe({ password });
             // console.log('newUsername: ', newUsername);
-            const alert = makeAlert('success', 'Password updated');
+            const alert = makeAlert('accent', 'Password updated');
             this.setState({ alert })
         } catch (ex) {
             if (ex.response && ex.response.status === 400){
@@ -46,9 +46,9 @@ class EditPassword extends Form {
         const { alert, errors } = this.state;
 
         return ( 
-            <div className="form form-password center">
-                <h1>Edit Password</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page edit-password-page">
+                <form onSubmit={this.handleSubmit} className="form">
+                <   h2>Edit Password</h2>
                     { _.isEmpty(errors) && alert }
                     {this.renderInput('password', 'New Password', { type: 'password' })}
                     {this.renderInput('confirmPassword', 'Confirm Password', { type: 'password' })}

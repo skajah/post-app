@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
+import Posts  from '../posts/Posts';
 import ProfileDetails from './ProfileDetails';
-import TabNav from '../common/tabNav';
-import UserContext from '../../context/userContext';
-import Posts from '../posts/Posts';
+import TabNav from '../common/TabNav';
+import UserContext from '../../context/UserContext';
 import _ from 'lodash';
 
-import { getUserPosts, deletePost } from '../../services/postService';
+import { getPosts, deletePost } from '../../services/postService';
 import { getUser, getFollowers, getFollowing, updateMe } from '../../services/userService';
-import { makeDate } from '../../utils/makeDate';
-import { decompress } from '../../utils/media';
+import { decompress, decompressPosts } from '../../utils/media';
 import ProfileSimple from './ProfileSimple';
 import './ProfilePage.css';
+import { loadLimit } from '../../config.json';
 
 class ProfilePage extends Component {
     static contextType = UserContext;
@@ -26,9 +26,8 @@ class ProfilePage extends Component {
 
     tabs = ['Posts', 'Following', 'Followers']
 
-    componentWillMount(){
+    componentDidMount(){
         this.unlisten = this.props.history.listen((location, action) => {
-            console.log('History change: ', location.pathname);
             let path = location.pathname;
             if (path.startsWith('/profile')){
                 path = location.pathname.endsWith('/') ?
@@ -39,14 +38,11 @@ class ProfilePage extends Component {
                     this.setUser(parts[1]);
             }
         });
+        this.setUser(this.props.match.params.id);
     }
+    
     componentWillUnmount(){
         this.unlisten();
-    }
-
-    componentDidMount(){
-        console.log('profilePage componentDidMount()');
-        this.setUser(this.props.match.params.id);
     }
 
     handleTabChange = tab => {
@@ -60,12 +56,27 @@ class ProfilePage extends Component {
 
     }
 
-    handleDelete = async ({ _id }) => {
-        const originalPosts = this.state.posts;
-        const posts = originalPosts.filter(post => post._id !== _id);
-        this.setState({ posts });
+    handleDelete = async id => {
+        
         try {
-            await deletePost(_id);
+            const { user, posts: oldPosts } = this.state;
+
+            await deletePost(id);
+
+            const { data: replacement } = await getPosts({ 
+                filter: 'userId', 
+                filterData: user._id, 
+                maxDate: oldPosts[oldPosts.length - 1].date,
+                limit: 1
+            });
+
+            await decompressPosts(replacement);
+
+            const posts = oldPosts
+            .filter(post => post._id !== id)
+            .concat(replacement);
+
+            this.setState({ posts, loadMore: replacement.length !== 0  });
         } catch (ex) {
             if (ex.response){
                 const status = ex.response.status;
@@ -74,12 +85,7 @@ class ProfilePage extends Component {
                 else if (status === 404)
                     toast.error("Post not found. Refresh to get latest content");
             }
-            this.setState({ posts: originalPosts });
         }
-    }
-
-    handlePostClick = ({ _id }) => {
-        this.props.history.push(`/posts/${_id}`);
     }
 
     setFollowing = async (id) => {
@@ -114,19 +120,36 @@ class ProfilePage extends Component {
             if (user.profilePic)
                 user.profilePic = await decompress(user.profilePic);
             
-            const { data: posts } = await getUserPosts(id);        
-            for (const post of posts) {
-                makeDate(post);
-                if (post.media)
-                    post.media.data = await decompress(post.media.data);
-                if (post.user.profilePic)
-                    post.user.profilePic = await decompress(post.user.profilePic);
-            }
-            this.setState({ user, posts, following: null, followers: null, currentTab: 'Posts'});
+            const { data: posts } = await getPosts({
+                filter: 'userId',
+                filterData: id,
+            });    
+            await decompressPosts(posts);
+
+            this.setState({ 
+                user, 
+                posts, 
+                currentTab: 'Posts',
+                loadMore: posts.length >= loadLimit
+            });
         } catch (ex) {
             console.log('Error: ', ex);
         }
     }
+
+    handleLoadMore = async () => {
+        const { posts, user } = this.state;
+        const { data: morePosts } = await getPosts({
+            filter: 'userId',
+            filterData: user._id, 
+            maxDate: posts[posts.length - 1].date
+        });
+        await decompressPosts(morePosts);
+        const combinedPosts = posts.concat(morePosts);
+
+        this.setState({ posts: combinedPosts, loadMore: morePosts.length >= loadLimit});
+
+    }   
 
     handleFollow = async () => {
         const id = this.state.user._id;
@@ -157,42 +180,51 @@ class ProfilePage extends Component {
         this.props.history.push(`/profile/${id}`);
     }
 
+    handlePostClick = id => {
+        this.props.history.push(`/posts/${id}`);
+    }
+
     render() { 
         // console.log('profilePage render()');
-        const { user, currentTab, posts, following, followers  } = this.state;
+        const { 
+            user, 
+            currentTab, 
+            posts, 
+            following, 
+            followers,
+            loadMore } = this.state;
 
         if (!user) return null;
 
-        const sameUser = this.context.currentUser._id === user._id || false;
-
         return ( 
-            <div className="profile-page">
-                <div className="profile-page-header">
-                    <ProfileDetails user={user} onFollow={this.handleFollow}/>
-                    <TabNav 
-                    tabs={this.tabs}
-                    currentTab={currentTab}
-                    onClick={this.handleTabChange}/>
-                </div>
+            <div className="page profile-page">
+                <div className="profile-card">
+                    <header className="card__header profile-card__header">
+                        <ProfileDetails user={user} onFollow={this.handleFollow}/>
+                        <TabNav 
+                        tabs={this.tabs}
+                        currentTab={currentTab}
+                        onClick={this.handleTabChange}/>
+                    </header>
+                <div className="card__body profile-card__body">
                 {
                     (currentTab === 'Posts') && 
                     (
                         !posts ? <p>Loading posts...</p> :
-                        <React.Fragment>
-                            <p>
-                                {
-                                 !posts.length ?
-                                 "No posts" :
-                                `${posts.length} Post(s)`
-                                }
-                            </p>
-                            <Posts 
-                            posts={posts}
-                            onDelete={this.handleDelete}
-                            onPostClick={this.handlePostClick}
-                            hideOptionMenu={true}/>
-                        </React.Fragment>
-                        
+                        (
+                            !posts.length ? <p>No posts</p> :
+                            <div 
+                            className="posts-container animate__animated animate__fadeIn">
+                                <Posts 
+                                posts={posts}
+                                onProfileClick={this.handleProfileClick}
+                                onPostClick={this.handlePostClick}
+                                onDelete={this.handleDelete}
+                                onLoadMore={this.handleLoadMore}
+                                loadMore={loadMore}
+                                />
+                            </div>
+                        )
                     )
                     
                 }
@@ -200,39 +232,32 @@ class ProfilePage extends Component {
                     (currentTab === 'Following') && 
                     (
                         !following ? <p>Loading followings...</p> :
-                        <React.Fragment>
-                            <p>
+                        (
+                            !following.length ? <p>No followings</p>:
+                            <div className="followers animate__animated animate__fadeIn">
                                 {
-                                 !following.length ?
-                                 "No followings" :
-                                `Following ${following.length} user(s)`
+                                following.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
                                 }
-                            </p>
-                            {
-                            following.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                            }
-                        </React.Fragment>
+                            </div>
+                        )
                     )
                 }
                 {
                     (currentTab === 'Followers') && 
                     (
                         !followers ? <p>Loading followers..</p> :
-                        <React.Fragment>
-                            <p>
+                        (
+                            !followers.length ? <p>No followers</p> :
+                            <div className="followers animate__animated animate__fadeIn">
                                 {
-                                 !followers.length ?
-                                 "No followers" :
-                                `${followers.length} follower(s)`
+                                followers.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
                                 }
-                            </p>
-                            {
-                            followers.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                            }
-                            </React.Fragment>
-                        
+                            </div>
+                        )
                     )
                 }
+                </div>
+                </div>
             </div>
          );
     }

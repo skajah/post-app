@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from '../common/Form';
 import _ from 'lodash';
-import UserContext from '../../context/userContext';
+import UserContext from '../../context/UserContext';
 import { makeAlert } from '../../utils/alert';
 import { updateMe } from '../../services/userService';
 import Joi  from 'joi-browser';
@@ -29,7 +29,7 @@ class EditUsername extends Form {
             const { username } = this.data;
             const { data: newUsername } = await updateMe({ username });
             // console.log('newUsername: ', newUsername);
-            const alert = makeAlert('success', 'Username updated');
+            const alert = makeAlert('accent', 'Username updated');
             this.setState({ alert })
             this.context.updateUser('username', newUsername);
         } catch (ex) {
@@ -45,11 +45,11 @@ class EditUsername extends Form {
         const { alert, errors } = this.state;
 
         return ( 
-            <div className="form form-username center">
-                <h1>Edit Username</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page edit-username-page">
+                <form onSubmit={this.handleSubmit} className="form">
+                    <h2>Edit Username</h2>
                     { _.isEmpty(errors) && alert }
-                    {this.renderInput('username', 'Username', { defaultValue: username })}
+                    {this.renderInput('username', '', { defaultValue: username })}
                     {this.renderButton('Save')}
                 </form>
             </div>

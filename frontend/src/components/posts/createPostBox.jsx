@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
-import ProfilePic from '../common/profilePic';
-import TextBox from '../common/textBox';
-import Camera from '../common/icons/camera';
-import VideoCamera from '../common/icons/videoCamera';
-import Volume from '../common/icons/volume';
+import TextBox from '../common/TextBox';
 import withAlert from '../hoc/withAlert';
-import Media from '../common/media';
-import UserContext from '../../context/userContext';
-import './CreatePostBox.css';
+import Media from '../common/Media';
+import UserContext from '../../context/UserContext';
+import FileIcon from '../common/icons/FileIcon';
 import Button from '../common/Button';
+import { AiOutlineCamera, AiOutlineVideoCamera } from 'react-icons/ai';
+import { IoVolumeHighOutline } from 'react-icons/io5';
+import './CreatePostBox.css';
+
 
 class CreatePostBox extends Component {
     static contextType = UserContext;
 
     state = {
-        clear: false,
         media: null,
     }
 
@@ -33,7 +32,7 @@ class CreatePostBox extends Component {
     }
 
     handleMediaUpload = (src, type) => {
-        const media = { type, src, attr: {className: 'post-media'} };
+        const media = { type, src };
         this.setState({ media })
     }
 
@@ -43,56 +42,67 @@ class CreatePostBox extends Component {
 
     render() { 
         const { clear, media } = this.state;
-
+        
         return ( 
-            <div className="card bg-light create-post-box">
-                <div className="card-header create-post-header">
-                    <ProfilePic src={this.context.currentUser.profilePic} /> 
+            <div className="card create-post">
+                <header className="card__header create-post__header">
                     {
                         media && 
                         <Button
-                        color="whitesmoke"
-                        size="btn--xsmall"
+                        size="small"
+                        color="secondary"
                         onClick={this.handleClearMedia}>Clear Media
                         </Button>
                     }
-                    
-                </div>
-                <div className="card-body create-post-body">
+                </header>
+                <div className="card__body create-post__body">
                     <TextBox 
                     name="postText"
-                    placeHolder=" What's on your mind?"
-                    value={clear ? '' : null}
+                    placeholder=" What's on your mind?"
+                    clear={clear}
                     onTextChange={this.handleTextChange}
-                    className="text-box"
-                    type="textarea"
-                    id="create-post-text-box"/>
+                    className="text-box create-post-text-box"
+                    type="textarea"/>
 
-                    { media && <Media type={media.type} src={URL.createObjectURL(media.src)} {...media.attr}/> }
+                    { media && 
+                    <Media 
+                    type={media.type} 
+                    src={URL.createObjectURL(media.src)} 
+                    alt={'Post Media: ' + media.type}/> 
+                    }
 
                 </div>
-                <div className="card-footer create-post-footer">
-                    <Camera 
+                <div className="create-post__footer">
+                    <FileIcon
                     extensions={['jpg', 'jpeg', 'png', 'gif']}
                     onFileChosen={src => this.handleMediaUpload(src, 'image')}
-                    maxFileSize={10}
-                    size="lg"/>
+                    maxFileSize={10}>
+                        <span className="icon">
+                            <AiOutlineCamera />
+                        </span>
+                    </FileIcon>
 
-                    <VideoCamera 
+                    <FileIcon
                     extensions={['mp4', 'mov', 'mpg']}
                     onFileChosen={src => this.handleMediaUpload(src, 'video')}
-                    maxFileSize={10}
-                    size="lg"/>
+                    maxFileSize={10}>
+                        <span className="icon">
+                            <AiOutlineVideoCamera />
+                        </span>
+                    </FileIcon>
 
-                    <Volume
+                    <FileIcon
                     extensions={['mp3', 'wav', 'ogg']}
                     onFileChosen={src => this.handleMediaUpload(src, 'audio')}
-                    maxFileSize={10}
-                    size="lg"/>
+                    maxFileSize={10}>
+                        <span className="icon">
+                            <IoVolumeHighOutline />
+                        </span>
+                    </FileIcon>
 
                     <Button
-                    style="btn--outline"
-                    size="btn--xsmall"
+                    color="accent"
+                    size="small"
                     onClick={this.handleCreate}>
                         Post
                     </Button>

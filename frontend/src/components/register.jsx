@@ -6,7 +6,7 @@ import Joi from 'joi-browser';
 import Form from './common/Form';
 import { register } from '../services/userService';
 import auth from '../services/authService';
-import UserContext from '../context/userContext';
+import UserContext from '../context/UserContext';
 import { makeAlert } from '../utils/alert';
 
 class Register extends Form {
@@ -36,10 +36,9 @@ class Register extends Form {
             window.location = '/';
         } catch (ex) {
             if (ex.response && ex.response.status === 400){
-                const alert = makeAlert('danger', ex.response.data);
+                const alert = makeAlert('primary', ex.response.data);
                 this.setState({ alert });
             }
-            console.log('Error: ', ex);
         }
     }
 
@@ -49,9 +48,9 @@ class Register extends Form {
         const { alert, errors } = this.state;
         // console.log(errors);
         return (
-            <div className="form form-register center">
-                <h1>Register</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page register-page">
+                <form onSubmit={this.handleSubmit} className="form">
+                    <h2>Register</h2>
                     { _.isEmpty(errors) && alert }
                     {this.renderInput('username', 'Username', { autoFocus: true })}
                     {this.renderInput('email', 'Email')}

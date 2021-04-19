@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import Edit from '../common/icons/edit';
-import ProfilePic from '../common/profilePic';
-import UserContext from '../../context/userContext';
+import ProfilePic from '../common/ProfilePic';
+import UserContext from '../../context/UserContext';
 import Button from '../common/Button';
+import { FaPencilAlt } from 'react-icons/fa';
+
 
 class ProfileDetails extends Component {
     static contextType = UserContext;
@@ -11,27 +12,26 @@ class ProfileDetails extends Component {
     render() { 
         const { user, onFollow } = this.props;
         const { currentUser } = this.context;
-        return ( 
+        return (
             <div className="profile-details">
-                <div>
-                    <ProfilePic src={ user.profilePic } />
+                <div className="content-details">
+                    <ProfilePic src={ user.profilePic } onClick={() => {}}/>
                     <span className="username">{ user.username }</span>
                     {
                     currentUser._id === user._id && 
-                    <Link to="/profile/edit"> <Edit size="lg"/> </Link>
+                    <Link to="/profile/edit"> 
+                        <FaPencilAlt />
+                    </Link>
                     }
                 </div>
-                <Button
-                color="whitesmoke"
-                size="btn--xsmall"
+                <Button 
+                styles={['outline']}
+                size="small"
                 onClick={onFollow}>
-                    {
-                        currentUser.following[user._id] ? 'Unfollow' : 'Follow'
-                    }
+                    { currentUser.following[user._id] ? 'Unfollow' : 'Follow' }
                 </Button>
-                
             </div>
-         );
+        );
     }
 }
  

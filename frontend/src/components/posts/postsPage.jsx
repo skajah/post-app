@@ -1,33 +1,36 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
 
-import Posts from './Posts';
 import PostSearch from './PostSearch';
 import CreatePostBox from './CreatePostBox';
 
 import { getPosts, deletePost, createPost } from '../../services/postService';
 
-import { filterByDateRange, filterByRelativeDate } from '../../utils/postFilters';
 import { makeDate } from '../../utils/makeDate';
 
-import UserContext from '../../context/userContext';
-import { readMedia, compress, decompress } from '../../utils/media';
-
+import UserContext from '../../context/UserContext';
+import { readMedia, compress, decompressPosts } from '../../utils/media';
 import './PostsPage.css';
+import Posts from './Posts';
+import { loadLimit } from '../../config.json';
 
 class PostsPage extends Component {
     static contextType = UserContext;
 
     state = {
         posts: null,
-        keywordFilter: null,
-        postTypeFilter: null,
-        relativeDateFilter: null,
-        dateRangeFilter: null,
         emptyPost: false,
     }
 
     relativeDates = ['Today', 'Yesterday', 'Last 7 Days', 'Last 30 Days']
+
+    filterMap = {
+        username: 'Username',
+        likedPosts: 'Liked Posts',
+        following: 'Following',
+        daysAgo: 'Date (Day)',
+        dateRange: 'Date Range'
+    }
 
     componentDidMount() {
         // console.log('postsPage componentDidMount()');
@@ -37,7 +40,7 @@ class PostsPage extends Component {
     }
 
     resize = () => {
-        const mobile = window.innerWidth < 760;
+        const mobile = window.innerWidth < 1000;
         if (this.state.mobile !== mobile) 
             this.setState({ mobile });
     }
@@ -48,26 +51,99 @@ class PostsPage extends Component {
 
     populatePosts = async () => {
         try {
-            const { data: posts } = await getPosts();
-            for (const post of posts) {
-                makeDate(post);
-                if (post.media)
-                    post.media.data = await decompress(post.media.data);
-                if (post.user.profilePic)
-                    post.user.profilePic = await decompress(post.user.profilePic);
-            }
-            this.setState({ posts });
+            const { data: posts } = await getPosts({});
+            await decompressPosts(posts);
+
+            this.setState({ posts, loadMore: posts.length >= loadLimit });
         } catch (ex) {
             // Axios will catch any unexpected erros
         }
     }
 
-    handleDelete = async ({ _id }) => {
-        const originalPosts = this.state.posts;
-        const posts = originalPosts.filter(post => post._id !== _id);
-        this.setState({ posts });
+    handleLoadMore = async () => {
+        const { filter, filterData, posts } = this.state;
+        let { data: morePosts } = await getPosts({ 
+            filter,
+            filterData,
+            maxDate: posts[posts.length -1 ].date
+        });
+
+        await decompressPosts(morePosts);
+
+        const combinedPosts = posts.concat(morePosts);
+      
+        this.setState({ 
+            posts: combinedPosts, 
+            loadMore: morePosts.length >= loadLimit
+         });
+
+    }   
+
+    handleLike = async (postId, liked) => { 
+        if (this.state.filter !== 'likedPosts') return;
+        // At this point, the filter is likedPosts and one of them must have been unliked
+        const { filter, filterData, posts: oldPosts } = this.state;
+        const { data: replacement } = await getPosts({ 
+            filter, 
+            filterData, 
+            maxDate: oldPosts[oldPosts.length - 1 ].date,
+            limit: 1
+        });
+
+        await decompressPosts(replacement);
+
+        const posts = oldPosts
+        .filter(post => post._id !== postId)
+        .concat(replacement);
+        
+
+        this.setState({
+            posts,
+            loadMore: replacement.length !== 0
+        });
+    }
+
+    handleFollow = async (userId, following) => {
+        if (this.state.filter !== 'following') return;
+        // At this point, the filter is following and one of them must have been unfollowed
+        const { filter, filterData, posts: oldPosts } = this.state;
+        const { data: replacement } = await getPosts({ 
+            filter, 
+            filterData, 
+            maxDate: oldPosts[oldPosts.length - 1 ].date,
+            limit: 1
+        });
+
+        await decompressPosts(replacement);
+
+        const posts = oldPosts
+        .filter(post => post.user._id !== userId)
+        .concat(replacement);
+
+        this.setState({
+            posts,
+            loadMore: replacement.length !== 0
+        });
+    }
+
+    handleDelete = async id => {
         try {
-            await deletePost(_id);
+            const { filter, filterData, posts: oldPosts } = this.state;
+            await deletePost(id);
+            const { data: replacement } = await getPosts({ 
+                filter, 
+                filterData, 
+                maxDate: oldPosts[oldPosts.length - 1 ].date, 
+                limit: 1
+            });
+
+            await decompressPosts(replacement);
+
+            const posts = oldPosts
+            .filter(post => post._id !== id)
+            .concat(replacement);
+
+            this.setState({ posts, loadMore: replacement.length !== 0 });
         } catch (ex) {
             if (ex.response){
                 const status = ex.response.status;
@@ -76,11 +152,10 @@ class PostsPage extends Component {
                 else if (status === 404)
                     toast.error("Post not found. Refresh to get latest content");
             }
-            this.setState({ posts: originalPosts });
         }
     }
 
-    handleCreatePost = async (text, media) => {
+    handleCreate = async (text, media) => {
         if ( !(text.trim() || media) ) {
             if (!this.state.emptyPost)
                 this.setState({ emptyPost: true }); // avoid rerender of posts
@@ -114,86 +189,108 @@ class PostsPage extends Component {
             post.user.profilePic = currentUser.profilePic;
             const posts = [...this.state.posts];
             posts.unshift(post);
+
             this.setState({ 
                 posts, 
                 emptyPost: false
                 });
         } catch (ex) {
             // REVISIT
-            console.log(ex.response);
+            if (ex.response && ex.response.status === 400)
+                toast.error('Something went wrong creating post');
         }
     }
 
-    handleSearchByKeyword = text => { 
+    handleSearchByUsername = async text => { 
         const trimmed = text.trim().toLowerCase();
-        if (!trimmed) return;
-        this.setState({ keywordFilter: trimmed, 
-                        postTypeFilter: null,
-                        relativeDateFilter: null, 
-                        dateRangeFilter: null,
-                        showSearch: false 
-                    });
-    }
-
-    handlePostType = type => {
-        this.setState({ keywordFilter: null, 
-            postTypeFilter: type,
-            relativeDateFilter: null, 
-            dateRangeFilter: null,
+        const filter = trimmed ? 'username' : undefined;
+        const { data: posts } = await getPosts({
+            filter,
+            filterData: trimmed,
+        });
+        await decompressPosts(posts);
+        this.setState({
+            posts,
+            filter,
+            filterData: trimmed,
+            loadMore: posts.length >= loadLimit,
+            relativeDate: null,
         });
     }
 
-    handleDateSelected = date => {
-        this.setState({ keywordFilter: null, 
-                        postTypeFilter: null,
-                        relativeDateFilter: date, 
-                        dateRangeFilter: null, 
-                    });
+    handlePostType = async type => {
+        let filter;
+        const { _id } = this.context.currentUser;
+        if (type === 'Liked Posts')
+            filter = 'likedPosts';
+        else if (type === 'Following')
+            filter = 'following';
+
+        const { data: posts } = await getPosts({ 
+            filter, 
+            filterData: _id,
+        });
+
+        await decompressPosts(posts);
+
+        this.setState({
+            posts,
+            filter,
+            filterData: _id,
+            loadMore: posts.length >= loadLimit,
+            relativeDate: null
+        })
     }
 
-    handleDateRange = (start, end) => {
-        this.setState({ keywordFilter: null,
-                        postTypeFilter: null,
-                        relativeDateFilter: null,
-                        dateRangeFilter: [start, end],
-                    });
+    handleDateSelected = async date => {
+        let daysAgo;
+        const filter = 'daysAgo';
+
+        if (date === 'Today')
+            daysAgo = 0;
+        else if (date === 'Yesterday')
+            daysAgo = 1;
+        else if (date.match(/Last \d+ Days/i))
+            daysAgo = date.split(' ')[1];
+
+        const { data: posts } = await getPosts({ 
+            filter,
+            filterData: daysAgo,
+        });
+
+        await decompressPosts(posts);
+
+        this.setState({
+            posts,
+            filter,
+            filterData: daysAgo,
+            loadMore: posts.length >= loadLimit,
+            relativeDate: date
+        });
     }
 
-    getCurrentPosts = () => {
-        const { 
-            keywordFilter, 
-            postTypeFilter,
-            relativeDateFilter, 
-            dateRangeFilter, 
-            posts } = this.state;
+    handleDateRange = async (start, end) => {
+       const filter = 'dateRange';
+       const filterData = start + ',' + end;
 
-        if (keywordFilter) 
-            return posts.filter(p => p.user.username.toLowerCase().includes(keywordFilter));
-        
-        if (postTypeFilter){
-            if (postTypeFilter === 'All')
-                return posts;
-            else if (postTypeFilter === 'My Posts')
-                return posts.filter(p => p.user._id === this.context.currentUser._id);
-            else if (postTypeFilter === 'Liked Posts')
-                return posts.filter(p => this.context.currentUser.likedPosts[p._id]);
-        }
-
-        if (relativeDateFilter)
-            return filterByRelativeDate(posts, relativeDateFilter);
-        
-        if (dateRangeFilter){
-            const [start, end] = this.state.dateRangeFilter;
-            return filterByDateRange(posts, start, end);
-        }
-
-        // console.log('Current posts: ', posts);
-        return posts;
+       const { data: posts } = await getPosts({
+           filter,
+           filterData,
+       });
+       await decompressPosts(posts);
+       this.setState({
+            posts,
+            filter,
+            filterData,
+            loadMore: posts.length >= loadLimit,
+            relativeDate: null
+       });
     }
 
-    handlePostClick = ({ _id }) => {
-        this.props.history.push(`/posts/${_id}`);
+    handlePostClick = id => {
+        this.props.history.push(`/posts/${id}`);
     }
+
     handleProfileClick = id => {
         this.props.history.push(`/profile/${id}`);
     }
@@ -202,54 +299,128 @@ class PostsPage extends Component {
         this.setState({ showSearch: !this.state.showSearch });
     }
 
+    handleClearFilter = async () => {
+        const { data: posts } = await getPosts({ });
+        await decompressPosts(posts);
+        this.setState({
+            posts,
+            filter: null,
+            filterData: null,
+            loadMore: posts.length >= loadLimit,
+            relativeDate: null,
+        });
+    }
+
+    clearFilterComponent = <span 
+    className="clickable"
+    onClick={() => this.handleClearFilter()}>
+        Clear Filter
+    </span>;
+
+    filterComponent = text => {
+        return <span className="clickable" onClick={this.handleShowSearch}>{ text }</span>;
+    }
+
     render() {  
-        // console.log('postsPage render()');
-        const { relativeDateFilter, posts, emptyPost, mobile, showSearch } = this.state;
-        const alert = { type: 'warning', message: "Post can't be empty"};
+        const { 
+            posts, 
+            emptyPost, 
+            mobile, 
+            showSearch,
+            loadMore,
+            filter,
+            relativeDate } = this.state;
+        
+        const alert = { type: 'secondary', message: "Post can't be empty"};
 
         if (!posts) 
             return (
                 <p style={{ textAlign: 'center' }}>Loading posts...</p>
             );
         return (
-            <div className="posts-page">
-                <div className={'post-search-container ' + (mobile && !showSearch ? "hide" : '' )}>
+            <div className="page posts-page">
+                {
+                    mobile &&
+                    <div
+                    style={{
+                    display: 'flex',
+                    width: '100%',
+                    maxWidth: '500px',
+                    justifyContent: showSearch ? 'flex-end' : (filter ? 'space-between' : 'flex-end'),
+                    padding: '10px 20px',
+                    }}>
                     {
-                        mobile &&
-                        <div className={"btn-post-search"}>
-                            <span onClick={this.handleShowSearch} className="clickable">
-                                Show results
-                            </span>
-                        </div>
+                    showSearch ? 
+                    this.filterComponent('See results') :
+                    <React.Fragment>
+                        { filter && this.clearFilterComponent }
+                        { this.filterComponent('Filter') }
+                    </React.Fragment>
                     }
-                    
-                    <PostSearch 
-                    searchByKeyword={this.handleSearchByKeyword}
-                    onPostType={this.handlePostType}
-                    dates={this.relativeDates}
-                    selectedDate={relativeDateFilter}
-                    onDateSelected={this.handleDateSelected}
-                    onDateRange={this.handleDateRange}/>
                 </div>
-                <div className={'posts-container ' + (mobile && showSearch ? "hide" : '' )}>
+                }
+                <div 
+                className={ "post-search-container " + 
+                (mobile ?
+                    (showSearch ? 
+                    'animate__animated animate__fadeIn' : 
+                    'hide' 
+                    ) :
+                    ''
+                )
+                }>
+                    <PostSearch 
+                    searchByUsername={this.handleSearchByUsername}
+                    dates={this.relativeDates} 
+                    selectedDate={relativeDate}
+                    onDateSelected={this.handleDateSelected}
+                    onDateRange={this.handleDateRange}
+                    onPostType={this.handlePostType}
+                    />
+                    <p>Current Filter: 
+                        <span style={{ 
+                            marginLeft: '5px',
+                            color: 'var(--color-accent)'
+                            }}>
+                            { this.filterMap[filter] || 'None' }
+                        </span>
+                    </p>
+                </div>
+                <div 
+                className={
+                    "posts-container " + 
+                    (mobile ?
+                        (!showSearch ? 
+                        'animate__animated animate__fadeIn' : 
+                        'hide' 
+                        ) :
+                        ''
+                    )
+                    }>
+                        {
+                            !mobile && filter && this.clearFilterComponent
+                        }
+                        {
+                            !filter &&
+                            <CreatePostBox 
+                            onCreate={this.handleCreate}
+                            alert={emptyPost && alert}/>
+                        }
+                    
                     {
-                        mobile &&
-                        <div className={"btn-post-search"}>
-                            <span onClick={this.handleShowSearch} className="clickable">
-                                Filter posts
-                            </span>
-                        </div>
-                    }
-                    <CreatePostBox 
-                    onCreate={this.handleCreatePost}
-                    alert={emptyPost && alert}/>
-
-                    <Posts 
-                    posts={this.getCurrentPosts()}
-                    onDelete={this.handleDelete}
-                    onCreatePost={this.handleCreatePost}
+                    !posts.length ? 
+                    <p style={{ textAlign: 'center' }}>No posts found</p> :
+                    <Posts
+                    posts={posts}
                     onPostClick={this.handlePostClick}
-                    onProfile={this.handleProfileClick}/>
+                    onProfileClick={this.handleProfileClick}
+                    onDelete={this.handleDelete}
+                    onLoadMore={this.handleLoadMore}
+                    loadMore={loadMore}
+                    onLike={this.handleLike}
+                    onFollow={this.handleFollow}
+                    />
+                    }
                 </div>
             </div>
         );

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Dots from './icons/dots';
+import { BiDotsVerticalRounded } from 'react-icons/bi'
+import Button from './Button';
 import './Dropdown.css';
 
 class Dropdown extends Component {
@@ -40,19 +41,19 @@ class Dropdown extends Component {
             <div 
             className="dropdown" 
             ref={this.dropdown}>
-                <div className={`dropdown-content${showOptions ? ' show': ''}`}>
+                <div className={`dropdown__content${showOptions ? ' show': ''}`}>
                     {
                         options.map(o => {
-                        return <button 
-                        className="btn"
+                        return <Button 
+                        styles={['block', 'corner']}
                         onClick={() => this.handleOption(o)}
                         key={o}>
                             { o }
-                        </button>
+                        </Button>
                         })
                     }
                 </div>
-                <Dots vertical={true} onClick={this.handleDropdown}/>
+                <BiDotsVerticalRounded onClick={this.handleDropdown} className="clickable"/>
             </div>
          );
     }

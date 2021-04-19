@@ -1,35 +1,39 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { toast } from 'react-toastify';
-import Comments from '../comments/comments';
-import CreateCommentBox from '../comments/CreateCommentBox';
-import _ from 'lodash';
-import Media from '../common/media';
+import Card from '../common/Card';
+import Comments from '../comments/Comments';
+import ContentDetails from '../common/ContentDetails';
+import IconCount from '../common/icons/IconCount';
+import Dropdown from '../common/Dropdown';
+import Media from '../common/Media';
+import Like from '../common/icons/Like';
+import { GoComment } from 'react-icons/go';
 import { makeDate } from '../../utils/makeDate';
+import { createComment, deleteComment, getComments } from '../../services/commentService';
 import { likePost, unlikePost } from '../../services/postService';
-import { createComment, deleteComment } from '../../services/commentService';
-import UserContext from '../../context/userContext';
-import './Post.css';
-import ContentDetailsHeader from '../common/ContentDetailsHeader';
-import ContentDetailsFooter from '../common/ContentDetailsFooter';
+import CreateCommentBox from '../comments/CreateCommentBox';
+import UserContext from '../../context/UserContext';
+import { updateMe } from '../../services/userService';
+import { loadLimit } from '../../config.json';
+import { decompressComments } from '../../utils/media';
 
-class Post extends Component {
+class Post extends Card {
+
     static contextType = UserContext;
 
     state = { 
         user: {},
         date: new Date(),
-        text: '',
-        media: null,
         comments: [],
-        likes: 0, // could leaveOut
-        emptyComment: false,
     } 
+
     componentDidMount() {
         this.populateState();
     }
 
-    async populateState(){
+    populateState(){
         const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
+        const loadMore = (comments || []).length >= loadLimit;
 
         this.setState({ 
             _id,
@@ -39,17 +43,31 @@ class Post extends Component {
             media, 
             comments: comments || [],
             numberOfComments,
-            likes: likes || 0,
+            likes: likes,
+            loadMore,
         });
     }
 
-    handleDeleteComment = async ({ _id }) => {
-        const originalComments = this.state.comments;
-        const comments  = originalComments.filter(c => c._id !== _id );
-        
-        this.setState({ comments, numberOfComments: comments.length });
+    handleDeleteComment = async (id) => {
         try {
-            await deleteComment(_id);
+            const { _id, numberOfComments, comments: oldComments } = this.state;
+            await deleteComment(id);
+            const { data: replacement } = await getComments(
+                _id, 
+                oldComments[oldComments.length - 1].date,
+                1)
+
+            await decompressComments(replacement);
+
+            const comments = oldComments
+            .filter(c => c._id !== id)
+            .concat(replacement);
+
+            this.setState({ 
+                comments, 
+                numberOfComments: numberOfComments - 1,
+                loadMore: replacement.length !== 0 
+            });
         } catch (ex){
             if (ex.response){
                 const status = ex.response.status;
@@ -57,8 +75,7 @@ class Post extends Component {
                     toast.warning("Can only delete your own posts/comments");
                 else if (status === 404)
                     toast.error("Comment not fond. Refresh to get latest content");
-            }
-            this.setState({ comments: originalComments, numberOfComments: originalComments.length });
+            }        
         }
     }
 
@@ -69,7 +86,7 @@ class Post extends Component {
         }
 
         try {
-            const postId = this.state._id;
+            const { _id: postId, numberOfComments } = this.state;
             const { currentUser } = this.context;
             const newComment = {
                 postId,
@@ -79,16 +96,17 @@ class Post extends Component {
             const { data: comment } = await createComment(newComment);
             makeDate(comment);
             comment.user.profilePic = currentUser.profilePic;
+
             const comments = [...this.state.comments];
             comments.unshift(comment);
+
             this.setState({ 
                 comments, 
                 emptyComment: false,
-                numberOfComments: comments.length
+                numberOfComments: numberOfComments + 1
             });
         } catch (ex) {
-            // REVIS IT
-            
+            toast.error('Some went wrong when commenting');
         }
     }
 
@@ -100,9 +118,12 @@ class Post extends Component {
             await likePost(id):
             await unlikePost(id);
 
+            if (this.props.onLike)
+                this.props.onLike(id, !liked);
             const { likes } = post;
             this.context.onLike(post._id, 'post', liked);
             this.setState({ likes });
+
         } catch (ex) {
             if (ex.response){
                 const status = ex.response.status;
@@ -115,75 +136,126 @@ class Post extends Component {
     
     }
 
-    render() { 
+    handleFollow = async (id) => {
+        const isFollowing = this.context.currentUser.following[id] ? true : false;
+        await updateMe({ following: { id, follow: !isFollowing } });
+        if (this.props.onFollow)
+            this.props.onFollow(id, !isFollowing);
+        this.context.onFollow(id);
+        
+    }
+
+    handleOptionSelected = option => {
+        const { onProfileClick, onDelete } = this.props;
+   
+        const { user, _id } = this.state;
+
+        if (option === 'Profile')
+            onProfileClick(user._id);
+        else if (option === 'Follow' || option === 'Unfollow')
+            this.handleFollow(user._id)
+        else if (option === 'Delete')
+            onDelete(_id);
+    }
+
+    handleLoadMore = async () => {
+        const { _id, comments } = this.state;
+        let { data: moreComments } = await getComments(
+            _id, 
+            comments[comments.length - 1].date
+            );
+
+        await decompressComments(moreComments);
+
+        const combinedComments = comments.concat(moreComments);
+
+        this.setState({ 
+            comments: combinedComments, 
+            loadMore: moreComments.length >= loadLimit });
+    }   
+
+    render() {
         const { 
             _id,
             text, 
             media, 
-            likes,
-            comments, 
-            emptyComment, 
             user, 
             date,
-            numberOfComments } = this.state;
-        const { showComments, onPostClick, onProfile, onDelete, hideOptionMenu, headerIconSpan } = this.props;        
-        const details = { username: user.username, date, userId: user._id, profilePic: user.profilePic };
-        const initialLike = this.context.currentUser.likedPosts[_id];
-        const alert = { type: 'warning', message: "Comment can't be empty"};
-        const sameUser = this.context.currentUser._id === user._id;
-        // console.log('Liked post: ', this.context.currentUser.likedPosts)
-        // console.log('id: ', _id);
-        // console.log('Found: ', this.context.currentUser.likedPosts[_id]);
-        if (_.isEmpty(user)) return null;
+            numberOfComments,
+            comments,
+            likes,
+            emptyComment,
+            loadMore } = this.state;
+        const { 
+            showComments,
+            onPostClick,
+            onProfileClick,
+            } = this.props;
+
+        const { currentUser } = this.context;
+        const initialLike = currentUser.likedPosts[_id];
+        const following = currentUser.following[user._id];
+        const options = ['Profile', following ? 'Unfollow' : 'Follow'];
+        if ( currentUser._id === user._id)
+            options.push('Delete');
+
+        const alert = { type: 'secondary', message: "Comment can't be empty" };
 
         return (
             <React.Fragment>
-                <div className="card post">
-                    <div className="card-header post-header">
-                        <ContentDetailsHeader 
-                        details={details}
-                        onDelete={onDelete}
-                        onProfile={onProfile}
-                        onPostClick={onPostClick}
-                        hideOptionMenu={hideOptionMenu}
-                        />
-                    </div>
-                    <div className="card-body post-body">
-                        { text &&  <p>{text}</p> }
-                        {
-                            media && 
-                            <Media 
-                            type={media.mediaType}
-                            src={media.data}
-                            className="post-media"/> 
-                        }
-                    </div>
+              <div className="card post">
+                <header className="card__header post__header">
+                  <ContentDetails 
+                  profilePicSrc={user.profilePic}
+                  onProfileClick={() => onProfileClick(user._id)} 
+                  username={user.username} 
+                  date={date}/>
+                  <Dropdown options={options} onOptionSelected={this.handleOptionSelected}/>
+                </header>
+                <div className="card__body post__body">
+                  { text &&  <p>{text}</p> }
+                  {
+                    media && 
+                    <Media 
+                    type={media.mediaType}
+                    src={media.data}
+                    alt={'Post media: ' + media.mediaType}/> 
+                  }
+                  <div className="post__details">
+                    <IconCount 
+                    count={likes} 
+                    margins={true}>
+                      <Like initialLike={initialLike} onLike={this.handleLike}/>
+                    </IconCount>
 
-                    <div className="card-footer post-footer">
-                        <ContentDetailsFooter 
-                        likes={likes}
-                        numberOfComments={numberOfComments}
-                        initialLike={initialLike}
-                        onLike={this.handleLike}
-                        onDelete={ sameUser && onDelete}/>
-                    </div>
+                    <IconCount 
+                    count={numberOfComments} 
+                    onClick={onPostClick && (() => onPostClick(_id)) }>
+                      <GoComment />
+                    </IconCount>
+                  </div>
                 </div>
-                {
-                    showComments &&
-                    <React.Fragment>
-                        <CreateCommentBox 
-                        alert={emptyComment && alert}
-                        onCreate={this.handleCreateComment}/>
-
-                        <Comments 
-                        comments={comments}
-                        onDelete={this.handleDeleteComment}
-                        onProfile={onProfile}/>
-                    </React.Fragment>
-                }
+              </div>
+              {
+                showComments &&
+                <div className="comments-container">
+                    <CreateCommentBox 
+                    onCreate={this.handleCreateComment}
+                    alert={ emptyComment && alert}/>
+                    
+                    <Comments 
+                    comments={comments} 
+                    onDelete={this.handleDeleteComment}
+                    onProfileClick={onProfileClick}
+                    onFollow={this.handleFollow}
+                    onLoadMore={this.handleLoadMore}
+                    loadMore={loadMore}/>
+                </div>
+              }         
             </React.Fragment>
-         );
+        );
     }
 }
- 
+
+
 export default Post;

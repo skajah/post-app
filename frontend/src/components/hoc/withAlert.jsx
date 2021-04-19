@@ -7,10 +7,10 @@ function withAlert(Component) {
             const { alert, ...rest } = this.props;
     
             return (
-            <div className="with-alert">
+            <React.Fragment>
                 <Component {...rest}/>
-                { alert && <div className={"alert alert-" + alert.type}>{ alert.message }</div> }
-            </div>);
+                { alert && <div className={"alert alert--" + alert.type}>{ alert.message }</div> }
+            </React.Fragment>);
         }
     }
 } 

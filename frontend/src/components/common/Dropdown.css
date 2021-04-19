@@ -3,22 +3,19 @@
   display: inline-block;
 }
 
-.dropdown-content {
+.dropdown__content {
   display: none;
   z-index: 100;
   position: absolute;
   right: 5px;
-  background: whitesmoke;
-  border: 1px solid var(--dark-gray);
+  border: 0.5px solid gray;
 }
 
-.dropdown-content button:hover {
-  background: var(--hover-gray) !important;
+.dropdown__content .btn {
+  transition: background-color 0.2s;
 }
-
-.dropdown-content button {
-  width: 100%;
-  height: 100%;
+.dropdown__content .btn:hover {
+  background: rgb(225, 225, 225);
 }
 
 .show {

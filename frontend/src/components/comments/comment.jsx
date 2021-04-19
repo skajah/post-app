@@ -1,12 +1,14 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
 import { likeComment, unlikeComment } from '../../services/commentService';
-import UserContext from '../../context/userContext';
-import './Comment.css';
-import ContentDetailsHeader from '../common/ContentDetailsHeader';
+import UserContext from '../../context/UserContext';
+import ContentDetails from '../common/ContentDetails';
+import Card from '../common/Card';
+import Dropdown from '../common/Dropdown';
+import IconCount from '../common/icons/IconCount';
+import Like from '../common/icons/Like';
 
-class Comment extends Component {
+class Comment extends Card {
     static contextType = UserContext;
 
     state = {
@@ -19,9 +21,9 @@ class Comment extends Component {
         this.populateState();
     }
 
-    async populateState() {
+    populateState() {
         const { _id, user, date, text, likes } = this.props.comment;
-        this.setState({ _id, user, date, text, likes: likes || 0});
+        this.setState({ _id, user, date, text, likes });
     }
 
     handleLike = async (liked) => {
@@ -46,28 +48,48 @@ class Comment extends Component {
         }
     }
 
+    handleOptionSelected = option => {
+        const { onProfileClick, onDelete, onFollow } = this.props;
+        const { user, _id } = this.state;
+
+        if (option === 'Profile')
+            onProfileClick(user._id);
+        else if (option === 'Follow' || option === 'Unfollow')
+            onFollow(user._id);
+        else if (option === 'Delete')
+            onDelete(_id);
+    }
+
     render() { 
-        const { onDelete, onProfile } = this.props;
-        const { _id, likes, text, user, date } = this.state;
-        const details = {
-            username: user.username,
-            date,
-            userId: user._id,
-            profilePic: user.profilePic
-        };
-        if (_.isEmpty(user)) return null; 
-        return ( 
-            <div className="comment"> 
-                <ContentDetailsHeader
-                details={details} 
-                onDelete={onDelete}
-                onProfile={onProfile}
-                initialLike={this.context.currentUser.likedComments[_id]}
-                onLike={this.handleLike}
-                likes={likes}/>
-                <p className="comment-text">{text}</p>
+        const { _id, text, user, likes, date } = this.state;
+        const { onProfileClick } = this.props;
+        const { currentUser } = this.context;
+        const initialLike = currentUser.likedComments[_id];
+        const following = currentUser.following[user._id];
+        const options = ['Profile', following ? 'Unfollow' : 'Follow'];
+        if ( currentUser._id === user._id)
+            options.push('Delete');
+
+        return (
+        <div className="card comment">
+            <header className="card__header post__header">
+                <ContentDetails 
+                profilePicSrc={user.profilePic}
+                onProfileClick={() => onProfileClick(user._id)} 
+                username={user.username} 
+                date={date}/>
+                <Dropdown options={options} onOptionSelected={this.handleOptionSelected}/>
+            </header>
+            <div className="card__body comment__body">
+                { text }
+                <div className="comment__details">
+                    <IconCount count={likes}>
+                      <Like onLike={this.handleLike} initialLike={initialLike}/>
+                    </IconCount>
+                </div>
             </div>
-         );
+        </div>
+        );
     }
 }
  

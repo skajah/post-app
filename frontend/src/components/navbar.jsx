@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import auth from '../services/authService';
-import UserContext from '../context/userContext';
+import UserContext from '../context/UserContext';
 import './Navbar.css';
+import { GoCommentDiscussion } from 'react-icons/go';
 
 class NavBar extends Component {
     static contextType = UserContext
@@ -10,25 +11,31 @@ class NavBar extends Component {
     render() { 
         const { currentUser } = this.context;
         return ( 
-            <nav className="navbar navbar-expand-lg justify-content-between">
-                <Link className="navbar-brand" to="/posts">
-                    <i className="fa fa-comments" style={{marginRight: 5}} />
+            <nav className="navbar">
+                <Link className="navbar__brand" to="/posts">
+                    <span className="icon">
+                        <GoCommentDiscussion />
+                    </span>
                     SBKonnect
                 </Link>
-                <div className="nav-items">
+                <ul className="list list-inline nav__items">
                     {
                         auth.hasCurrentUser() ?
                         <React.Fragment>
-                            <NavLink className="nav-link nav-item" to={`/profile/${currentUser._id}`}>Profile</NavLink>
-                            <NavLink className="nav-link nav-item" to="/logout">Logout</NavLink>
+                            <Link className="list__item nav__item" to={`/profile/${currentUser._id}`}>
+                                Profile
+                            </Link>
+                            <Link className="list__item nav__item" to="/logout">
+                                Logout
+                            </Link>
                         </React.Fragment> :
                         <React.Fragment>
-                            <NavLink className="nav-link nav-item" to="/register">Register</NavLink>
-                            <NavLink className="nav-link nav-item" to="/login">Login</NavLink>
+                            <Link className="list__item nav__item" to="/register">Register</Link>
+                            <Link className="list__item nav__item" to="/login">Login</Link>    
                         </React.Fragment> 
                     }
                     
-                </div>
+                </ul>
             </nav>
          );
     }

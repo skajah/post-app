@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import TextBox from './textBox';
-import Search from './icons/search';
+import { BsSearch } from 'react-icons/bs';
+import TextBox from './TextBox';
 
 class SearchKeyword extends Component {
 
     text = ''
+
     handleSearchTextChange = text => {
         this.text = text;
     }
@@ -14,18 +15,20 @@ class SearchKeyword extends Component {
     }
     
     render() { 
-        const { placeHolder } = this.props;
+        const { placeholder } = this.props;
 
         return ( 
-            <div className="search-keyword">
+            <div className="input-group">
                 <TextBox 
                 name="searchKeyword" 
-                placeHolder={placeHolder} 
-                className="text-box search-keyword-text-box"
-                type="input"
+                placeholder={placeholder} 
+                className="text-box"
                 onTextChange={this.handleSearchTextChange}
                 />
-                <Search size="lg" onClick={this.handleKeywordSearch}/> 
+                <span className="icon clickable" onClick={() => this.handleKeywordSearch()}>
+                    <BsSearch />
+                </span>
+                 
             </div>
          );
     }

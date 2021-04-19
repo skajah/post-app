@@ -6,12 +6,12 @@ class TabNav extends Component {
         const { tabs, currentTab, onClick } = this.props;
 
         return ( 
-            <div className="tab-nav">
+            <div className="tabnav">
                 {
                     tabs.map(tab => {
                         return <p 
                         key={tab}
-                        className={"tab-nav-item clickable" + (tab === currentTab ? " tab-nav-active" : '')}
+                        className={"tabnav__item clickable" + (tab === currentTab ? " tabnav__item--active" : '')}
                         onClick={() => onClick(tab)}>{tab}</p>
                     })
                 }

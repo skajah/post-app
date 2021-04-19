@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import Form from '../common/Form';
-import UserContext from '../../context/userContext';
+import UserContext from '../../context/UserContext';
 import Joi from 'joi-browser';
 import { updateMe } from '../../services/userService';
 import { makeAlert } from '../../utils/alert';
@@ -28,7 +28,7 @@ class EditEmail extends Form {
         try {
             const { email } = this.data;
             const { data: newEmail } = await updateMe({ email });
-            const alert = makeAlert('success', 'Email updated');
+            const alert = makeAlert('accent', 'Email updated');
             this.setState({ alert });
             this.context.updateUser('email', newEmail);
         } catch (ex) {
@@ -44,11 +44,11 @@ class EditEmail extends Form {
         const { errors, alert } = this.state;
 
         return ( 
-            <div className="form form-email center">
-                <h1>Edit Email</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page edit-email-page">
+                <form onSubmit={this.handleSubmit} className="form">
+                    <h2>Edit Email</h2>
                     { _.isEmpty(errors) && alert }
-                    {this.renderInput('email', 'Email', { defaultValue: email })}
+                    {this.renderInput('email', '', { defaultValue: email })}
                     {this.renderButton('Save')}
                 </form>
             </div>

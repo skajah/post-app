@@ -7,20 +7,20 @@ class FormInput extends Component {
         const { name, label, onChange, alert,  inputType, ...rest} = this.props;
         // console.log('Default value: ', rest);
         return ( 
-            <div className="form-group">
-                <label htmlFor={name}>{ label }</label>
+            <div className="form__group">
+                <label htmlFor={name} className="label">{ label }</label>
                 {
                     inputType === 'textarea' ?
                     <textarea
                     {...rest}
                     id={name}
-                    className="form-control text-box"
+                    className="text-box"
                     name={name}
                     onChange={(e) => onChange(e)}/> :
                     <input 
                     {...rest}
                     id={name}
-                    className="form-control text-box"
+                    className="text-box"
                     name={name}
                     onChange={(e) => onChange(e)}/>
                 }

@@ -4,7 +4,7 @@ import Joi from 'joi-browser';
 import _ from 'lodash';
 import Form from './common/Form';
 import auth from '../services/authService';
-import UserContext from '../context/userContext';
+import UserContext from '../context/UserContext';
 import { makeAlert } from '../utils/alert';
 
 
@@ -26,6 +26,7 @@ class Login extends Form {
     doSubmit = async () => {
         try {
             const { email, password } = this.data;
+
             await auth.login(email, password);
 
             await this.context.onLogin(); // notify App that jwt is set
@@ -36,7 +37,7 @@ class Login extends Form {
             
         } catch (ex) {
             if (ex.response && ex.response.status === 400){
-                const alert = makeAlert('danger', ex.response.data);
+                const alert = makeAlert('primary', ex.response.data);
                 this.setState({ alert });
             }
         }
@@ -47,9 +48,9 @@ class Login extends Form {
 
         const { alert, errors } = this.state;
         return (
-            <div className="form form-login center">
-                <h1>Login</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page login-page">
+                <form className="form" onSubmit={this.handleSubmit}>
+                    <h2>Login</h2>
                     {  _.isEmpty(errors) && alert }
                     {this.renderInput('email', 'Email', { autoFocus: true })}
                     {this.renderInput('password', 'Password', { type: 'password' })}

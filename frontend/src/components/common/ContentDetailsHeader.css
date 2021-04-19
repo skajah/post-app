@@ -1,9 +1,0 @@
-.content-details-header {
-  display: grid;
-  grid-template-columns: 1fr 8fr 1fr;
-  align-items: center;
-}
-
-.dropdown {
-  justify-self: end;
-}

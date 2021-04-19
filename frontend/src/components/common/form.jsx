@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Joi from 'joi-browser';
-import SelectInput from './selectInput';
-import FormInput from './formInput';
+import SelectInput from './SelectInput';
+import FormInput from './FormInput';
 import Button from './Button';
 import './Form.css';
 
@@ -18,9 +18,8 @@ class Form extends Component {
      renderButton = label => {
         return (
             <Button
-            style="btn--rounded"
-            color="primary"
-            size="btn--wide">
+            styles={['rounded', 'block']}
+            color="primary">
                 {label}
             </Button>
         );
@@ -30,7 +29,7 @@ class Form extends Component {
         const { errors } = this.state;
         // console.log(options)
 
-        alert = !errors[name] ? null : { type: 'danger', message: errors[name]};
+        const alert = !errors[name] ? null : { type: 'primary', message: errors[name]};
 
         // console.log('renderInput(): data: ', data);
 

@@ -1,20 +1,18 @@
 import http from './httpService';
-import { apiUrl } from '../config.json';
+import { apiUrl, loadLimit } from '../config.json';
 
 const postApiEndpoint = apiUrl + '/posts';
 
-export function getPosts() {
-  return http.get(postApiEndpoint);
-}
-
-export function getUserPosts(id) {
-  return http.get(`${postApiEndpoint}?userId=${id}`);
-}
-
-export function getPost(id, { withComments }) {
+export function getPosts({ filter, filterData, maxDate, limit = loadLimit }) {
   return http.get(
-    `${postApiEndpoint}/${id}${withComments ? '?withComments=true' : ''}`
+    `${postApiEndpoint}?filter=${
+      filter || ''
+    }&filterData=${filterData}&maxDate=${maxDate || ''}&limit=${limit}`
   );
+}
+
+export function getPost(id) {
+  return http.get(`${postApiEndpoint}/${id}`);
 }
 
 export function createPost(post) {

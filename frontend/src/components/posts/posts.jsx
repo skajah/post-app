@@ -1,27 +1,44 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Post from './Post';
+import Button from '../common/Button';
 
-class Posts extends Component {
-
-    render() { 
-        const { posts, onDelete, onPostClick, onProfile, hideOptionMenu, headerIconSpan } = this.props;
-        return ( 
-            <div className="posts">
-                {
-                    posts.map(post => {
-                        return <Post 
-                        key={post._id} 
+export default function Posts({
+    posts,
+    onFollow,
+    onLike,
+    onPostClick,
+    onProfileClick,
+    onDelete,
+    onLoadMore,
+    loadMore
+}){
+    return (
+        <div className="posts">
+            {
+                posts.map(post => {
+                    return (
+                        <Post 
+                        key={post._id}
                         post={post}
-                        onDelete={() => onDelete(post)}
-                        onPostClick={() => onPostClick(post)}
-                        onProfile={() => onProfile(post.user._id)}
-                        hideOptionMenu={hideOptionMenu}
-                        headerIconSpan={headerIconSpan}/>;
-                    }) 
-                }
-            </div>
-         );
-    }
+                        onPostClick={onPostClick}
+                        onProfileClick={onProfileClick}
+                        onDelete={onDelete}
+                        onFollow={onFollow}
+                        onLike={onLike}/>
+                    )
+                })
+            }
+            {
+                loadMore &&
+                <div className="load-more-container">
+                    <Button
+                    color="secondary"
+                    size="small"
+                    onClick={onLoadMore}>
+                        Load More
+                    </Button>
+                </div>
+            }       
+        </div>
+    )
 }
- 
-export default Posts;

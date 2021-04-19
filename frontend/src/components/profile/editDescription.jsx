@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import Form from '../common/Form';
-import UserContext from '../../context/userContext';
+import UserContext from '../../context/UserContext';
 import Joi from 'joi-browser';
 import { updateMe } from '../../services/userService';
 import { makeAlert } from '../../utils/alert';
@@ -28,12 +28,12 @@ class EditDescription extends Form {
         try {
             const { description } = this.data;
             const { data: newDescription } = await updateMe({ description });
-            const alert = makeAlert('success', 'Description updated');
+            const alert = makeAlert('accent', 'Description updated');
             this.setState({ alert });
             this.context.updateUser('description', newDescription);
         } catch (ex) {
             if (ex.response && ex.response.status === 400){
-                const alert = this.makeAlert('danger', ex.response.data);
+                const alert = makeAlert('primary', ex.response.data);
                 this.setState({ alert })
             }
         }
@@ -44,13 +44,16 @@ class EditDescription extends Form {
         const { alert, errors } = this.state;
 
         return ( 
-            <div className="form form-description center">
-                <h1>Edit Description</h1>
-                <form onSubmit={this.handleSubmit}>
+            <div className="page edit-username-page">
+                <form 
+                onSubmit={this.handleSubmit} 
+                className="form"
+                >
+                    <h2>Edit Description</h2>
                     { _.isEmpty(errors) && alert }
                     {this.renderInput(
                         'description', 
-                        'Description', 
+                        '', 
                         { inputType: 'textarea',  defaultValue: description })}
                     {this.renderButton('Save')}
                 </form>

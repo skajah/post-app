@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import SearchKeyword from '../common/searchKeyword';
-import SearchRelativeDate from '../common/searchRelativeDate';
-import SearchDateRange from '../common/searchDateRange';
-import DropdownList from '../common/dropdownList';
+import SearchKeyword from '../common/SearchKeyword';
+import SearchDateRange from '../common/SearchDateRange';
+import DropdownList from '../common/DropdownList';
+import ListGroup from '../common/ListGroup';
 
 class PostSearch extends Component {
 
@@ -21,46 +21,38 @@ class PostSearch extends Component {
 
     render() { 
         const { 
-            searchByKeyword, 
+            searchByUsername, 
             dates, 
             selectedDate, 
             onDateSelected,
             onPostType } = this.props;
 
         const { dateRangeError } = this.state;
-        const alert = { type: 'danger', message: "Start date can't be after end date "};
+        const alert = { type: 'primary', message: "End date can't be before start date"};
 
         return ( 
             <div className="post-search">
-                <p
-                style={{
-                    fontWeight: '500',
-                    fontSize: '1.2rem',
-                }}
-                >Filter posts</p>
+                <p style={{ fontSize: '2rem', margin: '0 0 1rem'}}>Filter posts</p>
                 <SearchKeyword 
-                placeHolder=" Enter a username"
-                onKeywordSearch={searchByKeyword}/>
+                placeholder=" Enter a username"
+                onKeywordSearch={searchByUsername}/>
 
-                <p>Post Type</p>
+                <p>Pick a Type</p>
 
                 <DropdownList 
-                options={['All', 'My Posts', 'Liked Posts']}
-                className="dropdown-list"
+                options={['All', 'Liked Posts', 'Following']}
                 onSelect={onPostType}/>
 
-                <p>Select a date</p>
+                <p>Pick a Date</p>
 
-                <SearchRelativeDate 
-                dates={dates} 
-                selectedDate={selectedDate}
-                onDateSelected={onDateSelected}/>
+                <ListGroup
+                items={dates} 
+                selectedItem={selectedDate}
+                onClick={onDateSelected}/>
 
                 <SearchDateRange 
                 onDateRange={this.handleDateRange}
                 alert={dateRangeError && alert}/>
-
-                <span>Note: The most recent filter will be used</span>
             </div>
          );
     }

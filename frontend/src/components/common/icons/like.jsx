@@ -1,35 +1,25 @@
-import Icon from './icon';
+import React, { useEffect, useState} from 'react';
+import { BsHeart, BsHeartFill } from 'react-icons/bs';
 
-class Like extends Icon {
 
-    state = { 
-        liked: false,
-        classes: "fa fa-heart-o"
-    }
+export default function Like({
+    initialLike,
+    onLike
+}) {
+    const [liked, setLiked] = useState(false);
+    
+    useEffect(() => {
+        setLiked(initialLike);
+    }, [initialLike]);
 
-    handleLike = () => {
-        let { liked, classes } = this.state;
-        liked = !liked;
-        classes = liked ? "fa fa-heart" : "fa fa-heart-o";
-        this.setState({ liked, classes });
-        this.props.onClick(liked);
-    }
+    const icon = liked ? <BsHeartFill /> : <BsHeart />;
 
-    renderIcon() {
-        // fa-layers fa-fw ?
-        if (!this.state.initialLike && this.props.initialLike){
-            this.setState({ liked: true, initialLike: true, classes: "fa fa-heart" });
-
-        }
-        return (
-        <span className="clickable" onClick={this.handleLike}>
-            <i className={this.getClasses()} />
-            <span className="fa-layers-counter like-counter"> {this.props.likes || null} </span>
-        </span>
-        );
-
-    }
-
+    return (
+        <span 
+        className="icon clickable" 
+        onClick={() => {
+            setLiked(!liked);
+            onLike(!liked)
+        }}>{ icon }</span>
+    );
 }
- 
-export default Like;

@@ -1,28 +1,27 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-
-import NavBar from './components/Navbar';
-import Login from './components/Login';
-import Register from './components/Register';
-import ProfilePage from './components/profile/ProfilePage';
-import ProfileEdit from './components/profile/ProfileEdit';
+import 'react-toastify/dist/ReactToastify.css';
+import UserContext from './context/UserContext';
+import PostsPage from './components/posts/PostsPage';
 import NotFound from './components/NotFound';
 import PostPage from './components/posts/PostPage';
-import PostsPage from './components/posts/PostsPage';
+import Login from './components/Login';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import NavBar from './components/Navbar';
 import Logout from './components/Logout';
-import ProtectedRoute from './components/common/protectedRoute';
-import UserContext from './context/userContext';
-
-import 'react-toastify/dist/ReactToastify.css';
+import ProfilePage from './components/profile/ProfilePage';
+import EditDescription from './components/profile/EditDescription';
 import EditUsername from './components/profile/EditUsername';
 import EditEmail from './components/profile/EditEmail';
 import EditPassword from './components/profile/EditPassword';
-import EditDescription from './components/profile/EditDescription';
+import ProfileEdit from './components/profile/ProfileEdit';
+import ScrollToTop from './components/ScrollToTop';
+
 import auth from './services/authService';
 import { getMe } from './services/userService';
 import { decompress } from './utils/media';
-import profilePicSrc from './images/profile_default.jpg';
+import Register from './components/Register';
 
 class App extends Component {
   state = {
@@ -72,9 +71,8 @@ class App extends Component {
     ]);
     console.log('Got me');
 
-    currentUser.profilePic = currentUser.profilePic
-      ? await decompress(currentUser.profilePic)
-      : profilePicSrc;
+    if (currentUser.profilePic)
+      currentUser.profilePic = await decompress(currentUser.profilePic);
     this.setState({ currentUser });
   };
 
@@ -115,7 +113,6 @@ class App extends Component {
   };
 
   render() {
-    console.log('App render()');
     if (auth.hasCurrentUser() && !this.state.currentUser) return null;
 
     return (
@@ -132,49 +129,50 @@ class App extends Component {
           <ToastContainer />
           <NavBar />
           <main>
-            <Switch>
-              <Route path="/login" component={Login} exact />
-              <Route path="/logout" component={Logout} exact />
-              <Route path="/register" component={Register} exact />
-              <ProtectedRoute path="/posts" component={PostsPage} exact />
-              <ProtectedRoute path="/posts/:id" component={PostPage} exact />
-              <ProtectedRoute
-                path="/profile/edit"
-                component={ProfileEdit}
-                exact
-              />
-              <ProtectedRoute
-                path="/profile/:id"
-                component={ProfilePage}
-                exact
-              />
-              <ProtectedRoute
-                path="/profile/edit/username"
-                component={EditUsername}
-                exact
-              />
-              <ProtectedRoute
-                path="/profile/edit/email"
-                component={EditEmail}
-                exact
-              />
-              <ProtectedRoute
-                path="/profile/edit/description"
-                component={EditDescription}
-                exact
-              />
-              <ProtectedRoute
-                path="/profile/edit/password"
-                component={EditPassword}
-                exact
-              />
-
-              <Route path="/not-found" component={NotFound} />
-              <Redirect from="/" to="/posts" exact />
-              <Redirect to="/not-found" />
-            </Switch>
+            <ScrollToTop>
+              <Switch>
+                <Route path="/register" component={Register} exact />
+                <Route path="/login" component={Login} exact />
+                <Route path="/logout" component={Logout} exact />
+                <ProtectedRoute path="/posts/:id" component={PostPage} exact />
+                <ProtectedRoute path="/posts" component={PostsPage} exact />
+                <ProtectedRoute
+                  path="/profile/edit"
+                  component={ProfileEdit}
+                  exact
+                />
+                <ProtectedRoute
+                  path="/profile/:id"
+                  component={ProfilePage}
+                  exact
+                />
+                <ProtectedRoute
+                  path="/profile/edit/username"
+                  component={EditUsername}
+                  exact
+                />
+                <ProtectedRoute
+                  path="/profile/edit/email"
+                  component={EditEmail}
+                  exact
+                />
+                <ProtectedRoute
+                  path="/profile/edit/description"
+                  component={EditDescription}
+                  exact
+                />
+                <ProtectedRoute
+                  path="/profile/edit/password"
+                  component={EditPassword}
+                  exact
+                />
+                <Route path="/not-found" component={NotFound} />
+                <Redirect from="/" to="/posts" exact />
+                <Redirect to="/not-found" />
+              </Switch>
+            </ScrollToTop>
           </main>
-          <footer id="footer">Just a footer...</footer>
+          <footer></footer>
         </React.Fragment>
       </UserContext.Provider>
     );

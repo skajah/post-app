@@ -1,7 +1,15 @@
 import http from './httpService';
-import { apiUrl } from '../config.json';
+import { apiUrl, loadLimit } from '../config.json';
 
 const commentApiEndpoint = apiUrl + '/comments';
+
+export function getComments(postId, maxDate, limit = loadLimit) {
+  return http.get(
+    `${commentApiEndpoint}?postId=${postId}&maxDate=${
+      maxDate || ''
+    }&limit=${limit}`
+  );
+}
 
 export function createComment(comment) {
   return http.post(commentApiEndpoint, comment);

@@ -1,13 +1,14 @@
 import React from 'react';
 
 const DrowdownList = (props) => {
-    const { options, onSelect, ...rest } = props;
+    const { options, onSelect } = props;
     return ( 
-        <select {...rest}>
+        <select className="dropdown-list">
             <option value=""></option>
             {
                 options.map(option => {
-                    return <option 
+                    return <option
+                    className="dropdown-list__option" 
                     key={option}
                     value={option} 
                     onClick={() => onSelect(option)}>{ option }</option>
