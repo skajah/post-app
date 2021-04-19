@@ -34,10 +34,10 @@ class PostSearch extends Component {
             <div className="post-search">
                 <p
                 style={{
-                    fontWeight: 'bold',
+                    fontWeight: '500',
                     fontSize: '1.2rem',
                 }}
-                >Search for posts</p>
+                >Filter posts</p>
                 <SearchKeyword 
                 placeHolder=" Enter a username"
                 onKeywordSearch={searchByKeyword}/>
@@ -59,6 +59,8 @@ class PostSearch extends Component {
                 <SearchDateRange 
                 onDateRange={this.handleDateRange}
                 alert={dateRangeError && alert}/>
+
+                <span>Note: The most recent filter will be used</span>
             </div>
          );
     }

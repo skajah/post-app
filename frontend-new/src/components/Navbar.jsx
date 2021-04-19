@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import auth from '../services/authService';
 import UserContext from '../context/UserContext';
 import './Navbar.css';

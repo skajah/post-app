@@ -1,3 +1,4 @@
+import { makeDate } from './makeDate';
 const LZUTF8 = require('lzutf8');
 
 export function readMedia(file) {
@@ -30,4 +31,26 @@ export function decompress(data, inputEncoding = 'StorageBinaryString') {
     });
   });
 }
-// StorageBinaryString
+
+export async function decompressPost(post) {
+  makeDate(post);
+  if (post.media) post.media.data = await decompress(post.media.data);
+  await decompressUser(post.user);
+}
+
+export async function decompressPosts(posts) {
+  for (const post of posts) {
+    await decompressPost(post);
+  }
+}
+
+export async function decompressComments(comments) {
+  for (const comment of comments) {
+    makeDate(comment);
+    await decompressUser(comment.user);
+  }
+}
+
+export async function decompressUser(user) {
+  if (user.profilePic) user.profilePic = await decompress(user.profilePic);
+}

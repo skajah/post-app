@@ -6,12 +6,12 @@ import TabNav from '../common/TabNav';
 import UserContext from '../../context/UserContext';
 import _ from 'lodash';
 
-import { getUserPosts, deletePost } from '../../services/postService';
+import { getPosts, deletePost } from '../../services/postService';
 import { getUser, getFollowers, getFollowing, updateMe } from '../../services/userService';
-import { makeDate } from '../../utils/makeDate';
-import { decompress } from '../../utils/media';
+import { decompress, decompressPosts } from '../../utils/media';
 import ProfileSimple from './ProfileSimple';
 import './ProfilePage.css';
+import { loadLimit } from '../../config.json';
 
 class ProfilePage extends Component {
     static contextType = UserContext;
@@ -26,9 +26,8 @@ class ProfilePage extends Component {
 
     tabs = ['Posts', 'Following', 'Followers']
 
-    componentWillMount(){
+    componentDidMount(){
         this.unlisten = this.props.history.listen((location, action) => {
-            console.log('History change: ', location.pathname);
             let path = location.pathname;
             if (path.startsWith('/profile')){
                 path = location.pathname.endsWith('/') ?
@@ -39,14 +38,11 @@ class ProfilePage extends Component {
                     this.setUser(parts[1]);
             }
         });
+        this.setUser(this.props.match.params.id);
     }
+    
     componentWillUnmount(){
         this.unlisten();
-    }
-
-    componentDidMount(){
-        console.log('profilePage componentDidMount()');
-        this.setUser(this.props.match.params.id);
     }
 
     handleTabChange = tab => {
@@ -63,9 +59,24 @@ class ProfilePage extends Component {
     handleDelete = async id => {
         
         try {
+            const { user, posts: oldPosts } = this.state;
+
             await deletePost(id);
-            const posts = this.state.posts.filter(post => post._id !== id);
-            this.setState({ posts });
+
+            const { data: replacement } = await getPosts({ 
+                filter: 'userId', 
+                filterData: user._id, 
+                maxDate: oldPosts[oldPosts.length - 1].date,
+                limit: 1
+            });
+
+            await decompressPosts(replacement);
+
+            const posts = oldPosts
+            .filter(post => post._id !== id)
+            .concat(replacement);
+
+            this.setState({ posts, loadMore: replacement.length !== 0  });
         } catch (ex) {
             if (ex.response){
                 const status = ex.response.status;
@@ -109,19 +120,36 @@ class ProfilePage extends Component {
             if (user.profilePic)
                 user.profilePic = await decompress(user.profilePic);
             
-            const { data: posts } = await getUserPosts(id);        
-            for (const post of posts) {
-                makeDate(post);
-                if (post.media)
-                    post.media.data = await decompress(post.media.data);
-                if (post.user.profilePic)
-                    post.user.profilePic = await decompress(post.user.profilePic);
-            }
-            this.setState({ user, posts, following: null, followers: null, currentTab: 'Posts'});
+            const { data: posts } = await getPosts({
+                filter: 'userId',
+                filterData: id,
+            });    
+            await decompressPosts(posts);
+
+            this.setState({ 
+                user, 
+                posts, 
+                currentTab: 'Posts',
+                loadMore: posts.length >= loadLimit
+            });
         } catch (ex) {
             console.log('Error: ', ex);
         }
     }
+
+    handleLoadMore = async () => {
+        const { posts, user } = this.state;
+        const { data: morePosts } = await getPosts({
+            filter: 'userId',
+            filterData: user._id, 
+            maxDate: posts[posts.length - 1].date
+        });
+        await decompressPosts(morePosts);
+        const combinedPosts = posts.concat(morePosts);
+
+        this.setState({ posts: combinedPosts, loadMore: morePosts.length >= loadLimit});
+
+    }   
 
     handleFollow = async () => {
         const id = this.state.user._id;
@@ -158,7 +186,13 @@ class ProfilePage extends Component {
 
     render() { 
         // console.log('profilePage render()');
-        const { user, currentTab, posts, following, followers  } = this.state;
+        const { 
+            user, 
+            currentTab, 
+            posts, 
+            following, 
+            followers,
+            loadMore } = this.state;
 
         if (!user) return null;
 
@@ -186,6 +220,8 @@ class ProfilePage extends Component {
                                 onProfileClick={this.handleProfileClick}
                                 onPostClick={this.handlePostClick}
                                 onDelete={this.handleDelete}
+                                onLoadMore={this.handleLoadMore}
+                                loadMore={loadMore}
                                 />
                             </div>
                         )

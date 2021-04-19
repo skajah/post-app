@@ -3,6 +3,7 @@ const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
 const { likeDelta } = require('../middleware/validateDelta');
 const { verifyUserForComment } = require('../middleware/verifyUser');
+const pagination = require('../middleware/pagination');
 const express = require('express');
 const { Comment, validate } = require('../models/comment');
 const { Post } = require('../models/post');
@@ -10,16 +11,25 @@ const { User, likeComment } = require('../models/user');
 const mongoose = require('mongoose');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  const { postId } = req.query;
+router.get('/', pagination, async (req, res) => {
+  const { postId, maxDate, limit } = req.query;
   if (!postId)
     return res
       .status(400)
       .send('Specify postId in query string to get comments');
   if (!mongoose.Types.ObjectId.isValid(postId))
-    // move to validateId
     return res.status(400).send('Invalid Id');
-  const comments = await Comment.find({ postId }).select('-__v').sort('-date');
+
+  const postExists = await Post.exists({ _id: postId });
+  if (!postExists) return res.status(404).send('Post not found');
+
+  const comments = await Comment.find({
+    postId,
+    date: { $lt: maxDate },
+  })
+    .limit(limit)
+    .select('-__v')
+    .sort('-date');
   res.send(comments);
 });
 

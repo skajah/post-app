@@ -14,7 +14,6 @@ class CreatePostBox extends Component {
     static contextType = UserContext;
 
     state = {
-        clear: false,
         media: null,
     }
 
@@ -33,7 +32,7 @@ class CreatePostBox extends Component {
     }
 
     handleMediaUpload = (src, type) => {
-        const media = { type, src, attr: {className: 'media'} };
+        const media = { type, src };
         this.setState({ media })
     }
 
@@ -59,14 +58,18 @@ class CreatePostBox extends Component {
                 <div className="card__body create-post__body">
                     <TextBox 
                     name="postText"
-                    placeHolder=" What's on your mind?"
-                    value={clear ? '' : null}
+                    placeholder=" What's on your mind?"
+                    clear={clear}
                     onTextChange={this.handleTextChange}
-                    className="text-box"
-                    type="textarea"
-                    id="create-post-text-box"/>
+                    className="text-box create-post-text-box"
+                    type="textarea"/>
 
-                    { media && <Media type={media.type} src={URL.createObjectURL(media.src)} {...media.attr}/> }
+                    { media && 
+                    <Media 
+                    type={media.type} 
+                    src={URL.createObjectURL(media.src)} 
+                    alt={'Post Media: ' + media.type}/> 
+                    }
 
                 </div>
                 <div className="create-post__footer">

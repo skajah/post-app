@@ -29,7 +29,7 @@ class Form extends Component {
         const { errors } = this.state;
         // console.log(options)
 
-        alert = !errors[name] ? null : { type: 'primary', message: errors[name]};
+        const alert = !errors[name] ? null : { type: 'primary', message: errors[name]};
 
         // console.log('renderInput(): data: ', data);
 

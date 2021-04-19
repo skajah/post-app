@@ -37,9 +37,7 @@ footer {
   min-height: 10vh;
 }
 
-.clickable {
-  cursor: pointer;
-}
+/* Lists */
 
 .list {
   list-style: none;
@@ -49,6 +47,13 @@ footer {
 
 .list-inline {
   display: flex;
+}
+
+/* Post/Comment/Profile */
+
+.post,
+.comment {
+  margin-top: 20px;
 }
 
 .content-details {
@@ -85,8 +90,7 @@ footer {
   max-height: 80%;
 }
 
-.posts,
-.comments,
+.posts-container,
 .profile-card,
 .profile-edit-page .file-chooser,
 .profile-edit__header,
@@ -97,10 +101,13 @@ footer {
   padding: 0 1px;
 }
 
-.post,
-.comment {
-  margin-top: 20px;
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
 }
+
+/* Inputs */
 
 .text-box {
   padding: 1.5rem 2rem;
@@ -114,13 +121,7 @@ footer {
   box-shadow: 0 0 3px 1px var(--color-secondary);
 }
 
-.page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 3rem 2rem;
-}
+/* Comments */
 
 .create-comment {
   margin-top: 10px;
@@ -140,6 +141,8 @@ footer {
   max-height: 200px;
 }
 
+/* Alerts */
+
 .alert {
   padding: 1rem 0;
   border-radius: 5px;
@@ -158,4 +161,18 @@ footer {
 
 .alert--accent {
   color: var(--color-accent);
+}
+
+/* General/Misc */
+
+.clickable {
+  cursor: pointer;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
 }

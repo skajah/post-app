@@ -6,9 +6,7 @@ class CreateCommentBox extends Component {
     
     text = ''
 
-    state = {
-        clear: false
-    }
+    state = { }
 
     handleTextChange = text => {
         this.text = text;
@@ -29,14 +27,15 @@ class CreateCommentBox extends Component {
         return ( 
             <div className="create-comment">
                 <TextBox 
-                    name="commentText"
-                    placeHolder=" Comment on this post..."
-                    value={clear ? '' : null}
-                    className="text-box create-comment-text-box"
-                    onTextChange={this.handleTextChange}
-                    // Pass down alert so that it is aligned with text box
-                    type="textarea"
-                    alert={alert}/>
+                name="commentText"
+                placeholder=" Comment on this post..."
+                className="text-box create-comment-text-box"
+                onTextChange={this.handleTextChange}
+                clear={clear}
+                // Pass down alert so that it is aligned with text box
+                type="textarea"
+                alert={alert}/>
+
                 <Button
                 color="accent"
                 size="small"

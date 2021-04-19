@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
 import { likeComment, unlikeComment } from '../../services/commentService';
 import UserContext from '../../context/UserContext';
 import ContentDetails from '../common/ContentDetails';

@@ -31,10 +31,12 @@ export function hasCurrentUser() {
   return localStorage.getItem(tokenKey) !== null;
 }
 
-export default {
+const auth = {
   login,
   logout,
   hasCurrentUser,
   loginWithJwt,
   getJwt,
 };
+
+export default auth;

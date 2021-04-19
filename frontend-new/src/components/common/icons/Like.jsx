@@ -10,7 +10,7 @@ export default function Like({
     
     useEffect(() => {
         setLiked(initialLike);
-    });
+    }, [initialLike]);
 
     const icon = liked ? <BsHeartFill /> : <BsHeart />;
 

@@ -15,15 +15,14 @@ class SearchKeyword extends Component {
     }
     
     render() { 
-        const { placeHolder } = this.props;
+        const { placeholder } = this.props;
 
         return ( 
             <div className="input-group">
                 <TextBox 
                 name="searchKeyword" 
-                placeHolder={placeHolder} 
+                placeholder={placeholder} 
                 className="text-box"
-                type="input"
                 onTextChange={this.handleSearchTextChange}
                 />
                 <span className="icon clickable" onClick={() => this.handleKeywordSearch()}>

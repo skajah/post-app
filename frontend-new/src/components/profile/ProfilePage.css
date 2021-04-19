@@ -4,6 +4,10 @@
   background: rgba(0, 128, 128, 0.01);
 }
 
+.profile-card__body {
+  padding-left: 0;
+  padding-right: 0;
+}
 .profile-details {
   display: flex;
   justify-content: space-between;

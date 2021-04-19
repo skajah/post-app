@@ -20,12 +20,12 @@ class SearchDateRange extends Component {
 
     handleDateChange = () => {
         const { start, end } = this.dateRange;
-        if (start && end)
+        if ((start && end) && 
+        (start.toString() !== 'Invalid Date' && end.toString() !== 'Invalid Date'))
             this.props.onDateRange(start, end);
     }
 
     render() { 
-        const { clear } = this.props;
 
         return (
             <div className="search-date-range">

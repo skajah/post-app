@@ -21,26 +21,26 @@ class PostSearch extends Component {
 
     render() { 
         const { 
-            searchByKeyword, 
+            searchByUsername, 
             dates, 
             selectedDate, 
             onDateSelected,
             onPostType } = this.props;
 
         const { dateRangeError } = this.state;
-        const alert = { type: 'primary', message: "Start date can't be after end date "};
+        const alert = { type: 'primary', message: "End date can't be before start date"};
 
         return ( 
             <div className="post-search">
                 <p style={{ fontSize: '2rem', margin: '0 0 1rem'}}>Filter posts</p>
                 <SearchKeyword 
-                placeHolder=" Enter a username"
-                onKeywordSearch={searchByKeyword}/>
+                placeholder=" Enter a username"
+                onKeywordSearch={searchByUsername}/>
 
                 <p>Pick a Type</p>
 
                 <DropdownList 
-                options={['All', 'My Posts', 'Liked Posts', 'Following']}
+                options={['All', 'Liked Posts', 'Following']}
                 onSelect={onPostType}/>
 
                 <p>Pick a Date</p>
@@ -53,8 +53,6 @@ class PostSearch extends Component {
                 <SearchDateRange 
                 onDateRange={this.handleDateRange}
                 alert={dateRangeError && alert}/>
-                <br />
-                <span>Note: The most recent filter will be used</span>
             </div>
          );
     }

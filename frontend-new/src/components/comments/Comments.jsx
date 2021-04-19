@@ -1,30 +1,27 @@
 import React from 'react';
-import Post from './Post';
+import Comment from './Comment';
 import Button from '../common/Button';
 
-export default function Posts({
-    posts,
-    onFollow,
-    onLike,
-    onPostClick,
-    onProfileClick,
+export default function Comments({
+    comments,
     onDelete,
-    onLoadMore,
-    loadMore
-}){
+    onProfileClick,
+    onFollow,
+    loadMore,
+    onLoadMore
+}) {
     return (
-        <div className="posts">
+        <div className="comments">
             {
-                posts.map(post => {
+                comments.map(comment => {
                     return (
-                        <Post 
-                        key={post._id}
-                        post={post}
-                        onPostClick={onPostClick}
-                        onProfileClick={onProfileClick}
+                        <Comment
+                        key={comment._id} 
+                        comment={comment}
                         onDelete={onDelete}
+                        onProfileClick={onProfileClick}
                         onFollow={onFollow}
-                        onLike={onLike}/>
+                        />
                     )
                 })
             }

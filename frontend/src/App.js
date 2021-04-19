@@ -15,12 +15,12 @@ import ProtectedRoute from './components/common/protectedRoute';
 import UserContext from './context/userContext';
 
 import 'react-toastify/dist/ReactToastify.css';
-import auth from './services/authService';
-import { getMe } from './services/userService';
 import EditUsername from './components/profile/EditUsername';
 import EditEmail from './components/profile/EditEmail';
 import EditPassword from './components/profile/EditPassword';
 import EditDescription from './components/profile/EditDescription';
+import auth from './services/authService';
+import { getMe } from './services/userService';
 import { decompress } from './utils/media';
 import profilePicSrc from './images/profile_default.jpg';
 

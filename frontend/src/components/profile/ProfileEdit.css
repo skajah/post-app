@@ -1,8 +1,9 @@
 .profile-summary {
-  max-width: 320px;
-  width: 100%;
+  max-width: 550px;
+  width: 90%;
   margin: 0 auto;
-  box-shadow: 0 0 2px 2px var(--hover-gray);
+  border-radius: 5px;
+  box-shadow: 0 0 5px 2px var(--hover-gray);
   display: flex;
   flex-direction: column;
 }
@@ -46,6 +47,13 @@
   justify-self: center;
 }
 
-.edit-row-text {
+.profile-summary-username .edit-row-text,
+.profile-summary-email .edit-row-text,
+.profile-summary-description .edit-row-text {
   margin-left: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
 }

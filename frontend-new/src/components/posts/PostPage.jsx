@@ -3,9 +3,9 @@ import { toast } from 'react-toastify';
 import Post from './Post';
 
 import { getPost, deletePost } from '../../services/postService';
-import { makeDate } from '../../utils/makeDate';
-import { decompress } from '../../utils/media';
+import { decompressPost, decompressComments } from '../../utils/media';
 import './PostsPage.css';
+import { getComments } from '../../services/commentService';
 
 class PostPage extends Component {
     
@@ -21,21 +21,12 @@ class PostPage extends Component {
     async setPost() {
         try {
             const { id: postId } = this.props.match.params;
-            const { data: post } = await getPost(postId,{ withComments: true });
-            makeDate(post);
-
-            if (post.user.profilePic)
-                post.user.profilePic = await decompress(post.user.profilePic);
+            const { data: post } = await getPost(postId);
+            const { data: comments } = await getComments(postId);
+            post.comments = comments;
+            await decompressPost(post);
+            await decompressComments(post.comments);
             
-            if (post.media)
-                post.media.data = await decompress(post.media.data);
-
-            const { comments } = post;
-            for (const comment of comments) {
-                makeDate(comment);
-                if (comment.user.profilePic)
-                    comment.user.profilePic = await decompress(comment.user.profilePic);
-            }
             this.setState({ post });
         } catch (ex) { 
             if (ex.response && ex.response.status === 404)
@@ -69,7 +60,7 @@ class PostPage extends Component {
         
         return (
             <div className="page post-page">
-                <div className="posts">
+                <div className="posts-container">
                     <Post 
                     post={post}
                     showComments={true}

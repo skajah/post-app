@@ -1,29 +1,24 @@
 const _ = require('lodash');
-const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
+const pagination = require('../middleware/pagination');
 const { likeDelta } = require('../middleware/validateDelta');
 const { verifyUserForPost } = require('../middleware/verifyUser');
 const express = require('express');
-const { Post, validate } = require('../models/post');
+const { Post, validate, filterPosts } = require('../models/post');
 const { Comment } = require('../models/comment');
 const { User, likePost } = require('../models/user');
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  // Implement paginations
-  const { userId } = req.query;
-  let posts;
-  if (!userId) posts = await Post.find().select('-__v').sort('-date');
-  else if (!mongoose.Types.ObjectId.isValid(userId))
-    return res.status(400).send('Invalid userId');
-  else {
-    const user = await User.exists({ _id: userId });
-    if (!user) return res.status(400).send('User not found');
-    posts = await Post.find({ 'user._id': userId })
-      .select('-__v')
-      .sort('-date');
-  }
+router.get('/', pagination, async (req, res) => {
+  const { filter, filterData, maxDate, limit } = req.query;
+  const { error, value: posts } = await filterPosts(
+    filter,
+    filterData,
+    maxDate,
+    limit
+  );
+  if (error) return res.status(400).send(error);
   res.send(posts);
 });
 

@@ -31,7 +31,19 @@ class PostsPage extends Component {
 
     componentDidMount() {
         // console.log('postsPage componentDidMount()');
+        window.addEventListener('resize', this.resize);
+        this.resize();
         this.populatePosts();
+    }
+
+    resize = () => {
+        const mobile = window.innerWidth < 760;
+        if (this.state.mobile !== mobile) 
+            this.setState({ mobile });
+    }
+
+    componentWillUnmount(){
+        window.removeEventListener('resize', this.resize);
     }
 
     populatePosts = async () => {
@@ -128,7 +140,6 @@ class PostsPage extends Component {
             postTypeFilter: type,
             relativeDateFilter: null, 
             dateRangeFilter: null,
-            showSearch: false  
         });
     }
 
@@ -136,8 +147,7 @@ class PostsPage extends Component {
         this.setState({ keywordFilter: null, 
                         postTypeFilter: null,
                         relativeDateFilter: date, 
-                        dateRangeFilter: null,
-                        showSearch: false  
+                        dateRangeFilter: null, 
                     });
     }
 
@@ -146,7 +156,6 @@ class PostsPage extends Component {
                         postTypeFilter: null,
                         relativeDateFilter: null,
                         dateRangeFilter: [start, end],
-                        showSearch: false  
                     });
     }
 
@@ -195,7 +204,7 @@ class PostsPage extends Component {
 
     render() {  
         // console.log('postsPage render()');
-        const { relativeDateFilter, posts, emptyPost, showSearch } = this.state;
+        const { relativeDateFilter, posts, emptyPost, mobile, showSearch } = this.state;
         const alert = { type: 'warning', message: "Post can't be empty"};
 
         if (!posts) 
@@ -204,12 +213,16 @@ class PostsPage extends Component {
             );
         return (
             <div className="posts-page">
-                <div className={!showSearch && "hide"}>
-                    <div className="btn-post-search">
-                        <span onClick={this.handleShowSearch} className="clickable">
-                            Show posts
-                        </span>
-                    </div>
+                <div className={'post-search-container ' + (mobile && !showSearch ? "hide" : '' )}>
+                    {
+                        mobile &&
+                        <div className={"btn-post-search"}>
+                            <span onClick={this.handleShowSearch} className="clickable">
+                                Show results
+                            </span>
+                        </div>
+                    }
+                    
                     <PostSearch 
                     searchByKeyword={this.handleSearchByKeyword}
                     onPostType={this.handlePostType}
@@ -218,12 +231,15 @@ class PostsPage extends Component {
                     onDateSelected={this.handleDateSelected}
                     onDateRange={this.handleDateRange}/>
                 </div>
-                <div className={showSearch && "hide"}>
-                    <div className="btn-post-search">
-                        <span onClick={this.handleShowSearch} className="clickable">
-                            Search for posts
-                        </span>
-                    </div>
+                <div className={'posts-container ' + (mobile && showSearch ? "hide" : '' )}>
+                    {
+                        mobile &&
+                        <div className={"btn-post-search"}>
+                            <span onClick={this.handleShowSearch} className="clickable">
+                                Filter posts
+                            </span>
+                        </div>
+                    }
                     <CreatePostBox 
                     onCreate={this.handleCreatePost}
                     alert={emptyPost && alert}/>

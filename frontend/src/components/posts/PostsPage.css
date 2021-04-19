@@ -1,6 +1,15 @@
 .posts-page {
-  max-width: 320px;
+  padding: 10px;
+}
+
+.posts-container {
   width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.post-search-container {
+  max-width: 250px;
   margin: 0 auto;
 }
 
@@ -8,6 +17,7 @@
   display: flex;
   justify-content: flex-end;
 }
+/* post search */
 
 .search-date-range input,
 .post-search .dropdown-list {
@@ -15,12 +25,10 @@
   border-radius: 5px;
 }
 
-/* post search */
-
 .post-search {
   display: flex;
   flex-direction: column;
-  width: 80%;
+  max-width: 300px;
   margin: 0 auto;
 }
 
@@ -63,4 +71,15 @@
 .list-group-item.my-active {
   background-color: var(--lighter-maroon);
   color: whitesmoke;
+}
+
+@media screen and (min-width: 760px) {
+  .posts-page {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .posts-container {
+    max-width: 550px;
+    margin-left: 20px;
+  }
 }
