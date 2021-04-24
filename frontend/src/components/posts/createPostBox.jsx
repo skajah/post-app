@@ -76,8 +76,8 @@ class CreatePostBox extends Component {
                     <FileIcon
                     extensions={['jpg', 'jpeg', 'png', 'gif']}
                     onFileChosen={src => this.handleMediaUpload(src, 'image')}
-                    maxFileSize={10}>
-                        <span className="icon">
+                    maxFileSize={8}>
+                        <span className="icon icon--medium">
                             <AiOutlineCamera />
                         </span>
                     </FileIcon>
@@ -85,8 +85,8 @@ class CreatePostBox extends Component {
                     <FileIcon
                     extensions={['mp4', 'mov', 'mpg']}
                     onFileChosen={src => this.handleMediaUpload(src, 'video')}
-                    maxFileSize={10}>
-                        <span className="icon">
+                    maxFileSize={8}>
+                        <span className="icon icon--medium">
                             <AiOutlineVideoCamera />
                         </span>
                     </FileIcon>
@@ -94,8 +94,8 @@ class CreatePostBox extends Component {
                     <FileIcon
                     extensions={['mp3', 'wav', 'ogg']}
                     onFileChosen={src => this.handleMediaUpload(src, 'audio')}
-                    maxFileSize={10}>
-                        <span className="icon">
+                    maxFileSize={8}>
+                        <span className="icon icon--medium">
                             <IoVolumeHighOutline />
                         </span>
                     </FileIcon>

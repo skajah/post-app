@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { toast } from 'react-toastify';
-import Post from './Post';
+import Posts from './Posts';
 
 import { getPost, deletePost } from '../../services/postService';
 import { decompressPost, decompressComments } from '../../utils/media';
@@ -61,11 +61,12 @@ class PostPage extends Component {
         return (
             <div className="page post-page">
                 <div className="posts-container">
-                    <Post 
-                    post={post}
+                    <Posts 
+                    posts={[post]}
                     showComments={true}
                     onProfileClick={this.handleProfileClick}
-                    onDelete={this.handleDelete}/>
+                    onDelete={this.handleDelete}
+                    />
                 </div>
             </div>
         );

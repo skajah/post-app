@@ -25,7 +25,7 @@ class SearchKeyword extends Component {
                 className="text-box"
                 onTextChange={this.handleSearchTextChange}
                 />
-                <span className="icon clickable" onClick={() => this.handleKeywordSearch()}>
+                <span className="icon icon--medium clickable" onClick={() => this.handleKeywordSearch()}>
                     <BsSearch />
                 </span>
                  

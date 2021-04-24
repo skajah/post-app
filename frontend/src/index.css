@@ -121,6 +121,43 @@ footer {
   box-shadow: 0 0 3px 1px var(--color-secondary);
 }
 
+input[type='date'] {
+  outline: 0;
+  border: 1px solid var(--outline-gray);
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+}
+
+input[type='date']:focus {
+  box-shadow: 0 0 1px 1px var(--color-secondary);
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  padding-right: 10px;
+  box-shadow: 0 0 1px 1px var(--outline-gray);
+  border-radius: 7px;
+  background: white;
+}
+
+.input-group:focus-within {
+  box-shadow: 0 0 3px 1px var(--color-secondary);
+}
+
+.input-group .text-box {
+  outline: none;
+  border: none;
+}
+
+.input-group .text-box:focus {
+  box-shadow: none;
+}
+
+.input-group .icon {
+  margin-left: 5px;
+}
+
 /* Comments */
 
 .create-comment {
@@ -175,4 +212,19 @@ footer {
   justify-content: center;
   align-items: center;
   padding: 3rem 2rem;
+}
+
+.icon {
+  margin-left: 20px;
+}
+.icon--small {
+  font-size: 1.6rem;
+}
+
+.icon--medium {
+  font-size: 2.2rem;
+}
+
+.icon--large {
+  font-size: 2.5rem;
 }

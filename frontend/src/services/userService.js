@@ -1,5 +1,5 @@
 import http from './httpService';
-import { apiUrl } from '../config.json';
+import { apiUrl, loadLimit } from '../config.json';
 
 const userApiEndpoint = apiUrl + '/users';
 
@@ -7,11 +7,8 @@ export function register(user) {
   return http.post(userApiEndpoint, user);
 }
 
-export async function getMe(properties, options = {}) {
-  const { data: me } = await http.get(
-    `${userApiEndpoint}/me?properties=${properties.join(',')}`
-  );
-  // const { getJwt } = options;
+export async function getMe() {
+  const { data: me } = await http.get(`${userApiEndpoint}/me`);
   return me;
 }
 
@@ -23,10 +20,22 @@ export function getUser(id) {
   return http.get(`${userApiEndpoint}/${id}`);
 }
 
-export function getFollowing(id) {
-  return http.get(`${userApiEndpoint}/${id}/following`);
+export function getFollowing(id, maxDate, limit = loadLimit) {
+  return http.get(
+    `${userApiEndpoint}/${id}/following?maxDate=${maxDate || ''}&limit=${limit}`
+  );
 }
 
-export function getFollowers(id) {
-  return http.get(`${userApiEndpoint}/${id}/followers`);
+export function getFollowers(id, maxDate, limit = loadLimit) {
+  return http.get(
+    `${userApiEndpoint}/${id}/followers?maxDate=${maxDate || ''}&limit=${limit}`
+  );
+}
+
+export function checkLiked(id, type) {
+  return http.get(`${userApiEndpoint}/me/checkLiked/${id}?type=${type}`);
+}
+
+export function checkFollowing(id) {
+  return http.get(`${userApiEndpoint}/me/checkFollowing/${id}`);
 }

@@ -58,18 +58,7 @@ class App extends Component {
   handleLogin = async () => {
     console.log('handleLogin()');
     console.log('Getting me...');
-    const currentUser = await getMe([
-      '_id',
-      'username',
-      'email',
-      'description',
-      'profilePic',
-      'likedPosts',
-      'likedComments',
-      'following',
-      'followers',
-    ]);
-    console.log('Got me');
+    const currentUser = await getMe();
 
     if (currentUser.profilePic)
       currentUser.profilePic = await decompress(currentUser.profilePic);

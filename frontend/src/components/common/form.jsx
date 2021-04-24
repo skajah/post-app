@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import Joi from 'joi-browser';
-import SelectInput from './SelectInput';
 import FormInput from './FormInput';
 import Button from './Button';
 import './Form.css';
@@ -42,19 +41,6 @@ class Form extends Component {
         onChange={this.handleChange}
         className="text-box"
         alert={alert}/>;
-     }
-
-
-     renderSelectInput = (name, label, options) => {
-         const {errors, data } = this.state;
-
-         return <SelectInput 
-         name={name}
-         value={data[name]}
-         label={label}
-         options={options}
-         onChange={this.handleChange}
-         error={errors[name]}/>;
      }
 
      validate = () => {

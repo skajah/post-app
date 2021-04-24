@@ -54,3 +54,9 @@ export async function decompressComments(comments) {
 export async function decompressUser(user) {
   if (user.profilePic) user.profilePic = await decompress(user.profilePic);
 }
+
+export async function decompressUsers(users) {
+  for (const user of users) {
+    await decompressUser(user);
+  }
+}

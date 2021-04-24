@@ -13,7 +13,7 @@ import { createComment, deleteComment, getComments } from '../../services/commen
 import { likePost, unlikePost } from '../../services/postService';
 import CreateCommentBox from '../comments/CreateCommentBox';
 import UserContext from '../../context/UserContext';
-import { updateMe } from '../../services/userService';
+import { checkLiked } from '../../services/userService';
 import { loadLimit } from '../../config.json';
 import { decompressComments } from '../../utils/media';
 
@@ -31,9 +31,11 @@ class Post extends Card {
         this.populateState();
     }
 
-    populateState(){
+    async populateState(){
         const { _id, user, date, text, media, comments, numberOfComments, likes } = this.props.post;
         const loadMore = (comments || []).length >= loadLimit;
+
+        const { data: initialLike } = await checkLiked(_id, 'post');
 
         this.setState({ 
             _id,
@@ -45,6 +47,7 @@ class Post extends Card {
             numberOfComments,
             likes: likes,
             loadMore,
+            initialLike,
         });
     }
 
@@ -90,7 +93,6 @@ class Post extends Card {
             const { currentUser } = this.context;
             const newComment = {
                 postId,
-                userId: currentUser._id,
                 text
             };
             const { data: comment } = await createComment(newComment);
@@ -114,14 +116,15 @@ class Post extends Card {
         try {
             const id = this.state._id;
 
-            const { data: post } = liked ? 
+            const { data: likeObj } = liked ? 
             await likePost(id):
             await unlikePost(id);
-
+            
+            const { likes } = likeObj;
+            
             if (this.props.onLike)
-                this.props.onLike(id, !liked);
-            const { likes } = post;
-            this.context.onLike(post._id, 'post', liked);
+                this.props.onLike(id);
+            // this.context.onLike(post._id, 'post', liked);
             this.setState({ likes });
 
         } catch (ex) {
@@ -136,24 +139,15 @@ class Post extends Card {
     
     }
 
-    handleFollow = async (id) => {
-        const isFollowing = this.context.currentUser.following[id] ? true : false;
-        await updateMe({ following: { id, follow: !isFollowing } });
-        if (this.props.onFollow)
-            this.props.onFollow(id, !isFollowing);
-        this.context.onFollow(id);
-        
-    }
-
     handleOptionSelected = option => {
-        const { onProfileClick, onDelete } = this.props;
+        const { onProfileClick, onDelete, onFollow } = this.props;
    
         const { user, _id } = this.state;
 
         if (option === 'Profile')
             onProfileClick(user._id);
         else if (option === 'Follow' || option === 'Unfollow')
-            this.handleFollow(user._id)
+            onFollow(user._id)
         else if (option === 'Delete')
             onDelete(_id);
     }
@@ -184,20 +178,28 @@ class Post extends Card {
             numberOfComments,
             comments,
             likes,
+            initialLike,
             emptyComment,
             loadMore } = this.state;
         const { 
             showComments,
             onPostClick,
             onProfileClick,
+            following,
+            onFollow,
+            optionMenu,
+            hideOptions
             } = this.props;
 
+        const followingUser = following[user._id];
         const { currentUser } = this.context;
-        const initialLike = currentUser.likedPosts[_id];
-        const following = currentUser.following[user._id];
-        const options = ['Profile', following ? 'Unfollow' : 'Follow'];
-        if ( currentUser._id === user._id)
-            options.push('Delete');
+        const options = optionMenu || ['Profile'];
+        if (!optionMenu)  {
+            if (currentUser._id === user._id)
+                options.push('Delete');
+            else 
+                options.push(followingUser ? 'Unfollow' : 'Follow');
+        }
 
         const alert = { type: 'secondary', message: "Comment can't be empty" };
 
@@ -210,7 +212,10 @@ class Post extends Card {
                   onProfileClick={() => onProfileClick(user._id)} 
                   username={user.username} 
                   date={date}/>
-                  <Dropdown options={options} onOptionSelected={this.handleOptionSelected}/>
+                  {
+                      !hideOptions && 
+                      <Dropdown options={options} onOptionSelected={this.handleOptionSelected}/>
+                  }
                 </header>
                 <div className="card__body post__body">
                   { text &&  <p>{text}</p> }
@@ -223,8 +228,7 @@ class Post extends Card {
                   }
                   <div className="post__details">
                     <IconCount 
-                    count={likes} 
-                    margins={true}>
+                    count={likes}>
                       <Like initialLike={initialLike} onLike={this.handleLike}/>
                     </IconCount>
 
@@ -247,9 +251,10 @@ class Post extends Card {
                     comments={comments} 
                     onDelete={this.handleDeleteComment}
                     onProfileClick={onProfileClick}
-                    onFollow={this.handleFollow}
+                    onFollow={(userId) => onFollow(userId)}
                     onLoadMore={this.handleLoadMore}
-                    loadMore={loadMore}/>
+                    loadMore={loadMore}
+                    following={following}/>
                 </div>
               }         
             </React.Fragment>

@@ -4,8 +4,8 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const bcrypt = require('bcrypt');
-const { Post } = require('./post');
-const { Comment } = require('./comment');
+const { Follow } = require('./follow');
+const { Like } = require('./like');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -44,16 +44,6 @@ const userSchema = new mongoose.Schema({
     default: new Map(),
   },
   profilePic: String,
-  followers: {
-    type: Map,
-    of: Number,
-    default: new Map(),
-  },
-  following: {
-    type: Map,
-    of: Number,
-    default: new Map(),
-  },
 });
 
 userSchema.methods.generateAuthToken = function () {
@@ -66,10 +56,6 @@ userSchema.methods.generateAuthToken = function () {
     config.get('jwtPrivateKey')
   );
   return token;
-};
-
-userSchema.methods.getProperties = function (properties) {
-  return _.pick(this, properties);
 };
 
 const User = mongoose.model('User', userSchema);
@@ -88,17 +74,35 @@ function validateUser(user) {
 }
 
 async function likePost(userId, postId, liked) {
-  const user = await User.findById(userId);
-  if (liked) user.likedPosts.set(postId, 1);
-  else user.likedPosts.delete(postId);
-  await user.save();
+  if (liked) {
+    await new Like({
+      userId,
+      content: 'post',
+      contentId: postId,
+    }).save();
+  } else {
+    await Like.deleteOne({
+      userId,
+      content: 'post',
+      contentId: postId,
+    });
+  }
 }
 
 async function likeComment(userId, commentId, liked) {
-  const user = await User.findById(userId);
-  if (liked) user.likedComments.set(commentId, 1);
-  else user.likedComments.delete(commentId);
-  await user.save();
+  if (liked) {
+    await new Like({
+      userId,
+      content: 'comment',
+      contentId: commentId,
+    }).save();
+  } else {
+    await Like.deleteOne({
+      userId,
+      content: 'comment',
+      contentId: commentId,
+    });
+  }
 }
 
 async function updateEmail(userId, email) {
@@ -139,22 +143,19 @@ async function updateUsername(userId, username) {
     return result;
   }
   const user = await User.findById(userId).select('username');
+
   if (user.username === username) {
     result.error = 'New username should not be the same as old';
     return result;
   }
+
   const emailTaken = await User.exists({ username });
   if (emailTaken) {
     result.error = 'Username already taken';
     return result;
   }
-  await User.findByIdAndUpdate(userId, { username });
-  await Post.updateMany({ 'user._id': userId }, { 'user.username': username });
-  await Comment.updateMany(
-    { 'user._id': userId },
-    { 'user.username': username }
-  );
 
+  await User.findByIdAndUpdate(userId, { username });
   result.value = username;
   return result;
 }
@@ -208,40 +209,55 @@ async function updateProfilePic(userId, profilePic) {
     return result;
   }
   await User.findByIdAndUpdate(userId, { profilePic });
-  await Post.updateMany(
-    { 'user._id': userId },
-    { 'user.profilePic': profilePic }
-  );
-  await Comment.updateMany(
-    { 'user._id': userId },
-    { 'user.profilePic': profilePic }
-  );
   result.value = profilePic;
   return result;
 }
 
 async function updateFollowing(userId, following) {
   const result = {};
-  const user = await User.findById(userId).select('following');
-  const followedUser = await User.findById(following.id).select('followers');
+  const followedUser = await User.findById(following.id).select('_id');
+
   if (!followedUser) {
     result.error = "Cannot follow/unfollow a user that doesn't exist";
     return result;
   }
+  const now = new Date();
+
   if (following.follow === true) {
-    user.following.set(following.id, 1);
-    followedUser.followers.set(userId, 1);
+    await new Follow({
+      user: userId,
+      followType: 'following',
+      followUser: followedUser._id,
+      date: now,
+    }).save();
+
+    await new Follow({
+      user: followedUser._id,
+      followType: 'followedBy',
+      followUser: userId,
+      date: now,
+    }).save();
+
     result.value = 'Following';
   } else if (following.follow === false) {
-    user.following.delete(following.id);
-    followedUser.followers.delete(userId);
+    await Follow.deleteOne({
+      user: userId,
+      followType: 'following',
+      followUser: followedUser._id,
+    });
+
+    await Follow.deleteOne({
+      user: followedUser._id,
+      followType: 'followedBy',
+      followUser: userId,
+    });
+
     result.value = 'Unfollowed';
   } else {
     result.error = '"following" must be true or false';
     return result;
   }
-  await user.save();
-  await followedUser.save();
+
   return result;
 }
 

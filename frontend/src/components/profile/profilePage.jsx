@@ -4,14 +4,13 @@ import Posts  from '../posts/Posts';
 import ProfileDetails from './ProfileDetails';
 import TabNav from '../common/TabNav';
 import UserContext from '../../context/UserContext';
-import _ from 'lodash';
 
 import { getPosts, deletePost } from '../../services/postService';
-import { getUser, getFollowers, getFollowing, updateMe } from '../../services/userService';
-import { decompress, decompressPosts } from '../../utils/media';
-import ProfileSimple from './ProfileSimple';
+import { getUser, getFollowers, getFollowing, updateMe, checkFollowing } from '../../services/userService';
+import { decompressPosts, decompressUser, decompressUsers } from '../../utils/media';
 import './ProfilePage.css';
 import { loadLimit } from '../../config.json';
+import ProfileList from './ProfileList';
 
 class ProfilePage extends Component {
     static contextType = UserContext;
@@ -56,7 +55,7 @@ class ProfilePage extends Component {
 
     }
 
-    handleDelete = async id => {
+    handleDeletePost = async id => {
         
         try {
             const { user, posts: oldPosts } = this.state;
@@ -76,7 +75,7 @@ class ProfilePage extends Component {
             .filter(post => post._id !== id)
             .concat(replacement);
 
-            this.setState({ posts, loadMore: replacement.length !== 0  });
+            this.setState({ posts, loadMorePosts: replacement.length !== 0  });
         } catch (ex) {
             if (ex.response){
                 const status = ex.response.status;
@@ -91,11 +90,11 @@ class ProfilePage extends Component {
     setFollowing = async (id) => {
         try {
             const { data: following } = await getFollowing(id);
-            for (const profile of following) {
-                if (profile.profilePic)
-                    profile.profilePic = await decompress(profile.profilePic);
-            }
-            this.setState({ following });
+            await decompressUsers(following);
+            this.setState({ 
+                following, 
+                loadMoreFollowing: following.length >= loadLimit 
+            });
         } catch (ex) {
             console.log('Error: ', ex);
         }
@@ -104,11 +103,11 @@ class ProfilePage extends Component {
     setFollowers = async (id) => {
         try {
             const { data: followers } = await getFollowers(id);
-            for (const profile of followers) {
-                if (profile.profilePic)
-                    profile.profilePic = await decompress(profile.profilePic);
-            }
-            this.setState({ followers });
+            await decompressUsers(followers);
+            this.setState({ 
+                followers,
+                loadMoreFollowers: followers.length >= loadLimit 
+             });
         } catch (ex) {
             console.log('Error: ', ex);
         }
@@ -117,27 +116,33 @@ class ProfilePage extends Component {
     setUser = async (id) => {
         try {
             const { data: user } = await getUser(id);
-            if (user.profilePic)
-                user.profilePic = await decompress(user.profilePic);
+           
+            await decompressUser(user);
             
             const { data: posts } = await getPosts({
                 filter: 'userId',
                 filterData: id,
             });    
+
+            const { data: isFollowing } = await checkFollowing(id);
+
             await decompressPosts(posts);
 
             this.setState({ 
                 user, 
-                posts, 
+                posts,
+                following: null,
+                followers: null,
                 currentTab: 'Posts',
-                loadMore: posts.length >= loadLimit
+                loadMorePosts: posts.length >= loadLimit,
+                isFollowing
             });
         } catch (ex) {
             console.log('Error: ', ex);
         }
     }
 
-    handleLoadMore = async () => {
+    handleLoadMorePosts = async () => {
         const { posts, user } = this.state;
         const { data: morePosts } = await getPosts({
             filter: 'userId',
@@ -147,33 +152,80 @@ class ProfilePage extends Component {
         await decompressPosts(morePosts);
         const combinedPosts = posts.concat(morePosts);
 
-        this.setState({ posts: combinedPosts, loadMore: morePosts.length >= loadLimit});
+        this.setState({ posts: combinedPosts, loadMorePosts: morePosts.length >= loadLimit});
 
     }   
 
-    handleFollow = async () => {
-        const id = this.state.user._id;
-        const { currentUser } = this.context;
-        const isFollowing = currentUser.following[id] ? true : false;
+    handleLoadMoreFollowing = async () => {
+        const { following, user } = this.state;
+        const { data: moreFollowing } = await getFollowing(
+            user._id, 
+            following.length && following[following.length - 1].date
+            );
+
+        await decompressUsers(moreFollowing);
+
+        const combinedFollowing = following.concat(moreFollowing);
+
+        this.setState({
+            following: combinedFollowing,
+            loadMoreFollowing: moreFollowing.length >= loadLimit
+        });
+    }
+
+    handleLoadMoreFollowers = async () => {
+        const { followers, user } = this.state;
+        const { data: moreFollowers } = await getFollowers(
+            user._id, 
+            followers.length &&
+            followers[followers.length - 1].date
+            );
+
+        await decompressUsers(moreFollowers);
+
+        const combinedFollowers = followers.concat(moreFollowers);
+
+        this.setState({
+            followers: combinedFollowers,
+            loadMoreFollowers: moreFollowers.length >= loadLimit
+        });
+    }
+
+    handleFollow = async (id) => {
+        const { isFollowing, following: oldFollowing, followers: oldFollowers, user } = this.state;
+        const { currentUser } = this.context; 
         await updateMe({ following: { id, follow: !isFollowing } });
-        this.context.onFollow(id);
-        let followers = this.state.followers ? [...this.state.followers] : [];
-        if (isFollowing)
-            followers = followers.filter(user => user._id !== currentUser._id);
-        else
-            followers.unshift(_.pick(currentUser, ['_id', 'username', 'profilePic']));
 
-        let following;
-        if (currentUser._id === id){ // my own profile
-            following = this.state.following ? [...this.state.following] : [];
-            if (isFollowing)
-                following = following.filter(user => user._id !== currentUser._id);
-            else
-                following.unshift(_.pick(currentUser, ['_id', 'username', 'profilePic']));
-        } 
+        let followers, following, loadMoreFollowers;
 
-        if (following) return this.setState({ followers, following });
-        this.setState({ followers });
+        if (isFollowing){
+            followers = oldFollowers && oldFollowers.filter(user => user._id !== currentUser._id);
+            if (followers){
+                const { data: replacement } = await getFollowers(
+                    user._id,
+                    oldFollowers[oldFollowers.length - 1].date,
+                    1
+                ); 
+                followers = followers.concat(replacement);
+                loadMoreFollowers = replacement.length !== 0;
+            }
+        }
+        else {
+            const { data: newFollowee } = await getUser(currentUser._id);
+            await decompressUser(newFollowee);
+            
+            followers = oldFollowers && [newFollowee, ...oldFollowers]
+
+            if (currentUser._id === user._id)
+                following = oldFollowing && [newFollowee, ...oldFollowing];
+        }
+
+        this.setState({ 
+            isFollowing: !isFollowing,
+            following,
+            followers,
+            loadMoreFollowers
+        });
     }
 
     handleProfileClick = (id) => {
@@ -192,7 +244,12 @@ class ProfilePage extends Component {
             posts, 
             following, 
             followers,
-            loadMore } = this.state;
+            loadMorePosts,
+            loadMoreFollowing,
+            loadMoreFollowers,
+            isFollowing } = this.state;
+
+        const { currentUser } = this.context;
 
         if (!user) return null;
 
@@ -200,7 +257,11 @@ class ProfilePage extends Component {
             <div className="page profile-page">
                 <div className="profile-card">
                     <header className="card__header profile-card__header">
-                        <ProfileDetails user={user} onFollow={this.handleFollow}/>
+                        <ProfileDetails 
+                        user={user} 
+                        onFollow={this.handleFollow}
+                        isFollowing={isFollowing}/>
+    
                         <TabNav 
                         tabs={this.tabs}
                         currentTab={currentTab}
@@ -212,16 +273,17 @@ class ProfilePage extends Component {
                     (
                         !posts ? <p>Loading posts...</p> :
                         (
-                            !posts.length ? <p>No posts</p> :
                             <div 
                             className="posts-container animate__animated animate__fadeIn">
                                 <Posts 
                                 posts={posts}
                                 onProfileClick={this.handleProfileClick}
                                 onPostClick={this.handlePostClick}
-                                onDelete={this.handleDelete}
-                                onLoadMore={this.handleLoadMore}
-                                loadMore={loadMore}
+                                onDelete={this.handleDeletePost}
+                                onLoadMore={this.handleLoadMorePosts}
+                                loadMore={loadMorePosts}
+                                optionMenu={ (currentUser._id === user._id) && ['Delete'] }
+                                hideOptions={ currentUser._id !== user._id }
                                 />
                             </div>
                         )
@@ -233,11 +295,13 @@ class ProfilePage extends Component {
                     (
                         !following ? <p>Loading followings...</p> :
                         (
-                            !following.length ? <p>No followings</p>:
-                            <div className="followers animate__animated animate__fadeIn">
-                                {
-                                following.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                                }
+                            <div className="following-container animate__animated animate__fadeIn">
+                                <ProfileList
+                                users={following}
+                                onProfileClick={this.handleProfileClick}
+                                loadMore={loadMoreFollowing}
+                                onLoadMore={this.handleLoadMoreFollowing}
+                                />
                             </div>
                         )
                     )
@@ -247,11 +311,12 @@ class ProfilePage extends Component {
                     (
                         !followers ? <p>Loading followers..</p> :
                         (
-                            !followers.length ? <p>No followers</p> :
-                            <div className="followers animate__animated animate__fadeIn">
-                                {
-                                followers.map(user => <ProfileSimple key={user._id} user={user} onClick={this.handleProfileClick}/>)
-                                }
+                            <div className="followers-container animate__animated animate__fadeIn">
+                                <ProfileList
+                                users={followers}
+                                onProfileClick={this.handleProfileClick}
+                                loadMore={loadMoreFollowers}
+                                onLoadMore={this.handleLoadMoreFollowers}/>
                             </div>
                         )
                     )

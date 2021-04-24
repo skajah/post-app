@@ -1,21 +1,14 @@
 module.exports = function (req, res, next) {
   let { maxDate, limit } = req.query;
 
-  if (!limit)
-    return res
-      .status(400)
-      .send('"limit" is required to calculate number of items to return');
+  const checkedLimit = parseInt(limit, 10);
 
-  limit = parseInt(limit, 10);
-  if (isNaN(limit) || limit <= 0)
-    return res.status(400).send('"limit" must be a positive integer');
+  if (isNaN(checkedLimit) || checkedLimit <= 0) limit = 5;
+  else limit = checkedLimit;
 
-  if (!maxDate) maxDate = new Date();
-  else {
-    maxDate = new Date(maxDate);
-    if (maxDate.toString() === 'Invalid Date')
-      return res.status(400).send('"maxDate" must be a valid Date');
-  }
+  const checkedDate = new Date(maxDate);
+  if (checkedDate.toString() === 'Invalid Date') maxDate = new Date();
+  else maxDate = checkedDate;
 
   req.query.maxDate = maxDate;
   req.query.limit = limit;

@@ -1,7 +1,7 @@
 import http from './httpService';
 import { apiUrl } from '../config.json';
 
-const tokenKey = 'token';
+let tokenKey = 'loginToken';
 const authApiEndpoint = apiUrl + '/auth';
 
 // get rid of bi-directional dependency

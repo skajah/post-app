@@ -10,7 +10,9 @@ export default function ProfilePic({
         src={src || profileDefault} 
         alt="Profile Pic" 
         className="profile-pic clickable" 
-        onClick={ () => onClick() }
+        onClick={ () => {
+            onClick && onClick()
+        }}
         style={{
             width: '4rem',
             height: '4rem',

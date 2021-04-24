@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Post from './Post';
 import Button from '../common/Button';
+import { updateMe } from '../../services/userService';
+import { getFollowings } from '../../utils/following';
 
-export default function Posts({
+const Posts = ({
     posts,
     onFollow,
     onLike,
@@ -10,8 +12,41 @@ export default function Posts({
     onProfileClick,
     onDelete,
     onLoadMore,
-    loadMore
-}){
+    loadMore,
+    showComments,
+    optionMenu,
+    hideOptions
+}) => {
+    const [following, setFollowing] = useState({});
+
+    useEffect(() => {
+        async function doGetFollowings(){
+            let following = await getFollowings(posts);
+            if (showComments){
+                following = {
+                    ...following, 
+                    ...await getFollowings(posts[0].comments)
+                };
+            }
+            setFollowing(following);
+        }
+
+        doGetFollowings();
+
+    }, [posts, showComments]);
+
+    const handleFollow = async (userId) => {
+        const newFollowing = {...following};
+        const isFollowing = following[userId];
+        await updateMe({ following: { id: userId, follow: !isFollowing } });
+        if (isFollowing)
+            delete newFollowing[userId];
+        else
+            newFollowing[userId] = 1;
+
+        setFollowing(newFollowing);
+    }
+
     return (
         <div className="posts">
             {
@@ -23,8 +58,17 @@ export default function Posts({
                         onPostClick={onPostClick}
                         onProfileClick={onProfileClick}
                         onDelete={onDelete}
-                        onFollow={onFollow}
-                        onLike={onLike}/>
+                        onFollow={ 
+                            (userId) => {
+                                handleFollow(userId);
+                                onFollow && onFollow(userId);
+                            }
+                        }
+                        onLike={onLike}
+                        following={following}
+                        showComments={showComments}
+                        optionMenu={optionMenu}
+                        hideOptions={hideOptions}/>
                     )
                 })
             }
@@ -42,3 +86,5 @@ export default function Posts({
         </div>
     )
 }
+
+export default Posts;

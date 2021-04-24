@@ -79,10 +79,11 @@ class PostsPage extends Component {
 
     }   
 
-    handleLike = async (postId, liked) => { 
+    handleLike = async (postId) => { 
         if (this.state.filter !== 'likedPosts') return;
         // At this point, the filter is likedPosts and one of them must have been unliked
         const { filter, filterData, posts: oldPosts } = this.state;
+
         const { data: replacement } = await getPosts({ 
             filter, 
             filterData, 
@@ -103,22 +104,24 @@ class PostsPage extends Component {
         });
     }
 
-    handleFollow = async (userId, following) => {
+    handleFollow = async (userId) => {
         if (this.state.filter !== 'following') return;
         // At this point, the filter is following and one of them must have been unfollowed
-        const { filter, filterData, posts: oldPosts } = this.state;
+        let { filter, filterData, posts: oldPosts } = this.state;
+        const oldLength = oldPosts.length;
+
+        const filteredPosts = oldPosts.filter(post => post.user._id !== userId);
+
         const { data: replacement } = await getPosts({ 
             filter, 
             filterData, 
             maxDate: oldPosts[oldPosts.length - 1 ].date,
-            limit: 1
+            limit: oldLength - filteredPosts.length
         });
 
         await decompressPosts(replacement);
 
-        const posts = oldPosts
-        .filter(post => post.user._id !== userId)
-        .concat(replacement);
+        const posts = filteredPosts.concat(replacement);
 
         this.setState({
             posts,
@@ -164,7 +167,6 @@ class PostsPage extends Component {
 
         const { currentUser } = this.context;
         const newPost = {
-            userId: currentUser._id,
             text
         };
 
@@ -183,7 +185,7 @@ class PostsPage extends Component {
         try {
             const { data: post } = await createPost(newPost);
             makeDate(post);
-
+ 
             if (media)
                 post.media.data = mediaData;
             post.user.profilePic = currentUser.profilePic;

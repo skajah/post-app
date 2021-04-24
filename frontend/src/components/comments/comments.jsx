@@ -2,14 +2,15 @@ import React from 'react';
 import Comment from './Comment';
 import Button from '../common/Button';
 
-export default function Comments({
+const Comments = ({
     comments,
     onDelete,
     onProfileClick,
     onFollow,
     loadMore,
-    onLoadMore
-}) {
+    onLoadMore,
+    following
+}) => {
     return (
         <div className="comments">
             {
@@ -21,6 +22,7 @@ export default function Comments({
                         onDelete={onDelete}
                         onProfileClick={onProfileClick}
                         onFollow={onFollow}
+                        following={following}
                         />
                     )
                 })
@@ -39,3 +41,6 @@ export default function Comments({
         </div>
     )
 }
+
+
+export default Comments;

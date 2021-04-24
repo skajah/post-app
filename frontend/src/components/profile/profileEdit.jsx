@@ -46,7 +46,7 @@ class ProfileEdit extends Component {
                 icon={<ProfilePic src={profilePic} onClick={() => {}}/>}
                 className="edit-row profile-edit__photo clickable"
                 extensions={['jpg', 'jpeg', 'gif', 'png']}
-                maxFileSize={10}
+                maxFileSize={2}
                 onFileChosen={this.handleProfilePicUpload}
                 />
                 

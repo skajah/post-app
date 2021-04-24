@@ -9,6 +9,7 @@ const { Comment, validate } = require('../models/comment');
 const { Post } = require('../models/post');
 const { User, likeComment } = require('../models/user');
 const mongoose = require('mongoose');
+const { Like } = require('../models/like');
 const router = express.Router();
 
 router.get('/', pagination, async (req, res) => {
@@ -27,6 +28,8 @@ router.get('/', pagination, async (req, res) => {
     postId,
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
     .limit(limit)
     .select('-__v')
     .sort('-date');
@@ -36,24 +39,18 @@ router.get('/', pagination, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const commentObject = _.pick(req.body, [
-    'userId',
-    'postId',
-    'likes',
-    'date',
-    'text',
-  ]);
+  const commentObject = _.pick(req.body, ['postId', 'likes', 'date', 'text']);
   const postExists = await Post.exists({ _id: commentObject.postId });
   if (!postExists) return res.status(400).send('Invalid postId for comment');
 
-  const user = await User.findById(commentObject.userId).select(
+  const user = await User.findById(req.user._id).select(
     '_id username profilePic'
   );
   if (!user) return res.status(400).send('Invalid userId for comment');
 
-  commentObject.user = user;
+  commentObject.user = user._id;
   const comment = await new Comment(commentObject).save();
-
+  comment.user = user;
   await Post.findByIdAndUpdate(comment.postId, {
     $inc: { numberOfComments: 1 },
   });
@@ -62,7 +59,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 router.patch('/:id', [auth, validateId, likeDelta], async (req, res) => {
-  const comment = await Comment.findById(req.params.id);
+  const comment = await Comment.findById(req.params.id).select('likes');
   if (!comment) return res.status(404).send('Comment not found');
 
   const likeDelta = req.likeDelta;
@@ -73,7 +70,7 @@ router.patch('/:id', [auth, validateId, likeDelta], async (req, res) => {
   await comment.save();
   likeComment(req.user._id, req.params.id, likeDelta === 1);
 
-  res.send(comment);
+  res.send({ likes: comment.likes });
 });
 
 router.delete(
@@ -84,9 +81,16 @@ router.delete(
       '-__v'
     );
     if (!comment) return res.status(404).send('Comment not found');
+
     await Post.findByIdAndUpdate(comment.postId, {
       $inc: { numberOfComments: -1 },
     });
+
+    await Like.deleteMany({
+      content: 'comment',
+      contentId: comment._id,
+    });
+
     res.send(comment);
   }
 );

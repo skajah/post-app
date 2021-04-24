@@ -1,18 +1,13 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const { User } = require('./user');
+const { Like } = require('./like');
+const { Follow } = require('./follow');
 
 const postSchema = new mongoose.Schema({
   user: {
-    type: new mongoose.Schema({
-      username: {
-        type: String,
-        minlength: 5,
-        maxlength: 255,
-        required: true,
-      },
-      profilePic: String,
-    }),
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
   date: { type: Date, default: Date.now },
@@ -39,8 +34,8 @@ const postSchema = new mongoose.Schema({
     },
   },
   media: {
-    mediaType: String,
-    data: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Media',
   },
 });
 
@@ -48,7 +43,6 @@ const Post = mongoose.model('Post', postSchema);
 
 function validatePost(post) {
   const schema = Joi.object({
-    userId: Joi.objectId().required(),
     date: Joi.date().default(Date.now),
     text: Joi.string().max(3000).allow(''),
     likes: Joi.number().integer().min(0).default(0),
@@ -66,6 +60,9 @@ async function getPosts(maxDate, limit) {
   return await Post.find({
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');
@@ -73,25 +70,41 @@ async function getPosts(maxDate, limit) {
 
 async function filterByUserId(userId, maxDate, limit) {
   return await Post.find({
-    'user._id': userId,
+    user: userId,
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');
 }
 
 async function filterByUsername(username, maxDate, limit) {
-  return await Post.find({
-    'user.username': {
-      $regex: username,
-      $options: 'i',
-    },
+  const users = Array.from(
+    await User.find({
+      username: {
+        $regex: username,
+        $options: 'i',
+      },
+    })
+      .lean()
+      .select('_id')
+  ).map((user) => user._id);
+
+  const posts = await Post.find({
+    user: { $in: users },
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');
+
+  return posts;
 }
 
 async function filterByDateRange(start, end, maxDate, limit) {
@@ -99,6 +112,9 @@ async function filterByDateRange(start, end, maxDate, limit) {
     date: { $gte: start, $lt: end },
   })
     .and({ date: { $lt: maxDate } })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');
@@ -117,24 +133,44 @@ async function filterByDaysAgo(days, maxDate, limit) {
 }
 
 async function filterByLikedPosts(userId, maxDate, limit) {
-  const user = await User.findById(userId).select('likedPosts');
-  const likedPosts = Array.from(user.likedPosts.keys());
+  const likedPosts = Array.from(
+    await Like.find({
+      content: 'post',
+      userId,
+    })
+      .lean()
+      .select('contentId')
+  ).map((like) => like.contentId);
+
   return await Post.find({
     _id: { $in: likedPosts },
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');
 }
 
 async function filterByFollowing(userId, maxDate, limit) {
-  const user = await User.findById(userId).select('following');
-  const following = Array.from(user.following.keys());
+  const following = Array.from(
+    await Follow.find({
+      user: userId,
+      followType: 'following',
+    })
+      .lean()
+      .select('followUser')
+  ).map((follow) => follow.followUser);
+
   return await Post.find({
-    'user._id': { $in: following },
+    user: { $in: following },
     date: { $lt: maxDate },
   })
+    .lean()
+    .populate('user', '_id username profilePic')
+    .populate('media', 'mediaType data')
     .limit(limit)
     .select('-__v')
     .sort('-date');

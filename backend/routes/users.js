@@ -2,22 +2,55 @@ const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const express = require('express');
 const { User, validate, update } = require('../models/user');
+const { Follow } = require('../models/follow');
 const auth = require('../middleware/auth');
 const validateId = require('../middleware/validateId');
+const pagination = require('../middleware/pagination');
+const { Like } = require('../models/like');
 
 const router = express.Router();
 
 router.get('/me', auth, async (req, res) => {
-  let { properties } = req.query;
-  if (!properties)
+  const me = await User.findById(req.user._id).select(
+    '_id email username description profilePic'
+  );
+  res.send(me);
+});
+
+router.get('/me/checkLiked/:id', [auth, validateId], async (req, res) => {
+  const { id } = req.params;
+  const { type } = req.query;
+  let result;
+
+  if (type === 'post') {
+    result = await Like.exists({
+      content: 'post',
+      contentId: id,
+      userId: req.user._id,
+    });
+  } else if (type === 'comment') {
+    result = await Like.exists({
+      content: 'comment',
+      contentId: id,
+      userId: req.user._id,
+    });
+  } else {
     return res
       .status(400)
-      .send(
-        'Must specify "properties" as a comma separated list in query string'
-      );
-  properties = properties.split(',');
-  const me = (await User.findById(req.user._id)).getProperties(properties);
-  res.send(me);
+      .send('Specify "type=comment" or "type=post" in query');
+  }
+
+  res.send(result);
+});
+
+router.get('/me/checkFollowing/:id', [auth, validateId], async (req, res) => {
+  const { id } = req.params;
+  const following = await Follow.exists({
+    user: req.user._id,
+    followType: 'following',
+    followUser: id,
+  });
+  res.send(following);
 });
 
 router.get('/:id', validateId, async (req, res) => {
@@ -28,23 +61,61 @@ router.get('/:id', validateId, async (req, res) => {
   res.send(user);
 });
 
-router.get('/:id/following', validateId, async (req, res) => {
-  const user = await User.findById(req.params.id).select('following');
+router.get('/:id/following', [validateId, pagination], async (req, res) => {
+  const { id } = req.params;
+  const user = await User.exists({ _id: id });
   if (!user) return res.status(404).send('User not found');
-  const userFollowing = [...user.following.keys()];
-  const following = await User.find({ _id: { $in: userFollowing } }).select(
-    '_id username profilePic'
-  );
+
+  const { maxDate, limit } = req.query;
+
+  let following = await Follow.find({
+    user: id,
+    followType: 'following',
+    date: { $lt: maxDate },
+  })
+    .lean()
+    .limit(limit)
+    .populate('followUser', '_id username profilePic')
+    .select('-_id followUser date')
+    .sort('-date');
+
+  following = following.map((f) => {
+    return {
+      _id: f.followUser._id.toString(),
+      username: f.followUser.username,
+      date: f.date,
+      profilePic: f.followUser.profilePic,
+    };
+  });
   res.send(following);
 });
 
-router.get('/:id/followers', validateId, async (req, res) => {
-  const user = await User.findById(req.params.id).select('followers');
+router.get('/:id/followers', [validateId, pagination], async (req, res) => {
+  const { id } = req.params;
+  const user = await User.exists({ _id: id });
   if (!user) return res.status(404).send('User not found');
-  const userFollowers = [...user.followers.keys()];
-  const followers = await User.find({ _id: { $in: userFollowers } }).select(
-    '_id username profilePic'
-  );
+
+  const { maxDate, limit } = req.query;
+  let followers = await Follow.find({
+    user: id,
+    followType: 'followedBy',
+    date: { $lt: maxDate },
+  })
+    .lean()
+    .limit(limit)
+    .populate('followUser', '_id username profilePic')
+    .select('-_id followUser date')
+    .sort('-date');
+
+  followers = followers.map((f) => {
+    return {
+      _id: f.followUser._id.toString(),
+      username: f.followUser.username,
+      date: f.date,
+      profilePic: f.followUser.profilePic,
+    };
+  });
+
   res.send(followers);
 });
 
@@ -69,7 +140,7 @@ router.patch('/me', auth, async (req, res) => {
     result = await update.profilePic(id, profilePic);
   else if (following != undefined)
     result = await update.following(id, following);
-
+  else return res.status(400).send('No data given to update');
   if (result.error) return res.status(400).send(result.error);
 
   if (result) {
@@ -80,7 +151,6 @@ router.patch('/me', auth, async (req, res) => {
       .header('access-control-expose-headers', 'x-auth-token')
       .send(result.value);
   }
-  res.status(400).send('No data given to update');
 });
 
 router.post('/', async (req, res) => {

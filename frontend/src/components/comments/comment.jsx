@@ -1,6 +1,7 @@
 import React from 'react';
 import { toast } from 'react-toastify';
 import { likeComment, unlikeComment } from '../../services/commentService';
+import { checkLiked } from '../../services/userService';
 import UserContext from '../../context/UserContext';
 import ContentDetails from '../common/ContentDetails';
 import Card from '../common/Card';
@@ -21,21 +22,31 @@ class Comment extends Card {
         this.populateState();
     }
 
-    populateState() {
+    async populateState() {
         const { _id, user, date, text, likes } = this.props.comment;
-        this.setState({ _id, user, date, text, likes });
+        
+        const { data: initialLike } = await checkLiked(_id, 'comment');
+
+        this.setState({ 
+            _id, 
+            user, 
+            date, 
+            text, 
+            likes, 
+            initialLike,
+        });
     }
 
     handleLike = async (liked) => {
         try {
             const id = this.state._id;
 
-            const { data: comment } = liked ? 
+            const { data: likeObj } = liked ? 
             await likeComment(id) :
             await unlikeComment(id);
-
-            const { likes } = comment;
-            this.context.onLike(comment._id, 'comment', liked);
+            
+            const { likes } = likeObj;
+            // this.context.onLike(comment._id, 'comment', liked);
             this.setState({ likes });
         } catch (ex) {
             if (ex.response){
@@ -61,14 +72,21 @@ class Comment extends Card {
     }
 
     render() { 
-        const { _id, text, user, likes, date } = this.state;
-        const { onProfileClick } = this.props;
+        const { text, user, likes, date, initialLike } = this.state;
+        const { 
+            onProfileClick, 
+            following,
+            optionMenu 
+        } = this.props;
+        const followingUser = following[user._id];
         const { currentUser } = this.context;
-        const initialLike = currentUser.likedComments[_id];
-        const following = currentUser.following[user._id];
-        const options = ['Profile', following ? 'Unfollow' : 'Follow'];
-        if ( currentUser._id === user._id)
-            options.push('Delete');
+        const options = optionMenu || ['Profile'];
+        if (!optionMenu)  {
+            if (currentUser._id === user._id)
+                options.push('Delete');
+            else 
+                options.push(followingUser ? 'Unfollow' : 'Follow');
+        }
 
         return (
         <div className="card comment">
