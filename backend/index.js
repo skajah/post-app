@@ -7,6 +7,7 @@ require('./startup/config')();
 require('./startup/validation')();
 require('./startup/db')();
 require('./startup/routes')(app);
+require('./startup/prod')(app);
 
 app.listen(4000, () => {
   winston.info('Listening on port 4000...');
