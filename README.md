@@ -2,7 +2,7 @@
 
 
 
-A simple web app that allows users to post content (text and/or media), search for posts by different criteria, and follow other users.
+A simple web app that allows users to post content (text and/or media), comment on posts, search for posts by different criteria, and follow other users.
 
 
 To run a local version on your machine, you must have Node.js and MongoDB installed.
@@ -14,3 +14,6 @@ To run a local version on your machine, you must have Node.js and MongoDB instal
 - Navigate into frontend/
 - run "npm i" to install dependencies
 - run "npm start" to host the frontend in the browser
+
+
+This is my first Full Stack Project after learning the MERN Stack for a few months. Gotta start somewhere :P
