@@ -1,4 +1,4 @@
-[SBKonnect](https://sbk-frontend.herokuapp.com/)
+# [SBKonnect](https://sbk-frontend.herokuapp.com/)
 
 A simple web app that allows users to post content (text and/or media), comment on posts, search for posts by different criteria, and follow other users.
 
